@@ -8,6 +8,63 @@
 > [!IMPORTANT]
 > **Not medical advice.** This tool is for understanding your data and helping you ask better questions of your diabetes care team. It is not a medical device and must never be used to make changes to your therapy. See the [full disclaimer](#disclaimer).
 
+> [!NOTE]
+> ## This is a fork
+>
+> Upstream, and all credit for this server: **[rilhia/omni-endo-ai-mcp](https://github.com/rilhia/omni-endo-ai-mcp)**.
+> Everything below this banner is the original author's documentation and still applies —
+> the MCP tools, the transports, and the sync engine are unchanged. This fork adds two
+> things for one self-hosted deployment. If you want the real project, go upstream.
+>
+> ### 1. `POST /my-data` — a raw Glooko passthrough for the companion web UI
+>
+> **What.** With `OMNI_MYDATA=1`, the HTTP transport serves one extra route alongside
+> `/mcp`. Given `{startDate, endDate}` it returns `{startDate, endDate, data1, data2, data3}`
+> — the three raw Glooko payloads, straight from `fetchGlookoRange()`, bypassing the SQLite
+> archive and the range caps.
+>
+> **How.** The companion UI [omni-endo-ai](https://github.com/rilhia/omni-endo-ai) posts
+> exactly that shape to its own `/my-data`, after asking for your Glooko password in the
+> browser. This server already holds a Glooko session and `fetchGlookoRange()` already
+> returns that identical object, so a reverse proxy can route the UI's `/my-data` here and
+> the UI never logs in at all. (Our UI fork,
+> [jbeck1563/omni-endo-ai](https://github.com/jbeck1563/omni-endo-ai), drops the credential
+> fields to match.)
+>
+> **Why.** Two apps were each logging into Glooko separately. Now there is one session and
+> no credential in the browser.
+>
+> **Auth.** `OMNI_MYDATA_BASIC` holds `user:password` and the route requires HTTP Basic —
+> not the `OMNI_HTTP_TOKEN` Bearer, because a browser cannot be made to send a Bearer on a
+> page's own `fetch()`, but it does replay Basic automatically on same-origin requests. The
+> full header is compared in constant time, and a 401 carries a realm so a browser prompts
+> by itself. **With `OMNI_MYDATA=1` and no `OMNI_MYDATA_BASIC` the route refuses to serve**
+> rather than defaulting to open — it would otherwise hand anyone who can reach the port a
+> live pull of your glucose history using the server's own Glooko credentials. Put a proxy
+> with the same credential in front as well; the app-level check is what protects the port
+> from anything already inside your Docker network. `/mcp` is unaffected and still Bearer.
+>
+> ### 2. Batched older-gap backfill
+>
+> **What.** A query starting before the archive floor used to issue the whole gap as one
+> `pullAndIngest`. Against Glooko's live API a wide orientation probe (`start=2000-01-01`,
+> which `get_diabetes_summary`'s own description invites) measured 5+ minutes or hung —
+> past any client-side tool-call timeout. It now walks backward in year-sized batches,
+> reusing the cold-start shape, and stops after `MAX_EMPTY_BATCHES` consecutive empty years.
+>
+> **Why the extra table.** A probe that finds nothing never moves the earliest-CGM epoch, so
+> the same empty span would be re-fetched from Glooko on *every* future wide query. A new
+> `meta` key-value table remembers the oldest epoch already probed. It is purely additive, so
+> `SCHEMA_VERSION` is deliberately **not** bumped — that would trigger the self-heal wipe and
+> force a destructive re-sync of a populated archive.
+>
+> ### Checks
+>
+> `node test-mydata.mjs` covers the payload shape, anonymous / wrong-credential /
+> Bearer-instead-of-Basic requests, and re-execs itself without `OMNI_MYDATA_BASIC` to prove
+> the fail-closed branch. It uses the existing `__OMNI_FETCH_STUB__` seam, so it never
+> touches the network.
+
 > [!TIP]
 > **Allergic to instructions? Let an AI do the talking.** 🤖
 > This README is thorough, but nobody actually *enjoys* reading setup docs. So here's a little experiment: I've written a prompt that turns any decent AI assistant (Claude, ChatGPT, Gemini) into a personal install guide. Paste it in and it'll hold your hand through the whole thing, going as fast or as slow as *you* need, from "what's a terminal?" to "just give me the commands".
