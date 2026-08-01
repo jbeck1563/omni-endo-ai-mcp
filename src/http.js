@@ -27,7 +27,7 @@
  */
 
 import http from 'http';
-import { randomUUID } from 'crypto';
+import { randomUUID, timingSafeEqual } from 'crypto';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { createServer } from './server.js';
 import { glookoConfigured } from './range.js';
@@ -46,10 +46,28 @@ const TOKEN = process.env.OMNI_HTTP_TOKEN || null;
 // serving it here lets the UI drop its own login entirely: one Glooko session
 // for the whole house instead of two, and no credentials in the browser.
 //
-// Off by default. It is deliberately NOT behind OMNI_HTTP_TOKEN (a browser
-// can't send a Bearer), so enabling it opens an unauthenticated route that
-// triggers live Glooko pulls with the server's own credentials. LAN only.
+// Off by default. It cannot use OMNI_HTTP_TOKEN, because a browser cannot be made
+// to send a Bearer header on a page's own fetch(). It uses HTTP Basic instead,
+// which a browser DOES replay automatically on same-origin requests once the user
+// has authenticated: set OMNI_MYDATA_BASIC to `user:password`.
+//
+// FAIL CLOSED: with OMNI_MYDATA=1 and no OMNI_MYDATA_BASIC the route refuses to
+// serve. An open /my-data hands anyone who can reach the port a live pull of your
+// glucose history using the server's own Glooko credentials, so there is no
+// "just for now" mode where it answers without a credential.
 const MYDATA = process.env.OMNI_MYDATA === '1';
+const MYDATA_BASIC = process.env.OMNI_MYDATA_BASIC || null;
+
+// Constant-time compare of the full Authorization header against the expected
+// Basic credential. Length is compared first because timingSafeEqual throws on a
+// length mismatch — that leaks only the length, not the secret.
+function basicOk(req) {
+  const got = Buffer.from(req.headers['authorization'] || '');
+  const want = Buffer.from(
+    `Basic ${Buffer.from(MYDATA_BASIC, 'utf8').toString('base64')}`
+  );
+  return got.length === want.length && timingSafeEqual(got, want);
+}
 
 // sessionId -> transport. One transport per live client session. The MCP server
 // is connected once to each transport when the session is created.
@@ -130,6 +148,24 @@ async function createSessionTransport() {
 // GLOOKO_EMAIL / GLOOKO_PASSWORD from the environment.
 async function handleMyData(req, res) {
   if (req.method !== 'POST') return notFound(res);
+  if (!MYDATA_BASIC) {
+    console.error(
+      '[omni-endo-ai] /my-data refused: OMNI_MYDATA=1 but OMNI_MYDATA_BASIC is unset.'
+    );
+    res.writeHead(503, { 'Content-Type': 'application/json' });
+    return res.end(
+      JSON.stringify({ error: 'Server misconfigured: /my-data has no credential set.' })
+    );
+  }
+  if (!basicOk(req)) {
+    // The realm makes a browser prompt for credentials by itself, so this holds
+    // even if the reverse proxy in front is misconfigured or absent.
+    res.writeHead(401, {
+      'Content-Type': 'application/json',
+      'WWW-Authenticate': 'Basic realm="omni-endo", charset="UTF-8"',
+    });
+    return res.end(JSON.stringify({ error: 'unauthorized' }));
+  }
   if (!glookoConfigured()) {
     res.writeHead(503, { 'Content-Type': 'application/json' });
     return res.end(
