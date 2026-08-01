@@ -31,6 +31,7 @@ import { randomUUID } from 'crypto';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { createServer } from './server.js';
 import { glookoConfigured } from './range.js';
+import { fetchGlookoRange } from './glooko.js';
 import { ensureFreshOnFirstCall } from './sync.js';
 import { initDb } from './store.js';
 
@@ -38,6 +39,17 @@ const PORT = parseInt(process.env.OMNI_HTTP_PORT || '3000', 10);
 const HOST = process.env.OMNI_HTTP_HOST || '127.0.0.1';
 const MCP_PATH = process.env.OMNI_HTTP_PATH || '/mcp';
 const TOKEN = process.env.OMNI_HTTP_TOKEN || null;
+
+// Optional raw-passthrough route for the omni-endo-ai web UI. That app POSTs
+// /my-data with browser-typed Glooko credentials and expects back the three raw
+// Glooko payloads. fetchGlookoRange() already returns exactly that shape, so
+// serving it here lets the UI drop its own login entirely: one Glooko session
+// for the whole house instead of two, and no credentials in the browser.
+//
+// Off by default. It is deliberately NOT behind OMNI_HTTP_TOKEN (a browser
+// can't send a Bearer), so enabling it opens an unauthenticated route that
+// triggers live Glooko pulls with the server's own credentials. LAN only.
+const MYDATA = process.env.OMNI_MYDATA === '1';
 
 // sessionId -> transport. One transport per live client session. The MCP server
 // is connected once to each transport when the session is created.
@@ -113,8 +125,44 @@ async function createSessionTransport() {
   return transport;
 }
 
+// POST /my-data — { startDate, endDate } -> { startDate, endDate, data1, data2, data3 }.
+// Credentials in the body (which the UI still sends) are ignored: this always uses
+// GLOOKO_EMAIL / GLOOKO_PASSWORD from the environment.
+async function handleMyData(req, res) {
+  if (req.method !== 'POST') return notFound(res);
+  if (!glookoConfigured()) {
+    res.writeHead(503, { 'Content-Type': 'application/json' });
+    return res.end(
+      JSON.stringify({
+        error: 'Offline mode: no Glooko credentials configured on the server.',
+      })
+    );
+  }
+  let body;
+  try {
+    body = await readBody(req);
+  } catch {
+    return badRequest(res, 'invalid JSON body');
+  }
+  const { startDate, endDate } = body || {};
+  if (!startDate || !endDate) {
+    return badRequest(res, 'startDate and endDate are required');
+  }
+
+  try {
+    const result = await fetchGlookoRange(startDate, endDate);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(result));
+  } catch (err) {
+    console.error('[omni-endo-ai] /my-data failed:', err.message);
+    res.writeHead(502, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: err.message }));
+  }
+}
+
 const httpServer = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || HOST}`);
+  if (MYDATA && url.pathname === '/my-data') return handleMyData(req, res);
   if (url.pathname !== MCP_PATH) return notFound(res);
   if (!tokenOk(req)) return unauthorized(res);
 
