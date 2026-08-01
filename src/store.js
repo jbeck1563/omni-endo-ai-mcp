@@ -35,6 +35,11 @@ let db = null;
 //   5 = widened bolus table: delivered/programmed/recommendation split, override,
 //       interrupted, bg input/source, is_manual
 const SCHEMA_VERSION = 5;
+// NOTE: the `meta` table added below is purely additive (a new, independent
+// table) and does not require a SCHEMA_VERSION bump — bumping it would trigger
+// the self-heal wipe above and force a full destructive re-sync of an already
+// -populated archive for no reason. `CREATE TABLE IF NOT EXISTS` alone is
+// sufficient to add it to existing databases.
 
 export function initDb(dbPath = process.env.OMNI_DB_PATH || '/data/omni-endo.db') {
   if (db) return db;
@@ -100,6 +105,10 @@ export function initDb(dbPath = process.env.OMNI_DB_PATH || '/data/omni-endo.db'
       day_utc   TEXT PRIMARY KEY,   -- 'YYYY-MM-DD'
       complete  INTEGER NOT NULL,   -- 1 = immutable past day, 0 = partial
       ingested_at INTEGER NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS meta (
+      key   TEXT PRIMARY KEY,
+      value TEXT NOT NULL
     );
   `);
 
@@ -423,6 +432,27 @@ export function getEarliestCgmEpoch() {
 export function getCgmCount() {
   const row = d().prepare('SELECT COUNT(*) c FROM cgm').get();
   return row ? row.c : 0;
+}
+
+/**
+ * Small persisted key-value store, currently used to remember the oldest
+ * epoch a live backfill probe has confirmed to be empty (see
+ * backfillProbedFloorEpoch in range.js), so a wide orientation query
+ * (e.g. start=2000-01-01) does not re-hit Glooko for the same empty
+ * historical span on every call.
+ */
+export function getMeta(key) {
+  const row = d().prepare('SELECT value FROM meta WHERE key = ?').get(key);
+  return row ? row.value : null;
+}
+
+export function setMeta(key, value) {
+  d()
+    .prepare(
+      `INSERT INTO meta (key, value) VALUES (?, ?)
+       ON CONFLICT(key) DO UPDATE SET value=excluded.value`
+    )
+    .run(key, String(value));
 }
 
 /**

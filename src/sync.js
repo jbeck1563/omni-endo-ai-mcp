@@ -60,8 +60,9 @@ const TOPUP_TRAILING_SECONDS = 2 * 86400;
 
 // Stop the cold-start backfill after this many CONSECUTIVE empty year-batches,
 // so a user who sets OMNI_OLDEST_DATE far too early does not trigger an endless
-// walk through years Glooko has no data for.
-const MAX_EMPTY_BATCHES = 2;
+// walk through years Glooko has no data for. Also used by the older-gap
+// backfill in range.js (a wide orientation probe is the same shape of problem).
+export const MAX_EMPTY_BATCHES = 2;
 
 // --- the lock -------------------------------------------------------------
 // A single in-flight sync promise. Anything that would pull awaits this first.
@@ -147,7 +148,7 @@ const iso = (epoch) => new Date(epoch * 1000).toISOString();
  * exact CGM row count before and after, so detection is unambiguous (the
  * earliest-epoch heuristic could misfire on abutting boundaries).
  */
-async function pullBatch(startEpoch, endEpoch) {
+export async function pullBatch(startEpoch, endEpoch) {
   const before = getCgmCount();
   await pullAndIngest(iso(startEpoch), iso(endEpoch));
   const after = getCgmCount();

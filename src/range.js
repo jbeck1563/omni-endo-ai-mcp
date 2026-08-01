@@ -46,11 +46,13 @@ import {
   getDailyInsulin,
   getBasalStates,
   getDeviceEvents,
+  getMeta,
+  setMeta,
 } from './store.js';
 // sync.js imports pullAndIngest + date helpers from THIS module. The cycle is
 // safe because both sides reference the imported bindings only inside functions
 // invoked at call time, never during module evaluation.
-import { runColdStart, withSyncLock } from './sync.js';
+import { runColdStart, withSyncLock, yearBatches, pullBatch, MAX_EMPTY_BATCHES } from './sync.js';
 
 export const CAPS = {
   summaryMaxDays: 400,
@@ -242,16 +244,46 @@ async function ensureCoverage(startISO, endISO) {
   }
 
   // OLDER GAP / BACKFILL: the requested window reaches before the oldest stored
-  // reading (a question older than the initial load floor). Pull that older
-  // span once; thereafter it is permanent. Locked so it cannot race the above.
+  // reading (a question older than the initial load floor, or a wide orientation
+  // probe like start=2000-01-01 per the get_diabetes_summary tool description).
+  // Pull that older span once; thereafter it is permanent. Locked so it cannot
+  // race the above.
+  //
+  // Walked backward in YEAR-SIZED batches (same shape as sync.js's cold start),
+  // NOT as one single request: a naive single pullAndIngest spanning decades was
+  // measured taking 5+ minutes (or hanging) against Glooko's live API for a
+  // wide orientation probe, which is well past any client-side tool-call
+  // timeout. Batching also lets it stop after MAX_EMPTY_BATCHES consecutive
+  // empty years instead of walking the full span.
+  //
+  // A probe that finds NOTHING (e.g. 2000-01-01 predates the pump entirely)
+  // never moves `earliest`, so without the guard below the exact same empty
+  // range would be re-fetched from Glooko on every future wide query, forever.
+  // backfillProbedFloorEpoch remembers the oldest point we have already probed
+  // (whether or not it found data), so a request at or after it skips straight
+  // past this whole block.
   const earliest = getEarliestCgmEpoch();
   if (earliest !== null && reqStartEpoch < earliest) {
-    await withSyncLock(() =>
-      pullAndIngest(
-        new Date(reqStartEpoch * 1000).toISOString(),
-        new Date(earliest * 1000).toISOString()
-      )
-    );
+    const probedFloorRaw = getMeta('backfillProbedFloorEpoch');
+    const probedFloor = probedFloorRaw !== null ? Number(probedFloorRaw) : null;
+    const alreadyProbed = probedFloor !== null && reqStartEpoch >= probedFloor;
+    if (!alreadyProbed) {
+      const lowerBound = probedFloor !== null ? Math.max(reqStartEpoch, probedFloor) : reqStartEpoch;
+      const batches = yearBatches(lowerBound, earliest).reverse(); // newest-first
+      let consecutiveEmpty = 0;
+      let reachedFloor = lowerBound;
+      for (const [s, e] of batches) {
+        reachedFloor = s;
+        const produced = await withSyncLock(() => pullBatch(s, e));
+        if (produced) {
+          consecutiveEmpty = 0;
+        } else {
+          consecutiveEmpty += 1;
+          if (consecutiveEmpty >= MAX_EMPTY_BATCHES) break;
+        }
+      }
+      setMeta('backfillProbedFloorEpoch', reachedFloor);
+    }
   }
 }
 
