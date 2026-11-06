@@ -1,4 +1,4 @@
-# Omni-Endo AI MCP server.
+# Ridgeline T1D MCP server.
 # Runs as either a stdio MCP server (default, launched by the client as a
 # subprocess) or a Streamable HTTP / SSE server (OMNI_TRANSPORT=http).
 

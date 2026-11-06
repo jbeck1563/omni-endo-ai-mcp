@@ -152,15 +152,15 @@ export async function pullAndIngest(startISO, endISO) {
       ? Object.keys(raw.data1.series.dailyInsulinTotals).length
       : 'ABSENT';
   console.error(
-    `[omni-endo] pull ${startISO.split('T')[0]}..${endISO.split('T')[0]}: ` +
+    `[ridgeline] pull ${startISO.split('T')[0]}..${endISO.split('T')[0]}: ` +
       `dailyInsulinTotals keys=${hasBlock}, parsed=${dailyInsulin.length} days`
   );
   if (dailyInsulin.length) {
     const todayUtc = new Date().toISOString().split('T')[0];
     ingestDailyInsulin(dailyInsulin, todayUtc);
-    console.error(`[omni-endo] ingested ${dailyInsulin.length} daily-insulin rows`);
+    console.error(`[ridgeline] ingested ${dailyInsulin.length} daily-insulin rows`);
   } else {
-    console.error('[omni-endo] NO daily-insulin rows to ingest (block absent or empty)');
+    console.error('[ridgeline] NO daily-insulin rows to ingest (block absent or empty)');
   }
 
   // Basal delivery states (normal/suspend/max/limited), derived from the bar
@@ -238,7 +238,7 @@ async function ensureCoverage(startISO, endISO) {
   // COLD START: archive empty. Year-batched, recent-first historical load from
   // the OMNI_OLDEST_DATE floor. Owned by the sync module (locked).
   if (coverageEpoch === null) {
-    await runColdStart((m) => console.error(`[omni-endo] ${m}`));
+    await runColdStart((m) => console.error(`[ridgeline] ${m}`));
   } else if (reqEndEpoch > coverageEpoch + COVERAGE_TOLERANCE_SECONDS) {
     // NEWER GAP: the question reaches MEANINGFULLY past our freshest stored data
     // (e.g. asking about today when the archive stops two days ago). CGM always

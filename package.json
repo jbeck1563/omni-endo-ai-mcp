@@ -1,10 +1,10 @@
 {
-  "name": "omni-endo-ai-mcp",
+  "name": "ridgeline-t1d",
   "version": "1.0.0",
   "description": "MCP server exposing Glooko diabetes data (Omnipod 5, Tandem t:slim X2) to an LLM for clinical audit.",
   "type": "module",
   "bin": {
-    "omni-endo-ai-mcp": "src/server.js"
+    "ridgeline-t1d": "src/server.js"
   },
   "scripts": {
     "start": "node src/server.js",

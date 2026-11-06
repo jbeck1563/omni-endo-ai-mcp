@@ -1,7 +1,7 @@
 /**
  * analytics.js — the clinical maths and data shaping.
  *
- * This is the heart of omni-endo. It takes raw Glooko data (and rows read back
+ * This is the heart of Ridgeline T1D. It takes raw Glooko data (and rows read back
  * from the archive) and turns it into the summaries, trends, logs and metrics
  * the tools return. There is no I/O here: functions take data in and return
  * plain objects out, which keeps the maths easy to test in isolation.

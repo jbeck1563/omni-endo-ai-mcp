@@ -72,7 +72,7 @@ export function glucoseDefaults() {
 // more than one transport. createServer() builds a fully-registered server.
 export function createServer() {
 const server = new McpServer({
-  name: 'omni-endo-ai',
+  name: 'ridgeline-t1d',
   version: '1.0.0',
 });
 
@@ -1063,7 +1063,7 @@ async function main() {
   const server = createServer();
   await server.connect(transport);
   // stderr is safe for logging; stdout is the MCP channel.
-  console.error('[omni-endo-ai] MCP server running on stdio.');
+  console.error('[ridgeline] MCP server running on stdio.');
 }
 
 // Only start the stdio transport when this file is run directly. When http.js
@@ -1076,7 +1076,7 @@ const isDirectEntry =
 
 if (isDirectEntry) {
   main().catch((err) => {
-    console.error('[omni-endo-ai] Fatal:', err);
+    console.error('[ridgeline] Fatal:', err);
     process.exit(1);
   });
 }
