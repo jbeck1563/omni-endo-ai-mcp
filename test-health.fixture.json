@@ -18,10 +18,24 @@
      "weight": {
       "sampleTime": {
        "physicalTime": "2001-03-10T12:30:00Z",
-       "utcOffset": "-18000s"
+       "utcOffset": "-18000s",
+       "civilTime": {
+        "date": {
+         "year": 2001,
+         "month": 3,
+         "day": 10
+        },
+        "time": {
+         "hours": 7,
+         "minutes": 30,
+         "seconds": 0,
+         "nanos": 0
+        }
+       }
       },
       "weightGrams": 80500
-     }
+     },
+     "name": "users/me/dataTypes/weight/dataPoints/synthetic-0001"
     }
    ],
    "nextPageToken": "p2"
@@ -29,21 +43,28 @@
   {
    "dataPoints": [
     {
+     "name": "users/me/dataTypes/weight/dataPoints/synthetic-0002",
      "dataSource": {
-      "platform": "HEALTH_CONNECT",
-      "recordingMethod": "ACTIVELY_MEASURED",
-      "application": {
-       "packageName": "com.example.scale"
-      },
-      "device": {
-       "formFactor": "SCALE",
-       "manufacturer": "Example"
-      }
+      "recordingMethod": "MANUAL",
+      "platform": "FITBIT"
      },
      "weight": {
       "sampleTime": {
        "physicalTime": "2001-03-11T12:40:00Z",
-       "utcOffset": "-18000s"
+       "utcOffset": "-18000s",
+       "civilTime": {
+        "date": {
+         "year": 2001,
+         "month": 3,
+         "day": 11
+        },
+        "time": {
+         "hours": 7,
+         "minutes": 40,
+         "seconds": 0,
+         "nanos": 0
+        }
+       }
       },
       "weightGrams": 80100
      }
