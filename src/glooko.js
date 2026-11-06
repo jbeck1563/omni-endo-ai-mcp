@@ -33,6 +33,18 @@ const MAX_RELOGIN_ATTEMPTS = 1; // strict, safest for Glooko
 const RETRY_BASE_DELAY_MS = 1500;
 const BASE_DOMAIN = 'https://my.glooko.com';
 
+export const GRAPH_SERIES = [
+  'cgmHigh', 'cgmLow', 'cgmNormal', 'deliveredBolus', 'automaticBolus',
+  'totalInsulinPerDay',
+  'basalBarAutomated', 'basalBarAutomatedSuspend', 'basalBarAutomatedMax',
+  'scheduledBasal', 'temporaryBasal', 'suspendBasal', 'lgsPlgs',
+  'pumpControliqAutomaticMode', 'pumpControliqManualMode',
+  'pumpControliqSleepMode', 'pumpControliqExerciseMode',
+  'pumpOp5AutomaticMode', 'pumpOp5ManualMode', 'pumpOp5LimitedMode',
+  'pumpOp5HypoprotectMode', 'pumpGenericAutomaticMode', 'pumpGenericManualMode',
+  'setSiteChange', 'reservoirChange', 'cgmSensorChange', 'pumpAlarm',
+];
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Module-scoped session cache. Lives for the life of the process.
@@ -176,12 +188,9 @@ async function executeFetch(currentSession, startDate, endDate) {
   const queryString =
     `patient=${patientId}&startDate=${startDate}&endDate=${endDate}` +
     `&locale=en-GB&insulinTooltips=true&filterBgReadings=true&splitByDay=false`;
-  const seriesString =
-    '&series[]=cgmHigh&series[]=cgmLow&series[]=cgmNormal&series[]=deliveredBolus' +
-    '&series[]=totalInsulinPerDay' +
-    '&series[]=basalBarAutomated&series[]=basalBarAutomatedSuspend' +
-    '&series[]=basalBarAutomatedMax' +
-    '&series[]=setSiteChange&series[]=cgmSensorChange';
+  // Omnipod 5 and Tandem (Control-IQ, via Tandem Source) series. Glooko only
+  // returns data for the ones the account's devices populate.
+  const seriesString = GRAPH_SERIES.map((s) => `&series[]=${s}`).join('');
 
   const url1 = `${urls.data}?${queryString}${seriesString}`;
   const url2 =

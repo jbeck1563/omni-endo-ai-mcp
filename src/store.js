@@ -34,7 +34,10 @@ let db = null;
 //   4 = basal bar edge-pairing fix (re-derive all basal states)
 //   5 = widened bolus table: delivered/programmed/recommendation split, override,
 //       interrupted, bg input/source, is_manual
-const SCHEMA_VERSION = 5;
+//   6 = device-neutral ingest (Tandem t:slim X2 / Control-IQ): automatic
+//       correction boluses, pump_mode table, pumpOp5LimitedMode now fetched,
+//       device_event type 'site' (was 'pod') plus 'cartridge'
+const SCHEMA_VERSION = 6;
 // NOTE: the `meta` table added below is purely additive (a new, independent
 // table) and does not require a SCHEMA_VERSION bump — bumping it would trigger
 // the self-heal wipe above and force a full destructive re-sync of an already
@@ -82,7 +85,7 @@ export function initDb(dbPath = process.env.OMNI_DB_PATH || '/data/omni-endo.db'
     );
     CREATE TABLE IF NOT EXISTS device_event (
       epoch   INTEGER NOT NULL,
-      type    TEXT NOT NULL,        -- 'pod' | 'sensor'
+      type    TEXT NOT NULL,        -- 'site' | 'cartridge' | 'sensor' ('pod' = legacy 'site')
       day_utc TEXT NOT NULL,
       PRIMARY KEY (epoch, type)
     );
@@ -91,6 +94,13 @@ export function initDb(dbPath = process.env.OMNI_DB_PATH || '/data/omni-endo.db'
       end_epoch   INTEGER NOT NULL,
       state       TEXT NOT NULL,      -- 'normal' | 'suspend' | 'max' | 'limited'
       day_utc     TEXT NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS pump_mode (
+      start_epoch INTEGER NOT NULL,
+      end_epoch   INTEGER NOT NULL,
+      mode        TEXT NOT NULL,      -- 'automatic' | 'manual' | 'sleep' | 'exercise' | 'limited' | 'activity'
+      day_utc     TEXT NOT NULL,
+      PRIMARY KEY (start_epoch, mode)
     );
     CREATE TABLE IF NOT EXISTS daily_insulin (
       day_utc     TEXT PRIMARY KEY,   -- 'YYYY-MM-DD'
@@ -119,11 +129,18 @@ export function initDb(dbPath = process.env.OMNI_DB_PATH || '/data/omni-endo.db'
   // cold-starts a fresh pull that populates every table for the whole span.
   const stored = db.prepare('PRAGMA user_version').get();
   const storedVersion = stored ? Object.values(stored)[0] : 0;
+  // Only when Glooko credentials are configured: an offline archive (e.g. the
+  // shipped example database) cannot be re-pulled, so wiping it would just
+  // destroy it. It keeps its old stamp and is healed once credentials appear.
+  const online = Boolean(
+    process.env.GLOOKO_EMAIL?.trim() && process.env.GLOOKO_PASSWORD?.trim()
+  );
   if (storedVersion > 0 && storedVersion < SCHEMA_VERSION) {
+    if (!online) return db;
     db.exec(
       'DELETE FROM cgm; DELETE FROM bolus; DELETE FROM settings; ' +
         'DELETE FROM daily_insulin; DELETE FROM basal_state; ' +
-        'DELETE FROM device_event; DELETE FROM day_status;'
+        'DELETE FROM device_event; DELETE FROM day_status; DELETE FROM pump_mode;'
     );
   }
   // Stamp the current version (covers both fresh DBs at 0 and just-healed ones).
@@ -301,13 +318,61 @@ export function ingestBasalStates(intervals) {
 }
 
 /**
- * Upsert device events (pod and sensor changes). Keyed by (epoch, type), so
- * re-pulling the same event is idempotent and the two types never collide.
+ * Replace the pump-mode intervals that start inside [fromEpoch, toEpoch] (the
+ * pulled window) with freshly derived ones. Modes may overlap (sleep inside
+ * automatic), so rows are keyed by (start, mode).
+ */
+export function ingestPumpModes(intervals, fromEpoch, toEpoch) {
+  const conn = d();
+  const del = conn.prepare(
+    'DELETE FROM pump_mode WHERE start_epoch BETWEEN ? AND ?'
+  );
+  const stmt = conn.prepare(
+    `INSERT INTO pump_mode (start_epoch, end_epoch, mode, day_utc) VALUES (?, ?, ?, ?)
+     ON CONFLICT(start_epoch, mode) DO UPDATE SET end_epoch=excluded.end_epoch`
+  );
+  conn.exec('BEGIN');
+  try {
+    del.run(fromEpoch, toEpoch);
+    for (const i of intervals) {
+      stmt.run(i.startEpoch, i.endEpoch, i.mode, i.start.split('T')[0]);
+    }
+    conn.exec('COMMIT');
+  } catch (err) {
+    conn.exec('ROLLBACK');
+    throw err;
+  }
+}
+
+/** Pump-mode intervals overlapping [startEpoch, endEpoch] (seconds), ordered. */
+export function getPumpModes(startEpoch, endEpoch) {
+  return d()
+    .prepare(
+      `SELECT start_epoch, end_epoch, mode FROM pump_mode
+        WHERE end_epoch > ? AND start_epoch < ?
+        ORDER BY start_epoch, mode`
+    )
+    .all(startEpoch, endEpoch)
+    .map((r) => ({
+      mode: r.mode,
+      start: new Date(r.start_epoch * 1000).toISOString(),
+      end: new Date(r.end_epoch * 1000).toISOString(),
+      startEpoch: r.start_epoch,
+      endEpoch: r.end_epoch,
+      minutes: Math.round((r.end_epoch - r.start_epoch) / 60),
+    }));
+}
+
+/**
+ * Upsert device events (site, cartridge and sensor changes). Keyed by
+ * (epoch, type), so re-pulling the same event is idempotent and the types
+ * never collide.
  */
 export function ingestDeviceEvents(events) {
   const conn = d();
   const all = [
-    ...(events.podChanges || []).map((e) => ({ ...e, type: 'pod' })),
+    ...(events.siteChanges || []).map((e) => ({ ...e, type: 'site' })),
+    ...(events.cartridgeChanges || []).map((e) => ({ ...e, type: 'cartridge' })),
     ...(events.sensorChanges || []).map((e) => ({ ...e, type: 'sensor' })),
   ];
   if (!all.length) return;
@@ -330,7 +395,8 @@ export function ingestDeviceEvents(events) {
 
 /**
  * Device events within [startEpoch, endEpoch] (seconds), split by type.
- * Returns { podChanges: [{epoch,time}], sensorChanges: [{epoch,time}] }.
+ * Legacy 'pod' rows (schema <= 5) read as site changes.
+ * Returns { siteChanges, cartridgeChanges, sensorChanges }, each [{epoch,time}].
  */
 export function getDeviceEvents(startEpoch, endEpoch) {
   const rows = d()
@@ -339,14 +405,16 @@ export function getDeviceEvents(startEpoch, endEpoch) {
         WHERE epoch BETWEEN ? AND ? ORDER BY epoch`
     )
     .all(startEpoch, endEpoch);
-  const podChanges = [];
+  const siteChanges = [];
+  const cartridgeChanges = [];
   const sensorChanges = [];
   for (const r of rows) {
     const item = { epoch: r.epoch, time: new Date(r.epoch * 1000).toISOString() };
-    if (r.type === 'pod') podChanges.push(item);
+    if (r.type === 'site' || r.type === 'pod') siteChanges.push(item);
+    else if (r.type === 'cartridge') cartridgeChanges.push(item);
     else if (r.type === 'sensor') sensorChanges.push(item);
   }
-  return { podChanges, sensorChanges };
+  return { siteChanges, cartridgeChanges, sensorChanges };
 }
 
 
@@ -577,5 +645,5 @@ export function closeDb() {
 // Test helper: wipe everything.
 export function _wipe() {
   const conn = d();
-  conn.exec('DELETE FROM cgm; DELETE FROM bolus; DELETE FROM settings; DELETE FROM day_status; DELETE FROM daily_insulin; DELETE FROM basal_state; DELETE FROM device_event;');
+  conn.exec('DELETE FROM cgm; DELETE FROM bolus; DELETE FROM settings; DELETE FROM day_status; DELETE FROM daily_insulin; DELETE FROM basal_state; DELETE FROM device_event; DELETE FROM pump_mode;');
 }

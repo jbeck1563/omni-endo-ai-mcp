@@ -29,6 +29,8 @@ import {
   getActiveSettings,
   extractDailyInsulin,
   deriveBasalStates,
+  derivePumpModes,
+  detectDevice,
   extractDeviceEvents,
 } from './analytics.js';
 import {
@@ -37,6 +39,7 @@ import {
   ingestDailyInsulin,
   ingestBasalStates,
   ingestDeviceEvents,
+  ingestPumpModes,
   markDays,
   getLatestCgmEpoch,
   getEarliestCgmEpoch,
@@ -46,6 +49,7 @@ import {
   getDailyInsulin,
   getBasalStates,
   getDeviceEvents,
+  getPumpModes,
   getMeta,
   setMeta,
 } from './store.js';
@@ -168,15 +172,25 @@ export async function pullAndIngest(startISO, endISO) {
   );
   if (basalStates.length) ingestBasalStates(basalStates);
 
-  // Device events: pod (setSiteChange) and sensor (cgmSensorChange) changes,
-  // deduplicated by timestamp.
-  const deviceEvents = extractDeviceEvents(raw.data1);
-  if (deviceEvents.podChanges.length || deviceEvents.sensorChanges.length) {
-    ingestDeviceEvents(deviceEvents);
-  }
+  // Device events: site (setSiteChange), cartridge (reservoirChange) and
+  // sensor (cgmSensorChange) changes, deduplicated by timestamp.
+  ingestDeviceEvents(extractDeviceEvents(raw.data1));
 
   const fromEpoch = Math.floor(Date.parse(startISO) / 1000);
   const toEpoch = Math.floor(Date.parse(endISO) / 1000);
+
+  // Pump modes (Control-IQ automatic/manual/sleep/exercise, Omnipod 5
+  // automatic/manual/limited/activity), stored as possibly-overlapping intervals.
+  ingestPumpModes(derivePumpModes(raw.data1), fromEpoch, toEpoch);
+
+  // Device identity for tool output. A pull whose window has no mode series
+  // keeps the algorithm an earlier pull detected.
+  const device = detectDevice(raw.data3, raw.data1);
+  if (device) {
+    const prev = JSON.parse(getMeta('device') || 'null');
+    device.algorithm ??= prev?.algorithm ?? null;
+    setMeta('device', JSON.stringify(device));
+  }
   const complete = completeDaysInSpan(fromEpoch, toEpoch);
   if (complete.length) markDays(complete, true);
 
@@ -308,6 +322,7 @@ export async function getProcessedRange(startISO, endISO) {
   const dailyInsulin = getDailyInsulin(sEpoch, eEpoch);
   const basalStates = getBasalStates(sEpoch, eEpoch);
   const deviceEvents = getDeviceEvents(sEpoch, eEpoch);
+  const pumpModes = getPumpModes(sEpoch, eEpoch);
 
   return {
     startDate: startISO,
@@ -318,6 +333,8 @@ export async function getProcessedRange(startISO, endISO) {
     dailyInsulin,
     basalStates,
     deviceEvents,
+    pumpModes,
+    device: JSON.parse(getMeta('device') || 'null'),
     servedFromArchive: true,
     statsAreForWiderRange: false,
   };

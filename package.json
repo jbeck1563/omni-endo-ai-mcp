@@ -1,7 +1,7 @@
 {
   "name": "omni-endo-ai-mcp",
   "version": "1.0.0",
-  "description": "MCP server exposing Glooko / Omnipod 5 diabetes data to an LLM for clinical audit.",
+  "description": "MCP server exposing Glooko diabetes data (Omnipod 5, Tandem t:slim X2) to an LLM for clinical audit.",
   "type": "module",
   "bin": {
     "omni-endo-ai-mcp": "src/server.js"

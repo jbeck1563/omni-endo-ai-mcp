@@ -39,6 +39,7 @@ import {
   bucketTrend,
   downsampleForChart,
   summariseBasalStates,
+  summarisePumpModes,
   getThresholds,
   toDisplay,
   toDisplayDelta,
@@ -167,7 +168,11 @@ server.registerTool(
       'Glooko daily data exists basalUnits, basalDayCount, ' +
       'averageBasalUnitsPerDay, basalPercent, bolusPercent); bolusArchitecture ' +
       '(counts by bolus type); carbs (carbsGrams, carbsPerDay, carbEntryCount); ' +
-      'and settings (the time-segmented profiles in force). All timestamps UTC.',
+      'settings (the time-segmented profiles in force, from the active profile; ' +
+      'fields the pump does not report are null, and settingsNote says when ' +
+      'none are available); and device (pumpBrand, pumpModel, cgm, algorithm, ' +
+      'or null if unknown). bolusArchitecture.automaticCorrection counts ' +
+      'algorithm-delivered boluses (Control-IQ). All timestamps UTC.',
     inputSchema: {
       start: z.string().describe(startDesc),
       end: z.string().describe(endDesc),
@@ -198,6 +203,8 @@ server.registerTool(
         bundle.dailyInsulin
       );
       summary.servedFromArchive = bundle.servedFromArchive;
+      summary.device = bundle.device ?? null;
+      if (!summary.settings.length) summary.settingsNote = 'Pump settings unavailable for this window.';
       if (!bundle.timeline.length) {
         return jsonResult({
           ...summary,
@@ -327,7 +334,8 @@ server.registerTool(
             'Meal Bolus',
             'Manual Correction Bolus',
             'System Correction Bolus',
-            'Meal With Correction Bolus'
+            'Meal With Correction Bolus',
+            'Automatic Correction Bolus'
           ])
         )
         .optional()
@@ -335,8 +343,10 @@ server.registerTool(
           'Optional filter. Array of bolus classes to include. Valid values ' +
           '(use these exact strings): "Meal Bolus" (carb-only dose), ' +
           '"Manual Correction Bolus" (user-initiated correction for a high), ' +
-          '"System Correction Bolus" (algorithm-initiated correction), ' +
-          '"Meal With Correction Bolus" (combined carb + correction dose). ' +
+          '"System Correction Bolus" (bolus-calculator correction, no carbs), ' +
+          '"Meal With Correction Bolus" (combined carb + correction dose), ' +
+          '"Automatic Correction Bolus" (delivered by the algorithm on its own, ' +
+          'e.g. a Tandem Control-IQ automatic correction; no user action). ' +
           'Provide one or more to combine, e.g. ["Manual Correction Bolus", ' +
           '"System Correction Bolus"]. Omit or leave empty to return all classes.'
         ),
@@ -422,7 +432,7 @@ server.registerTool(
   {
     title: 'Pump settings history',
     description:
-      'Every Omnipod 5 setting change that was in effect during the window, in ' +
+      'Every pump setting change that was in effect during the window, in ' +
       'chronological order: DIA, max basal rate, and the time-segmented target, ' +
       'ISF and carb-ratio profiles.\n\n' +
       'Use it to establish which settings were active at a given time (essential ' +
@@ -625,9 +635,14 @@ server.registerTool(
   {
     title: 'Basal delivery state timeline',
     description:
-      'What the Omnipod 5 was doing with basal over time: delivering normally, ' +
-      'pausing it (suspend), running at its ceiling (max), or running blind on a ' +
-      'fixed preset because it lost CGM signal (limited).\n\n' +
+      'What the pump\'s algorithm was doing with basal over time: delivering ' +
+      'normally, pausing it (suspend), running at its ceiling (max), or running ' +
+      'blind on a fixed preset because it lost CGM signal (limited). These ' +
+      'states come from Omnipod 5 bar series and may be absent for other pumps.\n\n' +
+      'Also returns pumpModes: time in each pump mode (automatic, manual, sleep, ' +
+      'exercise, limited, activity), from Glooko\'s mode series. For Tandem ' +
+      'Control-IQ this is where Sleep and Exercise mode time shows up; for ' +
+      'Omnipod 5, limited and activity (HypoProtect).\n\n' +
       'IMPORTANT: these are STATES describing the algorithm\'s behaviour, NOT ' +
       'insulin amounts. "suspend" means paused, "max" means at the ceiling; ' +
       'neither is a number of units. (For basal units, use get_daily_insulin.)\n\n' +
@@ -639,7 +654,11 @@ server.registerTool(
       'intervals, not raw points.\n\n' +
       'Returns: a summary of minutes and percentage per state ' +
       '(normal/suspend/max/limited) and, unless includeIntervals is false, an ' +
-      'intervals array (state, start, end, minutes).',
+      'intervals array (state, start, end, minutes); pumpModes with a per-mode ' +
+      'summary (minutes, percent of the window, episodes) and, unless ' +
+      'includeIntervals is false, its own intervals (mode, start, end, minutes). ' +
+      'Modes can overlap (e.g. sleep inside automatic), so percentages need not ' +
+      'sum to 100.',
     inputSchema: {
       start: z.string().describe(startDesc),
       end: z.string().describe(endDesc),
@@ -661,13 +680,23 @@ server.registerTool(
       const bundle = await getProcessedRange(s, e);
       const intervals = bundle.basalStates || [];
       const summary = summariseBasalStates(intervals);
+      const modes = bundle.pumpModes || [];
       const result = {
         window: { start: s, end: e },
         summary,
+        pumpModes: {
+          summary: summarisePumpModes(modes, Date.parse(s) / 1000, Date.parse(e) / 1000),
+        },
       };
       if (includeIntervals) {
         result.intervals = intervals.map((i) => ({
           state: i.state,
+          start: i.start,
+          end: i.end,
+          minutes: i.minutes,
+        }));
+        result.pumpModes.intervals = modes.map((i) => ({
+          mode: i.mode,
           start: i.start,
           end: i.end,
           minutes: i.minutes,
@@ -684,20 +713,23 @@ server.registerTool(
 server.registerTool(
   'get_device_events',
   {
-    title: 'Pod and CGM sensor changes',
+    title: 'Infusion site and CGM sensor changes',
     description:
-      'Pod changes (the Omnipod is replaced roughly every 3 days) and CGM sensor ' +
-      'changes, as timestamped events, kept as two separate lists.\n\n' +
+      'Infusion-site changes and CGM sensor changes, as timestamped events, ' +
+      'kept as separate lists. A site change is an Omnipod pod change or a ' +
+      'Tandem infusion-set (site) change; Tandem cartridge (reservoir) changes ' +
+      'are listed separately as cartridgeChanges. podChanges is the historical ' +
+      'name for siteChanges and holds the same list.\n\n' +
       'These are point-in-time markers, not amounts. They are most useful as ' +
-      'CONTEXT for nearby glucose disruption: a fresh pod can run high for the ' +
+      'CONTEXT for nearby glucose disruption: a fresh site can run high for the ' +
       'first hours while the cannula settles, and a new sensor can read ' +
       'erratically while it warms up. Use them to check whether an unexplained ' +
       'high or a run of odd readings lines up with a recent change. Treat any ' +
       'such link as a possible contributing factor, never assert it as the ' +
       'cause.\n\n' +
       'Times are UTC.\n\n' +
-      'Returns: podChanges and sensorChanges arrays of UTC timestamps, plus a ' +
-      'count for each.',
+      'Returns: siteChanges (also as podChanges), cartridgeChanges and ' +
+      'sensorChanges arrays of UTC timestamps, plus a count for each.',
     inputSchema: {
       start: z.string().describe(startDesc),
       end: z.string().describe(endDesc),
@@ -709,14 +741,20 @@ server.registerTool(
       const e = assertIsoDate(end, 'end');
       assertWithinCap(s, e, CAPS.summaryMaxDays, 'get_device_events');
       const bundle = await getProcessedRange(s, e);
-      const ev = bundle.deviceEvents || { podChanges: [], sensorChanges: [] };
+      const ev = bundle.deviceEvents || {};
+      const times = (a) => (a || []).map((x) => x.time);
+      const site = times(ev.siteChanges);
       return jsonResult({
         window: { start: s, end: e },
-        podChanges: ev.podChanges.map((x) => x.time),
-        sensorChanges: ev.sensorChanges.map((x) => x.time),
+        podChanges: site,
+        siteChanges: site,
+        cartridgeChanges: times(ev.cartridgeChanges),
+        sensorChanges: times(ev.sensorChanges),
         counts: {
-          podChanges: ev.podChanges.length,
-          sensorChanges: ev.sensorChanges.length,
+          podChanges: site.length,
+          siteChanges: site.length,
+          cartridgeChanges: (ev.cartridgeChanges || []).length,
+          sensorChanges: (ev.sensorChanges || []).length,
         },
       });
     } catch (err) {

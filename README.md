@@ -12,9 +12,9 @@
 > ## This is a fork
 >
 > Upstream, and all credit for this server: **[rilhia/omni-endo-ai-mcp](https://github.com/rilhia/omni-endo-ai-mcp)**.
-> Everything below this banner is the original author's documentation and still applies —
-> the MCP tools, the transports, and the sync engine are unchanged. This fork adds two
-> things for one self-hosted deployment. If you want the real project, go upstream.
+> Everything below this banner is the original author's documentation and still applies,
+> except where section 3 extends it for Tandem pumps. This fork adds three things for one
+> self-hosted deployment. If you want the real project, go upstream.
 >
 > ### 1. `POST /my-data` — a raw Glooko passthrough for the companion web UI
 >
@@ -58,8 +58,37 @@
 > `SCHEMA_VERSION` is deliberately **not** bumped — that would trigger the self-heal wipe and
 > force a destructive re-sync of a populated archive.
 >
+> ### 3. Tandem t:slim X2 (Control-IQ) through Glooko
+>
+> **What.** Glooko's Tandem Source link delivers a Tandem pump's data in series this server
+> never requested. Control-IQ automatic correction boluses arrive only in `automaticBolus`
+> (disjoint from `deliveredBolus`; Glooko's daily bolus total is the sum of both), so they were
+> silently dropped. Tandem settings snapshots have no `maxBasalRate` and several named
+> profiles, which made `get_diabetes_summary` and `get_enriched_bolus_log` throw.
+>
+> **How.** The client now also requests `automaticBolus`, the Control-IQ, Omnipod 5 and
+> generic pump-mode series (including `pumpOp5LimitedMode`, which `limited` basal state
+> always read but never fetched), `scheduledBasal`/`temporaryBasal`/`suspendBasal`/`lgsPlgs`,
+> `reservoirChange` and `pumpAlarm`. Automatic boluses get the class
+> `Automatic Correction Bolus`. A new `pump_mode` table holds possibly-overlapping
+> automatic / manual / sleep / exercise / limited / activity intervals, surfaced as
+> `pumpModes` in `get_basal_delivery`. Site changes are stored as `site` (old `pod` rows still
+> read), cartridge changes as `cartridge`. Settings use the active profile and every field is
+> optional. `get_diabetes_summary` adds `device` (pump, CGM, algorithm). Tool descriptions
+> and the prompt are device-neutral, with a short Control-IQ section.
+>
+> **Archive.** `SCHEMA_VERSION` is 6, so an online archive is wiped and re-pulled once. An
+> offline archive (no Glooko credentials, e.g. the example database) is never wiped, since it
+> could not be re-pulled; it keeps working at its old version.
+>
+> **Known gaps.** Tandem Source supplies no pump settings to Glooko: the settings shown are
+> the last ones uploaded some other way, possibly long ago. Glooko times are the pump's local
+> clock written as UTC.
+>
 > ### Checks
 >
+> `node --no-warnings test-tandem.mjs` feeds a synthetic Tandem fixture
+> (`test-tandem.fixture.json`) through ingest and the MCP tools.
 > `node test-mydata.mjs` covers the payload shape, anonymous / wrong-credential /
 > Bearer-instead-of-Basic requests, and re-execs itself without `OMNI_MYDATA_BASIC` to prove
 > the fail-closed branch. It uses the existing `__OMNI_FETCH_STUB__` seam, so it never
@@ -140,7 +169,7 @@ I built this to put the power back into the hands of the patient. We often only 
 <a id="who-this-is-for"></a>
 ## 👤 Who This Is For
 
-This project is built for people who use the **Omnipod 5** hybrid closed-loop insulin delivery system and sync their data to **Glooko**. If that is not you, you can still explore the project using the three months of included sample data (my data) — no Omnipod 5 or Glooko account required for that path.
+This project is built for people who use the **Omnipod 5** hybrid closed-loop insulin delivery system (or, in this fork, a **Tandem t:slim X2** with Control-IQ) and sync their data to **Glooko**. If that is not you, you can still explore the project using the three months of included sample data (my data) — no Omnipod 5 or Glooko account required for that path.
 
 ### Prerequisites
 
@@ -148,8 +177,8 @@ This project is built for people who use the **Omnipod 5** hybrid closed-loop in
 - **Docker** — the entire stack runs inside Docker. Install it from [docker.com](https://www.docker.com/get-started). See [Step 1](#step-1-installing-docker) below.
 
 **Required to analyse your own data**
-- **An Omnipod 5** — the insulin delivery device whose data this project analyses.
-- **A Glooko account** — with your Omnipod 5 synced to it. This is how the MCP server retrieves your data.
+- **An Omnipod 5 or a Tandem t:slim X2** — the insulin delivery device whose data this project analyses.
+- **A Glooko account** — with your pump synced to it (for Tandem, through Glooko's Tandem Source link). This is how the MCP server retrieves your data.
 
 **Required — you need at least one AI to talk to**
 
@@ -1009,7 +1038,7 @@ A `byHour` array of up to 24 rows, each with `hour` (UTC, `"HH:00"`), `averageBG
 
 #### `POST /get_basal_delivery`
 
-What the Omnipod 5 algorithm was doing with basal delivery over time, expressed as states rather than units.
+What the pump's algorithm was doing with basal delivery over time, expressed as states rather than units, plus `pumpModes`: time in each pump mode (automatic, manual, sleep, exercise, limited, activity).
 
 > **Important:** these are behavioural states, not insulin amounts. `suspend` means basal was paused; `max` means it was running at its ceiling. Neither is a unit figure. For basal units, use `get_daily_insulin`.
 
@@ -1057,7 +1086,7 @@ The most recent day may be flagged `provisional` if it has not yet been finalise
 
 #### `POST /get_settings_history`
 
-Every Omnipod 5 setting change that was in effect during the window, in chronological order: DIA, max basal rate, and the time-segmented target, ISF, and carb-ratio profiles.
+Every pump setting change that was in effect during the window, in chronological order: DIA, max basal rate, and the time-segmented target, ISF, and carb-ratio profiles.
 
 Useful for establishing which settings were active at a specific point in time before judging a bolus or an excursion, or for reviewing how settings have been adjusted over a long span.
 
@@ -1078,7 +1107,7 @@ A `settings` array. Each entry has `effective` (UTC timestamp when this setting 
 
 #### `POST /get_device_events`
 
-Pod changes and CGM sensor changes as timestamped events, in two separate lists.
+Infusion-site (pod or Tandem set), cartridge and CGM sensor changes as timestamped events, in separate lists.
 
 These are point-in-time markers, not amounts. They are most useful as context for nearby glucose disruption: a fresh pod can run high for the first hours while the cannula settles, and a new sensor can read erratically during warm-up. Treat any correlation as a possible contributing factor — never assert it as a confirmed cause.
 
@@ -1091,7 +1120,7 @@ These are point-in-time markers, not amounts. They are most useful as context fo
 
 **Returns**
 
-`podChanges` and `sensorChanges` arrays of UTC timestamps, plus a count for each.
+`siteChanges` (also as `podChanges`), `cartridgeChanges` and `sensorChanges` arrays of UTC timestamps, plus a count for each.
 
 ---
 

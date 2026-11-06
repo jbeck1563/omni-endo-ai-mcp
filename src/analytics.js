@@ -229,22 +229,24 @@ export function processUnifiedGlookoData(rawJson) {
     }
   });
 
-  const boluses = (series.deliveredBolus || []).map((b) => {
+  // Algorithm-initiated boluses (Tandem Control-IQ automatic corrections) come
+  // in their own automaticBolus series, disjoint from deliveredBolus; Glooko's
+  // daily bolus total is the sum of both. Keyed by epoch so a bolus that ever
+  // appears in both series is counted once, as automatic.
+  const byEpoch = new Map();
+  for (const b of series.deliveredBolus || []) byEpoch.set(b.x, { b, auto: false });
+  for (const b of series.automaticBolus || []) byEpoch.set(b.x, { b, auto: true });
+
+  const boluses = [...byEpoch.values()].map(({ b, auto }) => {
+    // Tandem leaves the correction recommendation null rather than 0.
+    const rc = b.insulinRecommendationForCorrection ?? 0;
     let cat = 'Unknown';
-    if (!b.isManual && b.carbsInput > 0 && b.insulinRecommendationForCorrection === 0)
-      cat = 'Meal Bolus';
+    if (auto) cat = 'Automatic Correction Bolus';
+    else if (!b.isManual && b.carbsInput > 0 && rc === 0) cat = 'Meal Bolus';
     else if (b.isManual && b.carbsInput === 0) cat = 'Manual Correction Bolus';
-    else if (
-      !b.isManual &&
-      b.carbsInput === 0 &&
-      b.insulinRecommendationForCorrection > 0
-    )
+    else if (!b.isManual && b.carbsInput === 0 && rc > 0)
       cat = 'System Correction Bolus';
-    else if (
-      !b.isManual &&
-      b.carbsInput > 0 &&
-      b.insulinRecommendationForCorrection > 0
-    )
+    else if (!b.isManual && b.carbsInput > 0 && rc > 0)
       cat = 'Meal With Correction Bolus';
     // Override direction: the device flags when the programmed dose was pushed
     // above or below the algorithm's recommendation.
@@ -333,9 +335,40 @@ export function getInterpolatedBG(targetEpoch, timeline) {
 }
 
 /**
+ * The bolus profile in force in a settings snapshot. Tandem pumps hold several
+ * named Personal Profiles; Glooko flags the active one with current=true on its
+ * segment blocks and names it in basalSettings.activeBasalProgram. Omnipod has
+ * a single profile. Returns null when the snapshot has no profiles.
+ */
+export function activeBolusProfile(settings) {
+  const profiles = settings?.profilesBolus;
+  if (!Array.isArray(profiles) || !profiles.length) return null;
+  const blocks = (p) => [
+    p?.targetBgSegments,
+    p?.isfSegments,
+    p?.insulinToCarbRatioSegments,
+  ];
+  const program = settings?.basalSettings?.activeBasalProgram;
+  return (
+    profiles.find((p) => blocks(p).some((b) => b?.current === true)) ||
+    (program != null &&
+      profiles.find((p) => blocks(p).some((b) => b?.profileName === program))) ||
+    profiles[0]
+  );
+}
+
+/** The active profile's segment list for one setting, or null if absent. */
+function segmentsOf(settings, key) {
+  const data = activeBolusProfile(settings)?.[key]?.data;
+  return Array.isArray(data) && data.length ? data : null;
+}
+
+/**
  * Finds the active setting value for a clock-hour from time-segmented data.
+ * Returns null for missing or empty data.
  */
 export function findActiveDataRecord(data, epoch) {
+  if (!Array.isArray(data) || !data.length) return null;
   const h = new Date(epoch * 1000).getUTCHours();
   const sorted = [...data].sort((a, b) => a.segmentStart - b.segmentStart);
   const active = sorted.findLast((s) => s.segmentStart <= h);
@@ -357,28 +390,22 @@ export function buildEnrichedBolusLog(timeline, settingsHistory, units = 'mmol')
       const activeSetting = settingsHistory.findLast(
         (s) => new Date(s.activeTimestamp).getTime() / 1000 <= bolus.epoch
       );
+      const st = activeSetting?.settings;
       const context = activeSetting
         ? {
-            DIA: activeSetting.settings.generalSettings.activeInsulinTime,
+            DIA: st?.generalSettings?.activeInsulinTime ?? null,
             target: toDisplay(
-              findActiveDataRecord(
-                activeSetting.settings.profilesBolus[0].targetBgSegments.data,
-                bolus.epoch
-              ),
+              findActiveDataRecord(segmentsOf(st, 'targetBgSegments'), bolus.epoch),
               units
             ),
             // ISF is a glucose drop per unit of insulin, so it scales like a
             // glucose delta (factor, no offset).
             isf: toDisplayDelta(
-              findActiveDataRecord(
-                activeSetting.settings.profilesBolus[0].isfSegments.data,
-                bolus.epoch
-              ),
+              findActiveDataRecord(segmentsOf(st, 'isfSegments'), bolus.epoch),
               units
             ),
             active_cr: findActiveDataRecord(
-              activeSetting.settings.profilesBolus[0].insulinToCarbRatioSegments
-                .data,
+              segmentsOf(st, 'insulinToCarbRatioSegments'),
               bolus.epoch
             ),
           }
@@ -412,10 +439,10 @@ export function targetForEpoch(epoch, settingsHistory) {
   const activeSetting = settingsHistory.findLast(
     (s) => new Date(s.activeTimestamp).getTime() / 1000 <= epoch
   );
-  const segs =
-    activeSetting?.settings?.profilesBolus?.[0]?.targetBgSegments?.data;
-  if (!segs || !segs.length) return null;
-  return findActiveDataRecord(segs, epoch);
+  return findActiveDataRecord(
+    segmentsOf(activeSetting?.settings, 'targetBgSegments'),
+    epoch
+  );
 }
 
 /** Median of a numeric array (returns null for empty). */
@@ -634,25 +661,36 @@ export function computeSummary(
     mealWithCorrection: boluses.filter(
       (b) => b.class === 'Meal With Correction Bolus'
     ).length,
+    automaticCorrection: boluses.filter(
+      (b) => b.class === 'Automatic Correction Bolus'
+    ).length,
   };
 
   // Settings snapshots, human-readable
-  const settings = settingsHistory.map((s) => ({
-    effective: s.activeTimestamp,
-    DIA_hours: s.settings.generalSettings.activeInsulinTime,
-    maxBasalRate: s.settings.basalSettings.maxBasalRate,
-    targetBg: s.settings.profilesBolus[0].targetBgSegments.data.map((sn) => ({
+  // Every field is optional: Tandem snapshots carry no maxBasalRate, and a
+  // snapshot may lack profiles entirely. Missing values come back null rather
+  // than throwing, so the summary always renders.
+  const segList = (st, key, fmt) =>
+    (segmentsOf(st, key) || []).map((sn) => ({
       from: formatHour(sn.segmentStart),
-      value: toDisplay(sn.value, units),
-    })),
-    isf: s.settings.profilesBolus[0].isfSegments.data.map((sn) => ({
-      from: formatHour(sn.segmentStart),
-      value: toDisplayDelta(sn.value, units),
-    })),
-    carbRatio: s.settings.profilesBolus[0].insulinToCarbRatioSegments.data.map(
-      (sn) => ({ from: formatHour(sn.segmentStart), value: sn.value })
-    ),
-  }));
+      value: fmt(sn.value),
+    }));
+  const settings = settingsHistory.map((s) => {
+    const st = s.settings;
+    const profile = activeBolusProfile(st);
+    return {
+      effective: s.activeTimestamp,
+      DIA_hours: st?.generalSettings?.activeInsulinTime ?? null,
+      maxBasalRate: st?.basalSettings?.maxBasalRate ?? null,
+      activeProfile:
+        profile?.targetBgSegments?.profileName ??
+        st?.basalSettings?.activeBasalProgram ??
+        null,
+      targetBg: segList(st, 'targetBgSegments', (v) => toDisplay(v, units)),
+      isf: segList(st, 'isfSegments', (v) => toDisplayDelta(v, units)),
+      carbRatio: segList(st, 'insulinToCarbRatioSegments', (v) => v),
+    };
+  });
 
   return {
     unit: unitLabel,
@@ -1190,6 +1228,104 @@ function numOrNull(v) {
 
 // --- basal delivery state ------------------------------------------------
 
+// Interval series (pump modes, suspendBasal, lgsPlgs, scheduledBasal, ...)
+// carry real start/end timestamps; each interval is repeated as several
+// drawing points, so take the distinct [timestamp, endTimestamp] pairs.
+function modeIntervals(arr) {
+  if (!Array.isArray(arr) || !arr.length) return [];
+  const seen = new Set();
+  const out = [];
+  for (const p of arr) {
+    if (!p.timestamp || !p.endTimestamp) continue;
+    const s = Math.floor(new Date(p.timestamp).getTime() / 1000);
+    const e = Math.floor(new Date(p.endTimestamp).getTime() / 1000);
+    const key = `${s}|${e}`;
+    if (e > s && !seen.has(key)) {
+      seen.add(key);
+      out.push([s, e]);
+    }
+  }
+  return out;
+}
+
+// Glooko mode series -> normalised pump mode. Control-IQ and Omnipod 5 name
+// the same ideas differently; HypoProtect is Omnipod's activity feature.
+export const PUMP_MODE_SERIES = {
+  pumpControliqAutomaticMode: 'automatic',
+  pumpControliqManualMode: 'manual',
+  pumpControliqSleepMode: 'sleep',
+  pumpControliqExerciseMode: 'exercise',
+  pumpOp5AutomaticMode: 'automatic',
+  pumpOp5ManualMode: 'manual',
+  pumpOp5LimitedMode: 'limited',
+  pumpOp5HypoprotectMode: 'activity',
+  pumpGenericAutomaticMode: 'automatic',
+  pumpGenericManualMode: 'manual',
+};
+
+/**
+ * Pump-mode intervals from Glooko's mode series. Modes can overlap (Control-IQ
+ * Sleep or Exercise runs inside automatic). Glooko splits intervals at local
+ * midnight (23:59:59 -> 00:00:00), so same-mode intervals within 1 s are
+ * merged back together.
+ * Returns [{ mode, start, end, startEpoch, endEpoch, minutes }] sorted by start.
+ */
+export function derivePumpModes(rawJson) {
+  const series = rawJson && rawJson.series ? rawJson.series : {};
+  const byMode = {};
+  for (const [name, mode] of Object.entries(PUMP_MODE_SERIES)) {
+    (byMode[mode] ||= []).push(...modeIntervals(series[name]));
+  }
+  const out = [];
+  for (const [mode, ivs] of Object.entries(byMode)) {
+    ivs.sort((a, b) => a[0] - b[0]);
+    let cur = null;
+    for (const [s, e] of ivs) {
+      if (cur && s <= cur[1] + 1) cur[1] = Math.max(cur[1], e);
+      else {
+        if (cur) out.push([mode, ...cur]);
+        cur = [s, e];
+      }
+    }
+    if (cur) out.push([mode, ...cur]);
+  }
+  return out
+    .sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0]))
+    .map(([mode, s, e]) => ({
+      mode,
+      start: new Date(s * 1000).toISOString(),
+      end: new Date(e * 1000).toISOString(),
+      startEpoch: s,
+      endEpoch: e,
+      minutes: Math.round((e - s) / 60),
+    }));
+}
+
+/**
+ * Minutes, share of the window, and episode count per pump mode. Intervals are
+ * clipped to [windowStart, windowEnd] (seconds). Modes overlap, so percentages
+ * need not sum to 100.
+ */
+export function summarisePumpModes(intervals, windowStart, windowEnd) {
+  if (!intervals || !intervals.length) {
+    return { available: false, note: 'No pump-mode data for this window.' };
+  }
+  const span = Math.max(1, windowEnd - windowStart);
+  const out = { available: true, windowHours: +(span / 3600).toFixed(2), modes: {} };
+  for (const i of intervals) {
+    const secs = Math.min(i.endEpoch, windowEnd) - Math.max(i.startEpoch, windowStart);
+    if (secs <= 0) continue;
+    const m = (out.modes[i.mode] ||= { minutes: 0, percent: 0, episodes: 0 });
+    m.minutes += secs / 60;
+    m.episodes += 1;
+  }
+  for (const m of Object.values(out.modes)) {
+    m.percent = +(((m.minutes * 60) / span) * 100).toFixed(1);
+    m.minutes = Math.round(m.minutes);
+  }
+  return out;
+}
+
 /**
  * The Omnipod 5 basal delivery state over time, derived from Glooko's bar
  * series. These series are DRAWING instructions (y is only 0/1/null, the bar
@@ -1244,29 +1380,33 @@ export function deriveBasalStates(rawJson, windowStartEpoch, windowEndEpoch) {
     return out;
   };
 
-  // Mode series (pumpOp5LimitedMode) carry real start/end timestamps with a
-  // duration; take distinct [x, endTimestamp-derived] from timestamp/endTimestamp.
-  const modeIntervals = (arr) => {
-    if (!Array.isArray(arr) || !arr.length) return [];
-    const seen = new Set();
-    const out = [];
-    for (const p of arr) {
-      if (!p.timestamp || !p.endTimestamp) continue;
-      const s = Math.floor(new Date(p.timestamp).getTime() / 1000);
-      const e = Math.floor(new Date(p.endTimestamp).getTime() / 1000);
-      const key = `${s}|${e}`;
-      if (e > s && !seen.has(key)) {
-        seen.add(key);
-        out.push([s, e]);
-      }
-    }
-    return out;
-  };
-
-  const suspend = barIntervals(series.basalBarAutomatedSuspend);
+  // Omnipod 5 encodes basal states as bars. Tandem has no bars: it reports
+  // suspensions (suspendBasal; lgsPlgs = Control-IQ / Basal-IQ low-glucose
+  // suspends) and profile or temporary basal segments, which mark the time
+  // basal was actually being delivered.
+  const bars = [
+    ...barIntervals(series.basalBarAutomated),
+    ...barIntervals(series.basalBarAutomatedSuspend),
+    ...barIntervals(series.basalBarAutomatedMax),
+  ];
+  const suspend = [
+    ...barIntervals(series.basalBarAutomatedSuspend),
+    ...modeIntervals(series.suspendBasal),
+    ...modeIntervals(series.lgsPlgs),
+  ];
   const max = barIntervals(series.basalBarAutomatedMax);
-  const normal = barIntervals(series.basalBarAutomated);
+  const normal = [
+    ...barIntervals(series.basalBarAutomated),
+    ...modeIntervals(series.scheduledBasal),
+    ...modeIntervals(series.temporaryBasal),
+    // Algorithm-modulated basal is not in scheduledBasal; the pump being in
+    // any mode means it was delivering unless suspended.
+    ...derivePumpModes(rawJson).map((m) => [m.startEpoch, m.endEpoch]),
+  ];
   const limited = modeIntervals(series.pumpOp5LimitedMode);
+  // With bars, a gap between bars has always been read as normal delivery.
+  // Without them, a gap is time with no basal data and gets no state.
+  const fillGaps = bars.length > 0;
 
   // Determine the day/window bounds from the data if not supplied.
   const allStarts = [...suspend, ...max, ...normal, ...limited].map((i) => i[0]);
@@ -1295,7 +1435,8 @@ export function deriveBasalStates(rawJson, windowStartEpoch, windowEndEpoch) {
     if (inAny(mid, limited)) state = 'limited';
     else if (inAny(mid, max)) state = 'max';
     else if (inAny(mid, suspend)) state = 'suspend';
-    else state = 'normal';
+    else if (fillGaps || inAny(mid, normal)) state = 'normal';
+    else continue;
     segs.push([a, b, state]);
   }
 
@@ -1358,19 +1499,21 @@ export function summariseBasalStates(intervals) {
   };
 }
 
-// --- device events (pod / sensor changes) --------------------------------
+// --- device events (site / cartridge / sensor changes) -------------------
 
 /**
- * Extract pod (setSiteChange) and CGM sensor (cgmSensorChange) change events
- * from a Glooko response. These are point-in-time markers, not intervals or
- * amounts. Glooko sometimes emits the same event twice (identical timestamp),
- * so we deduplicate by timestamp: same time means the same event.
+ * Extract infusion-site (setSiteChange: an Omnipod pod change or a Tandem set
+ * change), cartridge (reservoirChange, plus Tandem's "Cartridge Loaded" pump
+ * alarm) and CGM sensor (cgmSensorChange) change events from a Glooko
+ * response. These are point-in-time markers, not intervals or amounts. Glooko
+ * sometimes emits the same event twice (identical timestamp), so we
+ * deduplicate by timestamp: same time means the same event.
  *
- * Kept as two separate event types. Useful as context for explaining nearby
- * glucose disruption (a fresh pod can run high while the cannula settles; a new
- * sensor can read erratically while it warms up), never asserted as a cause.
+ * Kept as separate event types. Useful as context for explaining nearby
+ * glucose disruption (a fresh site can run high while the cannula settles; a
+ * new sensor can read erratically while it warms up), never asserted as a cause.
  *
- * Returns { podChanges: [{epoch, time}], sensorChanges: [{epoch, time}] }.
+ * Returns { siteChanges, cartridgeChanges, sensorChanges }, each [{epoch, time}].
  */
 export function extractDeviceEvents(rawJson) {
   const series = rawJson && rawJson.series ? rawJson.series : {};
@@ -1389,8 +1532,46 @@ export function extractDeviceEvents(rawJson) {
     return out.sort((a, b) => a.epoch - b.epoch);
   };
 
+  const cartridgeAlarms = (series.pumpAlarm || []).filter((a) =>
+    /cartridge loaded/i.test(a?.name || '')
+  );
   return {
-    podChanges: dedupe(series.setSiteChange),
+    siteChanges: dedupe(series.setSiteChange),
+    cartridgeChanges: dedupe([...(series.reservoirChange || []), ...cartridgeAlarms]),
     sensorChanges: dedupe(series.cgmSensorChange),
+  };
+}
+
+// --- device detection ----------------------------------------------------
+
+/**
+ * Which pump, CGM and algorithm the account uses, from devices_and_settings
+ * (data3) and the series a pull returned (data1). Returns null when Glooko
+ * lists no pump. A Tandem Source link shows up as a generic Tandem "pump", so
+ * the model falls back to another device of the same brand.
+ */
+export function detectDevice(settingsJson, rawJson) {
+  const pumps = (settingsJson?.devices || []).filter((d) => d?.type === 'pump');
+  if (!pumps.length) return null;
+  const active =
+    pumps.find((d) => d.guid === settingsJson.activePumpGuid) || pumps[0];
+  const real = (m) => (m && m !== 'pump' ? m : null);
+  const series = rawJson?.series || {};
+  const has = (re) =>
+    Object.keys(series).some(
+      (k) => re.test(k) && Array.isArray(series[k]) && series[k].length
+    );
+  return {
+    pumpBrand: active.brand ?? null,
+    pumpModel:
+      real(active.model) ??
+      real(pumps.find((d) => d.brand === active.brand && real(d.model))?.model) ??
+      null,
+    cgm: active.properties?.cgmModel ?? null,
+    algorithm: has(/^pumpControliq/)
+      ? 'Control-IQ'
+      : has(/^(pumpOp5|basalBarAutomated)/)
+        ? 'SmartAdjust'
+        : null,
   };
 }
