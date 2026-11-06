@@ -1,0 +1,5550 @@
+{
+ "data1": {
+  "series": {
+   "cgmHigh": [
+    {
+     "x": 984194100,
+     "y": 10.1,
+     "mealTag": "none",
+     "value": 18198,
+     "timestamp": "2001-03-10T03:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984194400,
+     "y": 10.1,
+     "mealTag": "none",
+     "value": 18198,
+     "timestamp": "2001-03-10T03:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984194700,
+     "y": 10.2,
+     "mealTag": "none",
+     "value": 18379,
+     "timestamp": "2001-03-10T03:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984195000,
+     "y": 10.2,
+     "mealTag": "none",
+     "value": 18379,
+     "timestamp": "2001-03-10T03:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984195300,
+     "y": 10.2,
+     "mealTag": "none",
+     "value": 18379,
+     "timestamp": "2001-03-10T03:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984195600,
+     "y": 10.3,
+     "mealTag": "none",
+     "value": 18559,
+     "timestamp": "2001-03-10T03:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984195900,
+     "y": 10.3,
+     "mealTag": "none",
+     "value": 18559,
+     "timestamp": "2001-03-10T03:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984196200,
+     "y": 10.4,
+     "mealTag": "none",
+     "value": 18739,
+     "timestamp": "2001-03-10T03:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984196500,
+     "y": 10.4,
+     "mealTag": "none",
+     "value": 18739,
+     "timestamp": "2001-03-10T03:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984196800,
+     "y": 10.5,
+     "mealTag": "none",
+     "value": 18919,
+     "timestamp": "2001-03-10T04:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984197100,
+     "y": 10.5,
+     "mealTag": "none",
+     "value": 18919,
+     "timestamp": "2001-03-10T04:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984197400,
+     "y": 10.6,
+     "mealTag": "none",
+     "value": 19099,
+     "timestamp": "2001-03-10T04:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984197700,
+     "y": 10.6,
+     "mealTag": "none",
+     "value": 19099,
+     "timestamp": "2001-03-10T04:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984198000,
+     "y": 10.6,
+     "mealTag": "none",
+     "value": 19099,
+     "timestamp": "2001-03-10T04:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984198300,
+     "y": 10.7,
+     "mealTag": "none",
+     "value": 19279,
+     "timestamp": "2001-03-10T04:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984198600,
+     "y": 10.7,
+     "mealTag": "none",
+     "value": 19279,
+     "timestamp": "2001-03-10T04:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984198900,
+     "y": 10.8,
+     "mealTag": "none",
+     "value": 19460,
+     "timestamp": "2001-03-10T04:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984199200,
+     "y": 10.8,
+     "mealTag": "none",
+     "value": 19460,
+     "timestamp": "2001-03-10T04:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984199500,
+     "y": 10.8,
+     "mealTag": "none",
+     "value": 19460,
+     "timestamp": "2001-03-10T04:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984199800,
+     "y": 10.9,
+     "mealTag": "none",
+     "value": 19640,
+     "timestamp": "2001-03-10T04:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984200100,
+     "y": 10.9,
+     "mealTag": "none",
+     "value": 19640,
+     "timestamp": "2001-03-10T04:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984200400,
+     "y": 11,
+     "mealTag": "none",
+     "value": 19820,
+     "timestamp": "2001-03-10T05:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984200700,
+     "y": 11,
+     "mealTag": "none",
+     "value": 19820,
+     "timestamp": "2001-03-10T05:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984201000,
+     "y": 11,
+     "mealTag": "none",
+     "value": 19820,
+     "timestamp": "2001-03-10T05:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984201300,
+     "y": 11.1,
+     "mealTag": "none",
+     "value": 20000,
+     "timestamp": "2001-03-10T05:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984201600,
+     "y": 11.1,
+     "mealTag": "none",
+     "value": 20000,
+     "timestamp": "2001-03-10T05:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984201900,
+     "y": 11.1,
+     "mealTag": "none",
+     "value": 20000,
+     "timestamp": "2001-03-10T05:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984202200,
+     "y": 11.2,
+     "mealTag": "none",
+     "value": 20180,
+     "timestamp": "2001-03-10T05:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984202500,
+     "y": 11.2,
+     "mealTag": "none",
+     "value": 20180,
+     "timestamp": "2001-03-10T05:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984202800,
+     "y": 11.2,
+     "mealTag": "none",
+     "value": 20180,
+     "timestamp": "2001-03-10T05:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984203100,
+     "y": 11.3,
+     "mealTag": "none",
+     "value": 20361,
+     "timestamp": "2001-03-10T05:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984203400,
+     "y": 11.3,
+     "mealTag": "none",
+     "value": 20361,
+     "timestamp": "2001-03-10T05:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984203700,
+     "y": 11.3,
+     "mealTag": "none",
+     "value": 20361,
+     "timestamp": "2001-03-10T05:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984204000,
+     "y": 11.4,
+     "mealTag": "none",
+     "value": 20541,
+     "timestamp": "2001-03-10T06:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984204300,
+     "y": 11.4,
+     "mealTag": "none",
+     "value": 20541,
+     "timestamp": "2001-03-10T06:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984204600,
+     "y": 11.4,
+     "mealTag": "none",
+     "value": 20541,
+     "timestamp": "2001-03-10T06:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984204900,
+     "y": 11.5,
+     "mealTag": "none",
+     "value": 20721,
+     "timestamp": "2001-03-10T06:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984205200,
+     "y": 11.5,
+     "mealTag": "none",
+     "value": 20721,
+     "timestamp": "2001-03-10T06:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984205500,
+     "y": 11.5,
+     "mealTag": "none",
+     "value": 20721,
+     "timestamp": "2001-03-10T06:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984205800,
+     "y": 11.5,
+     "mealTag": "none",
+     "value": 20721,
+     "timestamp": "2001-03-10T06:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984206100,
+     "y": 11.6,
+     "mealTag": "none",
+     "value": 20901,
+     "timestamp": "2001-03-10T06:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984206400,
+     "y": 11.6,
+     "mealTag": "none",
+     "value": 20901,
+     "timestamp": "2001-03-10T06:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984206700,
+     "y": 11.6,
+     "mealTag": "none",
+     "value": 20901,
+     "timestamp": "2001-03-10T06:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984207000,
+     "y": 11.6,
+     "mealTag": "none",
+     "value": 20901,
+     "timestamp": "2001-03-10T06:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984207300,
+     "y": 11.7,
+     "mealTag": "none",
+     "value": 21081,
+     "timestamp": "2001-03-10T06:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984207600,
+     "y": 11.7,
+     "mealTag": "none",
+     "value": 21081,
+     "timestamp": "2001-03-10T07:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984207900,
+     "y": 11.7,
+     "mealTag": "none",
+     "value": 21081,
+     "timestamp": "2001-03-10T07:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984208200,
+     "y": 11.7,
+     "mealTag": "none",
+     "value": 21081,
+     "timestamp": "2001-03-10T07:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984208500,
+     "y": 11.7,
+     "mealTag": "none",
+     "value": 21081,
+     "timestamp": "2001-03-10T07:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984208800,
+     "y": 11.8,
+     "mealTag": "none",
+     "value": 21261,
+     "timestamp": "2001-03-10T07:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984209100,
+     "y": 11.8,
+     "mealTag": "none",
+     "value": 21261,
+     "timestamp": "2001-03-10T07:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984209400,
+     "y": 11.8,
+     "mealTag": "none",
+     "value": 21261,
+     "timestamp": "2001-03-10T07:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984209700,
+     "y": 11.8,
+     "mealTag": "none",
+     "value": 21261,
+     "timestamp": "2001-03-10T07:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984210000,
+     "y": 11.8,
+     "mealTag": "none",
+     "value": 21261,
+     "timestamp": "2001-03-10T07:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984210300,
+     "y": 11.8,
+     "mealTag": "none",
+     "value": 21261,
+     "timestamp": "2001-03-10T07:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984210600,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-10T07:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984210900,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-10T07:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984211200,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-10T08:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984211500,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-10T08:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984211800,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-10T08:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984212100,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-10T08:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984212400,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-10T08:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984212700,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-10T08:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984213000,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T08:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984213300,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T08:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984213600,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T08:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984213900,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T08:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984214200,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T08:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984214500,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T08:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984214800,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T09:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984215100,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T09:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984215400,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T09:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984215700,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T09:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984216000,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T09:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984216300,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T09:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984216600,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T09:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984216900,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T09:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984217200,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T09:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984217500,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T09:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984217800,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T09:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984218100,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T09:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984218400,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T10:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984218700,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T10:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984219000,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T10:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984219300,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T10:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984219600,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-10T10:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984219900,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-10T10:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984220200,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-10T10:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984220500,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-10T10:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984220800,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-10T10:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984221100,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-10T10:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984221400,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-10T10:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984221700,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-10T10:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984222000,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-10T11:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984222300,
+     "y": 11.8,
+     "mealTag": "none",
+     "value": 21261,
+     "timestamp": "2001-03-10T11:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984222600,
+     "y": 11.8,
+     "mealTag": "none",
+     "value": 21261,
+     "timestamp": "2001-03-10T11:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984222900,
+     "y": 11.8,
+     "mealTag": "none",
+     "value": 21261,
+     "timestamp": "2001-03-10T11:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984223200,
+     "y": 11.8,
+     "mealTag": "none",
+     "value": 21261,
+     "timestamp": "2001-03-10T11:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984223500,
+     "y": 11.8,
+     "mealTag": "none",
+     "value": 21261,
+     "timestamp": "2001-03-10T11:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984223800,
+     "y": 11.8,
+     "mealTag": "none",
+     "value": 21261,
+     "timestamp": "2001-03-10T11:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984224100,
+     "y": 11.7,
+     "mealTag": "none",
+     "value": 21081,
+     "timestamp": "2001-03-10T11:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984224400,
+     "y": 11.7,
+     "mealTag": "none",
+     "value": 21081,
+     "timestamp": "2001-03-10T11:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984224700,
+     "y": 11.7,
+     "mealTag": "none",
+     "value": 21081,
+     "timestamp": "2001-03-10T11:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984225000,
+     "y": 11.7,
+     "mealTag": "none",
+     "value": 21081,
+     "timestamp": "2001-03-10T11:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984225300,
+     "y": 11.7,
+     "mealTag": "none",
+     "value": 21081,
+     "timestamp": "2001-03-10T11:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984225600,
+     "y": 11.6,
+     "mealTag": "none",
+     "value": 20901,
+     "timestamp": "2001-03-10T12:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984225900,
+     "y": 11.6,
+     "mealTag": "none",
+     "value": 20901,
+     "timestamp": "2001-03-10T12:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984226200,
+     "y": 11.6,
+     "mealTag": "none",
+     "value": 20901,
+     "timestamp": "2001-03-10T12:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984226500,
+     "y": 11.6,
+     "mealTag": "none",
+     "value": 20901,
+     "timestamp": "2001-03-10T12:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984226800,
+     "y": 11.5,
+     "mealTag": "none",
+     "value": 20721,
+     "timestamp": "2001-03-10T12:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984227100,
+     "y": 11.5,
+     "mealTag": "none",
+     "value": 20721,
+     "timestamp": "2001-03-10T12:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984227400,
+     "y": 11.5,
+     "mealTag": "none",
+     "value": 20721,
+     "timestamp": "2001-03-10T12:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984227700,
+     "y": 11.5,
+     "mealTag": "none",
+     "value": 20721,
+     "timestamp": "2001-03-10T12:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984228000,
+     "y": 11.4,
+     "mealTag": "none",
+     "value": 20541,
+     "timestamp": "2001-03-10T12:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984228300,
+     "y": 11.4,
+     "mealTag": "none",
+     "value": 20541,
+     "timestamp": "2001-03-10T12:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984228600,
+     "y": 11.4,
+     "mealTag": "none",
+     "value": 20541,
+     "timestamp": "2001-03-10T12:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984228900,
+     "y": 11.3,
+     "mealTag": "none",
+     "value": 20361,
+     "timestamp": "2001-03-10T12:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984229200,
+     "y": 11.3,
+     "mealTag": "none",
+     "value": 20361,
+     "timestamp": "2001-03-10T13:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984229500,
+     "y": 11.3,
+     "mealTag": "none",
+     "value": 20361,
+     "timestamp": "2001-03-10T13:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984229800,
+     "y": 11.2,
+     "mealTag": "none",
+     "value": 20180,
+     "timestamp": "2001-03-10T13:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984230100,
+     "y": 11.2,
+     "mealTag": "none",
+     "value": 20180,
+     "timestamp": "2001-03-10T13:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984230400,
+     "y": 11.2,
+     "mealTag": "none",
+     "value": 20180,
+     "timestamp": "2001-03-10T13:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984230700,
+     "y": 11.1,
+     "mealTag": "none",
+     "value": 20000,
+     "timestamp": "2001-03-10T13:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984231000,
+     "y": 11.1,
+     "mealTag": "none",
+     "value": 20000,
+     "timestamp": "2001-03-10T13:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984231300,
+     "y": 11.1,
+     "mealTag": "none",
+     "value": 20000,
+     "timestamp": "2001-03-10T13:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984231600,
+     "y": 11,
+     "mealTag": "none",
+     "value": 19820,
+     "timestamp": "2001-03-10T13:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984231900,
+     "y": 11,
+     "mealTag": "none",
+     "value": 19820,
+     "timestamp": "2001-03-10T13:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984232200,
+     "y": 11,
+     "mealTag": "none",
+     "value": 19820,
+     "timestamp": "2001-03-10T13:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984232500,
+     "y": 10.9,
+     "mealTag": "none",
+     "value": 19640,
+     "timestamp": "2001-03-10T13:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984232800,
+     "y": 10.9,
+     "mealTag": "none",
+     "value": 19640,
+     "timestamp": "2001-03-10T14:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984233100,
+     "y": 10.9,
+     "mealTag": "none",
+     "value": 19640,
+     "timestamp": "2001-03-10T14:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984233400,
+     "y": 10.8,
+     "mealTag": "none",
+     "value": 19460,
+     "timestamp": "2001-03-10T14:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984233700,
+     "y": 10.8,
+     "mealTag": "none",
+     "value": 19460,
+     "timestamp": "2001-03-10T14:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984234000,
+     "y": 10.7,
+     "mealTag": "none",
+     "value": 19279,
+     "timestamp": "2001-03-10T14:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984234300,
+     "y": 10.7,
+     "mealTag": "none",
+     "value": 19279,
+     "timestamp": "2001-03-10T14:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984234600,
+     "y": 10.7,
+     "mealTag": "none",
+     "value": 19279,
+     "timestamp": "2001-03-10T14:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984234900,
+     "y": 10.6,
+     "mealTag": "none",
+     "value": 19099,
+     "timestamp": "2001-03-10T14:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984235200,
+     "y": 10.6,
+     "mealTag": "none",
+     "value": 19099,
+     "timestamp": "2001-03-10T14:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984235500,
+     "y": 10.5,
+     "mealTag": "none",
+     "value": 18919,
+     "timestamp": "2001-03-10T14:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984235800,
+     "y": 10.5,
+     "mealTag": "none",
+     "value": 18919,
+     "timestamp": "2001-03-10T14:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984236100,
+     "y": 10.4,
+     "mealTag": "none",
+     "value": 18739,
+     "timestamp": "2001-03-10T14:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984236400,
+     "y": 10.4,
+     "mealTag": "none",
+     "value": 18739,
+     "timestamp": "2001-03-10T15:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984236700,
+     "y": 10.3,
+     "mealTag": "none",
+     "value": 18559,
+     "timestamp": "2001-03-10T15:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984237000,
+     "y": 10.3,
+     "mealTag": "none",
+     "value": 18559,
+     "timestamp": "2001-03-10T15:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984237300,
+     "y": 10.3,
+     "mealTag": "none",
+     "value": 18559,
+     "timestamp": "2001-03-10T15:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984237600,
+     "y": 10.2,
+     "mealTag": "none",
+     "value": 18379,
+     "timestamp": "2001-03-10T15:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984237900,
+     "y": 10.2,
+     "mealTag": "none",
+     "value": 18379,
+     "timestamp": "2001-03-10T15:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984238200,
+     "y": 10.1,
+     "mealTag": "none",
+     "value": 18198,
+     "timestamp": "2001-03-10T15:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984238500,
+     "y": 10.1,
+     "mealTag": "none",
+     "value": 18198,
+     "timestamp": "2001-03-10T15:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984330000,
+     "y": 10.1,
+     "mealTag": "none",
+     "value": 18198,
+     "timestamp": "2001-03-11T17:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984330300,
+     "y": 10.1,
+     "mealTag": "none",
+     "value": 18198,
+     "timestamp": "2001-03-11T17:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984330600,
+     "y": 10.2,
+     "mealTag": "none",
+     "value": 18379,
+     "timestamp": "2001-03-11T17:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984330900,
+     "y": 10.2,
+     "mealTag": "none",
+     "value": 18379,
+     "timestamp": "2001-03-11T17:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984331200,
+     "y": 10.3,
+     "mealTag": "none",
+     "value": 18559,
+     "timestamp": "2001-03-11T17:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984331500,
+     "y": 10.3,
+     "mealTag": "none",
+     "value": 18559,
+     "timestamp": "2001-03-11T17:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984331800,
+     "y": 10.4,
+     "mealTag": "none",
+     "value": 18739,
+     "timestamp": "2001-03-11T17:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984332100,
+     "y": 10.4,
+     "mealTag": "none",
+     "value": 18739,
+     "timestamp": "2001-03-11T17:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984332400,
+     "y": 10.5,
+     "mealTag": "none",
+     "value": 18919,
+     "timestamp": "2001-03-11T17:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984332700,
+     "y": 10.5,
+     "mealTag": "none",
+     "value": 18919,
+     "timestamp": "2001-03-11T17:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984333000,
+     "y": 10.5,
+     "mealTag": "none",
+     "value": 18919,
+     "timestamp": "2001-03-11T17:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984333300,
+     "y": 10.6,
+     "mealTag": "none",
+     "value": 19099,
+     "timestamp": "2001-03-11T17:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984333600,
+     "y": 10.6,
+     "mealTag": "none",
+     "value": 19099,
+     "timestamp": "2001-03-11T18:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984333900,
+     "y": 10.7,
+     "mealTag": "none",
+     "value": 19279,
+     "timestamp": "2001-03-11T18:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984334200,
+     "y": 10.7,
+     "mealTag": "none",
+     "value": 19279,
+     "timestamp": "2001-03-11T18:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984334500,
+     "y": 10.8,
+     "mealTag": "none",
+     "value": 19460,
+     "timestamp": "2001-03-11T18:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984334800,
+     "y": 10.8,
+     "mealTag": "none",
+     "value": 19460,
+     "timestamp": "2001-03-11T18:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984335100,
+     "y": 10.8,
+     "mealTag": "none",
+     "value": 19460,
+     "timestamp": "2001-03-11T18:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984335400,
+     "y": 10.9,
+     "mealTag": "none",
+     "value": 19640,
+     "timestamp": "2001-03-11T18:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984335700,
+     "y": 10.9,
+     "mealTag": "none",
+     "value": 19640,
+     "timestamp": "2001-03-11T18:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984336000,
+     "y": 10.9,
+     "mealTag": "none",
+     "value": 19640,
+     "timestamp": "2001-03-11T18:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984336300,
+     "y": 11,
+     "mealTag": "none",
+     "value": 19820,
+     "timestamp": "2001-03-11T18:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984336600,
+     "y": 11,
+     "mealTag": "none",
+     "value": 19820,
+     "timestamp": "2001-03-11T18:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984336900,
+     "y": 11.1,
+     "mealTag": "none",
+     "value": 20000,
+     "timestamp": "2001-03-11T18:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984337200,
+     "y": 11.1,
+     "mealTag": "none",
+     "value": 20000,
+     "timestamp": "2001-03-11T19:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984337500,
+     "y": 11.1,
+     "mealTag": "none",
+     "value": 20000,
+     "timestamp": "2001-03-11T19:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984337800,
+     "y": 11.2,
+     "mealTag": "none",
+     "value": 20180,
+     "timestamp": "2001-03-11T19:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984338100,
+     "y": 11.2,
+     "mealTag": "none",
+     "value": 20180,
+     "timestamp": "2001-03-11T19:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984338400,
+     "y": 11.2,
+     "mealTag": "none",
+     "value": 20180,
+     "timestamp": "2001-03-11T19:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984338700,
+     "y": 11.3,
+     "mealTag": "none",
+     "value": 20361,
+     "timestamp": "2001-03-11T19:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984339000,
+     "y": 11.3,
+     "mealTag": "none",
+     "value": 20361,
+     "timestamp": "2001-03-11T19:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984339300,
+     "y": 11.3,
+     "mealTag": "none",
+     "value": 20361,
+     "timestamp": "2001-03-11T19:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984339600,
+     "y": 11.4,
+     "mealTag": "none",
+     "value": 20541,
+     "timestamp": "2001-03-11T19:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984339900,
+     "y": 11.4,
+     "mealTag": "none",
+     "value": 20541,
+     "timestamp": "2001-03-11T19:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984340200,
+     "y": 11.4,
+     "mealTag": "none",
+     "value": 20541,
+     "timestamp": "2001-03-11T19:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984340500,
+     "y": 11.4,
+     "mealTag": "none",
+     "value": 20541,
+     "timestamp": "2001-03-11T19:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984340800,
+     "y": 11.5,
+     "mealTag": "none",
+     "value": 20721,
+     "timestamp": "2001-03-11T20:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984341100,
+     "y": 11.5,
+     "mealTag": "none",
+     "value": 20721,
+     "timestamp": "2001-03-11T20:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984341400,
+     "y": 11.5,
+     "mealTag": "none",
+     "value": 20721,
+     "timestamp": "2001-03-11T20:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984341700,
+     "y": 11.5,
+     "mealTag": "none",
+     "value": 20721,
+     "timestamp": "2001-03-11T20:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984342000,
+     "y": 11.6,
+     "mealTag": "none",
+     "value": 20901,
+     "timestamp": "2001-03-11T20:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984342300,
+     "y": 11.6,
+     "mealTag": "none",
+     "value": 20901,
+     "timestamp": "2001-03-11T20:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984342600,
+     "y": 11.6,
+     "mealTag": "none",
+     "value": 20901,
+     "timestamp": "2001-03-11T20:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984342900,
+     "y": 11.6,
+     "mealTag": "none",
+     "value": 20901,
+     "timestamp": "2001-03-11T20:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984343200,
+     "y": 11.7,
+     "mealTag": "none",
+     "value": 21081,
+     "timestamp": "2001-03-11T20:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984343500,
+     "y": 11.7,
+     "mealTag": "none",
+     "value": 21081,
+     "timestamp": "2001-03-11T20:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984343800,
+     "y": 11.7,
+     "mealTag": "none",
+     "value": 21081,
+     "timestamp": "2001-03-11T20:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984344100,
+     "y": 11.7,
+     "mealTag": "none",
+     "value": 21081,
+     "timestamp": "2001-03-11T20:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984344400,
+     "y": 11.8,
+     "mealTag": "none",
+     "value": 21261,
+     "timestamp": "2001-03-11T21:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984344700,
+     "y": 11.8,
+     "mealTag": "none",
+     "value": 21261,
+     "timestamp": "2001-03-11T21:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984345000,
+     "y": 11.8,
+     "mealTag": "none",
+     "value": 21261,
+     "timestamp": "2001-03-11T21:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984345300,
+     "y": 11.8,
+     "mealTag": "none",
+     "value": 21261,
+     "timestamp": "2001-03-11T21:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984345600,
+     "y": 11.8,
+     "mealTag": "none",
+     "value": 21261,
+     "timestamp": "2001-03-11T21:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984345900,
+     "y": 11.8,
+     "mealTag": "none",
+     "value": 21261,
+     "timestamp": "2001-03-11T21:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984346200,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-11T21:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984346500,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-11T21:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984346800,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-11T21:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984347100,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-11T21:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984347400,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-11T21:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984347700,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-11T21:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984348000,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-11T22:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984348300,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-11T22:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984348600,
+     "y": 11.9,
+     "mealTag": "none",
+     "value": 21442,
+     "timestamp": "2001-03-11T22:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984348900,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-11T22:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984349200,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-11T22:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984349500,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-11T22:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984349800,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-11T22:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984350100,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-11T22:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984350400,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-11T22:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984350700,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-11T22:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984351000,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-11T22:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984351300,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-11T22:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984351600,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-11T23:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984351900,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-11T23:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984352200,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-11T23:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984352500,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-11T23:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984352800,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-11T23:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984353100,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-11T23:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984353400,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-11T23:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984353700,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-11T23:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984354000,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-11T23:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984354300,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-11T23:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984354600,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-11T23:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984354900,
+     "y": 12,
+     "mealTag": "none",
+     "value": 21622,
+     "timestamp": "2001-03-11T23:55:00.000Z",
+     "calculated": false
+    }
+   ],
+   "cgmNormal": [
+    {
+     "x": 984182400,
+     "y": 8,
+     "mealTag": "none",
+     "value": 14415,
+     "timestamp": "2001-03-10T00:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984182700,
+     "y": 8.1,
+     "mealTag": "none",
+     "value": 14595,
+     "timestamp": "2001-03-10T00:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984183000,
+     "y": 8.1,
+     "mealTag": "none",
+     "value": 14595,
+     "timestamp": "2001-03-10T00:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984183300,
+     "y": 8.2,
+     "mealTag": "none",
+     "value": 14775,
+     "timestamp": "2001-03-10T00:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984183600,
+     "y": 8.2,
+     "mealTag": "none",
+     "value": 14775,
+     "timestamp": "2001-03-10T00:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984183900,
+     "y": 8.3,
+     "mealTag": "none",
+     "value": 14955,
+     "timestamp": "2001-03-10T00:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984184200,
+     "y": 8.3,
+     "mealTag": "none",
+     "value": 14955,
+     "timestamp": "2001-03-10T00:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984184500,
+     "y": 8.4,
+     "mealTag": "none",
+     "value": 15135,
+     "timestamp": "2001-03-10T00:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984184800,
+     "y": 8.4,
+     "mealTag": "none",
+     "value": 15135,
+     "timestamp": "2001-03-10T00:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984185100,
+     "y": 8.5,
+     "mealTag": "none",
+     "value": 15315,
+     "timestamp": "2001-03-10T00:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984185400,
+     "y": 8.6,
+     "mealTag": "none",
+     "value": 15496,
+     "timestamp": "2001-03-10T00:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984185700,
+     "y": 8.6,
+     "mealTag": "none",
+     "value": 15496,
+     "timestamp": "2001-03-10T00:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984186000,
+     "y": 8.7,
+     "mealTag": "none",
+     "value": 15676,
+     "timestamp": "2001-03-10T01:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984186300,
+     "y": 8.7,
+     "mealTag": "none",
+     "value": 15676,
+     "timestamp": "2001-03-10T01:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984186600,
+     "y": 8.8,
+     "mealTag": "none",
+     "value": 15856,
+     "timestamp": "2001-03-10T01:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984186900,
+     "y": 8.8,
+     "mealTag": "none",
+     "value": 15856,
+     "timestamp": "2001-03-10T01:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984187200,
+     "y": 8.9,
+     "mealTag": "none",
+     "value": 16036,
+     "timestamp": "2001-03-10T01:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984187500,
+     "y": 8.9,
+     "mealTag": "none",
+     "value": 16036,
+     "timestamp": "2001-03-10T01:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984187800,
+     "y": 9,
+     "mealTag": "none",
+     "value": 16216,
+     "timestamp": "2001-03-10T01:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984188100,
+     "y": 9,
+     "mealTag": "none",
+     "value": 16216,
+     "timestamp": "2001-03-10T01:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984188400,
+     "y": 9.1,
+     "mealTag": "none",
+     "value": 16397,
+     "timestamp": "2001-03-10T01:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984188700,
+     "y": 9.2,
+     "mealTag": "none",
+     "value": 16577,
+     "timestamp": "2001-03-10T01:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984189000,
+     "y": 9.2,
+     "mealTag": "none",
+     "value": 16577,
+     "timestamp": "2001-03-10T01:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984189300,
+     "y": 9.3,
+     "mealTag": "none",
+     "value": 16757,
+     "timestamp": "2001-03-10T01:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984189600,
+     "y": 9.3,
+     "mealTag": "none",
+     "value": 16757,
+     "timestamp": "2001-03-10T02:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984189900,
+     "y": 9.4,
+     "mealTag": "none",
+     "value": 16937,
+     "timestamp": "2001-03-10T02:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984190200,
+     "y": 9.4,
+     "mealTag": "none",
+     "value": 16937,
+     "timestamp": "2001-03-10T02:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984190500,
+     "y": 9.5,
+     "mealTag": "none",
+     "value": 17117,
+     "timestamp": "2001-03-10T02:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984190800,
+     "y": 9.5,
+     "mealTag": "none",
+     "value": 17117,
+     "timestamp": "2001-03-10T02:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984191100,
+     "y": 9.6,
+     "mealTag": "none",
+     "value": 17297,
+     "timestamp": "2001-03-10T02:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984191400,
+     "y": 9.6,
+     "mealTag": "none",
+     "value": 17297,
+     "timestamp": "2001-03-10T02:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984191700,
+     "y": 9.7,
+     "mealTag": "none",
+     "value": 17478,
+     "timestamp": "2001-03-10T02:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984192000,
+     "y": 9.7,
+     "mealTag": "none",
+     "value": 17478,
+     "timestamp": "2001-03-10T02:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984192300,
+     "y": 9.8,
+     "mealTag": "none",
+     "value": 17658,
+     "timestamp": "2001-03-10T02:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984192600,
+     "y": 9.8,
+     "mealTag": "none",
+     "value": 17658,
+     "timestamp": "2001-03-10T02:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984192900,
+     "y": 9.9,
+     "mealTag": "none",
+     "value": 17838,
+     "timestamp": "2001-03-10T02:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984193200,
+     "y": 9.9,
+     "mealTag": "none",
+     "value": 17838,
+     "timestamp": "2001-03-10T03:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984193500,
+     "y": 10,
+     "mealTag": "none",
+     "value": 18018,
+     "timestamp": "2001-03-10T03:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984193800,
+     "y": 10,
+     "mealTag": "none",
+     "value": 18018,
+     "timestamp": "2001-03-10T03:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984238800,
+     "y": 10,
+     "mealTag": "none",
+     "value": 18018,
+     "timestamp": "2001-03-10T15:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984239100,
+     "y": 10,
+     "mealTag": "none",
+     "value": 18018,
+     "timestamp": "2001-03-10T15:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984239400,
+     "y": 9.9,
+     "mealTag": "none",
+     "value": 17838,
+     "timestamp": "2001-03-10T15:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984239700,
+     "y": 9.9,
+     "mealTag": "none",
+     "value": 17838,
+     "timestamp": "2001-03-10T15:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984240000,
+     "y": 9.8,
+     "mealTag": "none",
+     "value": 17658,
+     "timestamp": "2001-03-10T16:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984240300,
+     "y": 9.8,
+     "mealTag": "none",
+     "value": 17658,
+     "timestamp": "2001-03-10T16:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984240600,
+     "y": 9.7,
+     "mealTag": "none",
+     "value": 17478,
+     "timestamp": "2001-03-10T16:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984240900,
+     "y": 9.7,
+     "mealTag": "none",
+     "value": 17478,
+     "timestamp": "2001-03-10T16:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984241200,
+     "y": 9.6,
+     "mealTag": "none",
+     "value": 17297,
+     "timestamp": "2001-03-10T16:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984241500,
+     "y": 9.6,
+     "mealTag": "none",
+     "value": 17297,
+     "timestamp": "2001-03-10T16:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984241800,
+     "y": 9.5,
+     "mealTag": "none",
+     "value": 17117,
+     "timestamp": "2001-03-10T16:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984242100,
+     "y": 9.5,
+     "mealTag": "none",
+     "value": 17117,
+     "timestamp": "2001-03-10T16:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984242400,
+     "y": 9.4,
+     "mealTag": "none",
+     "value": 16937,
+     "timestamp": "2001-03-10T16:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984242700,
+     "y": 9.4,
+     "mealTag": "none",
+     "value": 16937,
+     "timestamp": "2001-03-10T16:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984243000,
+     "y": 9.3,
+     "mealTag": "none",
+     "value": 16757,
+     "timestamp": "2001-03-10T16:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984243300,
+     "y": 9.3,
+     "mealTag": "none",
+     "value": 16757,
+     "timestamp": "2001-03-10T16:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984243600,
+     "y": 9.2,
+     "mealTag": "none",
+     "value": 16577,
+     "timestamp": "2001-03-10T17:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984243900,
+     "y": 9.2,
+     "mealTag": "none",
+     "value": 16577,
+     "timestamp": "2001-03-10T17:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984244200,
+     "y": 9.1,
+     "mealTag": "none",
+     "value": 16397,
+     "timestamp": "2001-03-10T17:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984244500,
+     "y": 9.1,
+     "mealTag": "none",
+     "value": 16397,
+     "timestamp": "2001-03-10T17:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984244800,
+     "y": 9,
+     "mealTag": "none",
+     "value": 16216,
+     "timestamp": "2001-03-10T17:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984245100,
+     "y": 8.9,
+     "mealTag": "none",
+     "value": 16036,
+     "timestamp": "2001-03-10T17:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984245400,
+     "y": 8.9,
+     "mealTag": "none",
+     "value": 16036,
+     "timestamp": "2001-03-10T17:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984245700,
+     "y": 8.8,
+     "mealTag": "none",
+     "value": 15856,
+     "timestamp": "2001-03-10T17:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984246000,
+     "y": 8.8,
+     "mealTag": "none",
+     "value": 15856,
+     "timestamp": "2001-03-10T17:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984246300,
+     "y": 8.7,
+     "mealTag": "none",
+     "value": 15676,
+     "timestamp": "2001-03-10T17:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984246600,
+     "y": 8.7,
+     "mealTag": "none",
+     "value": 15676,
+     "timestamp": "2001-03-10T17:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984246900,
+     "y": 8.6,
+     "mealTag": "none",
+     "value": 15496,
+     "timestamp": "2001-03-10T17:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984247200,
+     "y": 8.6,
+     "mealTag": "none",
+     "value": 15496,
+     "timestamp": "2001-03-10T18:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984247500,
+     "y": 8.5,
+     "mealTag": "none",
+     "value": 15315,
+     "timestamp": "2001-03-10T18:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984247800,
+     "y": 8.5,
+     "mealTag": "none",
+     "value": 15315,
+     "timestamp": "2001-03-10T18:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984248100,
+     "y": 8.4,
+     "mealTag": "none",
+     "value": 15135,
+     "timestamp": "2001-03-10T18:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984248400,
+     "y": 8.3,
+     "mealTag": "none",
+     "value": 14955,
+     "timestamp": "2001-03-10T18:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984248700,
+     "y": 8.3,
+     "mealTag": "none",
+     "value": 14955,
+     "timestamp": "2001-03-10T18:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984249000,
+     "y": 8.2,
+     "mealTag": "none",
+     "value": 14775,
+     "timestamp": "2001-03-10T18:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984249300,
+     "y": 8.2,
+     "mealTag": "none",
+     "value": 14775,
+     "timestamp": "2001-03-10T18:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984249600,
+     "y": 8.1,
+     "mealTag": "none",
+     "value": 14595,
+     "timestamp": "2001-03-10T18:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984249900,
+     "y": 8.1,
+     "mealTag": "none",
+     "value": 14595,
+     "timestamp": "2001-03-10T18:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984250200,
+     "y": 8,
+     "mealTag": "none",
+     "value": 14415,
+     "timestamp": "2001-03-10T18:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984250500,
+     "y": 8,
+     "mealTag": "none",
+     "value": 14415,
+     "timestamp": "2001-03-10T18:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984250800,
+     "y": 7.9,
+     "mealTag": "none",
+     "value": 14234,
+     "timestamp": "2001-03-10T19:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984251100,
+     "y": 7.8,
+     "mealTag": "none",
+     "value": 14054,
+     "timestamp": "2001-03-10T19:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984251400,
+     "y": 7.8,
+     "mealTag": "none",
+     "value": 14054,
+     "timestamp": "2001-03-10T19:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984251700,
+     "y": 7.7,
+     "mealTag": "none",
+     "value": 13874,
+     "timestamp": "2001-03-10T19:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984252000,
+     "y": 7.7,
+     "mealTag": "none",
+     "value": 13874,
+     "timestamp": "2001-03-10T19:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984252300,
+     "y": 7.6,
+     "mealTag": "none",
+     "value": 13694,
+     "timestamp": "2001-03-10T19:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984252600,
+     "y": 7.6,
+     "mealTag": "none",
+     "value": 13694,
+     "timestamp": "2001-03-10T19:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984252900,
+     "y": 7.5,
+     "mealTag": "none",
+     "value": 13514,
+     "timestamp": "2001-03-10T19:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984253200,
+     "y": 7.5,
+     "mealTag": "none",
+     "value": 13514,
+     "timestamp": "2001-03-10T19:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984253500,
+     "y": 7.4,
+     "mealTag": "none",
+     "value": 13333,
+     "timestamp": "2001-03-10T19:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984253800,
+     "y": 7.3,
+     "mealTag": "none",
+     "value": 13153,
+     "timestamp": "2001-03-10T19:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984254100,
+     "y": 7.3,
+     "mealTag": "none",
+     "value": 13153,
+     "timestamp": "2001-03-10T19:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984254400,
+     "y": 7.2,
+     "mealTag": "none",
+     "value": 12973,
+     "timestamp": "2001-03-10T20:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984254700,
+     "y": 7.2,
+     "mealTag": "none",
+     "value": 12973,
+     "timestamp": "2001-03-10T20:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984255000,
+     "y": 7.1,
+     "mealTag": "none",
+     "value": 12793,
+     "timestamp": "2001-03-10T20:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984255300,
+     "y": 7.1,
+     "mealTag": "none",
+     "value": 12793,
+     "timestamp": "2001-03-10T20:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984255600,
+     "y": 7,
+     "mealTag": "none",
+     "value": 12613,
+     "timestamp": "2001-03-10T20:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984255900,
+     "y": 7,
+     "mealTag": "none",
+     "value": 12613,
+     "timestamp": "2001-03-10T20:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984256200,
+     "y": 6.9,
+     "mealTag": "none",
+     "value": 12433,
+     "timestamp": "2001-03-10T20:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984256500,
+     "y": 6.9,
+     "mealTag": "none",
+     "value": 12433,
+     "timestamp": "2001-03-10T20:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984256800,
+     "y": 6.8,
+     "mealTag": "none",
+     "value": 12252,
+     "timestamp": "2001-03-10T20:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984257100,
+     "y": 6.8,
+     "mealTag": "none",
+     "value": 12252,
+     "timestamp": "2001-03-10T20:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984257400,
+     "y": 6.7,
+     "mealTag": "none",
+     "value": 12072,
+     "timestamp": "2001-03-10T20:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984257700,
+     "y": 6.6,
+     "mealTag": "none",
+     "value": 11892,
+     "timestamp": "2001-03-10T20:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984258000,
+     "y": 6.6,
+     "mealTag": "none",
+     "value": 11892,
+     "timestamp": "2001-03-10T21:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984258300,
+     "y": 6.5,
+     "mealTag": "none",
+     "value": 11712,
+     "timestamp": "2001-03-10T21:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984258600,
+     "y": 6.5,
+     "mealTag": "none",
+     "value": 11712,
+     "timestamp": "2001-03-10T21:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984258900,
+     "y": 6.4,
+     "mealTag": "none",
+     "value": 11532,
+     "timestamp": "2001-03-10T21:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984259200,
+     "y": 6.4,
+     "mealTag": "none",
+     "value": 11532,
+     "timestamp": "2001-03-10T21:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984259500,
+     "y": 6.3,
+     "mealTag": "none",
+     "value": 11351,
+     "timestamp": "2001-03-10T21:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984259800,
+     "y": 6.3,
+     "mealTag": "none",
+     "value": 11351,
+     "timestamp": "2001-03-10T21:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984260100,
+     "y": 6.2,
+     "mealTag": "none",
+     "value": 11171,
+     "timestamp": "2001-03-10T21:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984260400,
+     "y": 6.2,
+     "mealTag": "none",
+     "value": 11171,
+     "timestamp": "2001-03-10T21:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984260700,
+     "y": 6.1,
+     "mealTag": "none",
+     "value": 10991,
+     "timestamp": "2001-03-10T21:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984261000,
+     "y": 6.1,
+     "mealTag": "none",
+     "value": 10991,
+     "timestamp": "2001-03-10T21:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984261300,
+     "y": 6,
+     "mealTag": "none",
+     "value": 10811,
+     "timestamp": "2001-03-10T21:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984261600,
+     "y": 6,
+     "mealTag": "none",
+     "value": 10811,
+     "timestamp": "2001-03-10T22:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984261900,
+     "y": 5.9,
+     "mealTag": "none",
+     "value": 10631,
+     "timestamp": "2001-03-10T22:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984262200,
+     "y": 5.9,
+     "mealTag": "none",
+     "value": 10631,
+     "timestamp": "2001-03-10T22:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984262500,
+     "y": 5.9,
+     "mealTag": "none",
+     "value": 10631,
+     "timestamp": "2001-03-10T22:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984262800,
+     "y": 5.8,
+     "mealTag": "none",
+     "value": 10451,
+     "timestamp": "2001-03-10T22:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984263100,
+     "y": 5.8,
+     "mealTag": "none",
+     "value": 10451,
+     "timestamp": "2001-03-10T22:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984263400,
+     "y": 5.7,
+     "mealTag": "none",
+     "value": 10270,
+     "timestamp": "2001-03-10T22:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984263700,
+     "y": 5.7,
+     "mealTag": "none",
+     "value": 10270,
+     "timestamp": "2001-03-10T22:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984264000,
+     "y": 5.6,
+     "mealTag": "none",
+     "value": 10090,
+     "timestamp": "2001-03-10T22:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984264300,
+     "y": 5.6,
+     "mealTag": "none",
+     "value": 10090,
+     "timestamp": "2001-03-10T22:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984264600,
+     "y": 5.5,
+     "mealTag": "none",
+     "value": 9910,
+     "timestamp": "2001-03-10T22:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984264900,
+     "y": 5.5,
+     "mealTag": "none",
+     "value": 9910,
+     "timestamp": "2001-03-10T22:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984265200,
+     "y": 5.4,
+     "mealTag": "none",
+     "value": 9730,
+     "timestamp": "2001-03-10T23:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984265500,
+     "y": 5.4,
+     "mealTag": "none",
+     "value": 9730,
+     "timestamp": "2001-03-10T23:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984265800,
+     "y": 5.4,
+     "mealTag": "none",
+     "value": 9730,
+     "timestamp": "2001-03-10T23:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984266100,
+     "y": 5.3,
+     "mealTag": "none",
+     "value": 9550,
+     "timestamp": "2001-03-10T23:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984266400,
+     "y": 5.3,
+     "mealTag": "none",
+     "value": 9550,
+     "timestamp": "2001-03-10T23:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984266700,
+     "y": 5.2,
+     "mealTag": "none",
+     "value": 9369,
+     "timestamp": "2001-03-10T23:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984267000,
+     "y": 5.2,
+     "mealTag": "none",
+     "value": 9369,
+     "timestamp": "2001-03-10T23:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984267300,
+     "y": 5.2,
+     "mealTag": "none",
+     "value": 9369,
+     "timestamp": "2001-03-10T23:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984267600,
+     "y": 5.1,
+     "mealTag": "none",
+     "value": 9189,
+     "timestamp": "2001-03-10T23:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984267900,
+     "y": 5.1,
+     "mealTag": "none",
+     "value": 9189,
+     "timestamp": "2001-03-10T23:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984268200,
+     "y": 5,
+     "mealTag": "none",
+     "value": 9009,
+     "timestamp": "2001-03-10T23:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984268500,
+     "y": 5,
+     "mealTag": "none",
+     "value": 9009,
+     "timestamp": "2001-03-10T23:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984268800,
+     "y": 5,
+     "mealTag": "none",
+     "value": 9009,
+     "timestamp": "2001-03-11T00:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984269100,
+     "y": 4.9,
+     "mealTag": "none",
+     "value": 8829,
+     "timestamp": "2001-03-11T00:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984269400,
+     "y": 4.9,
+     "mealTag": "none",
+     "value": 8829,
+     "timestamp": "2001-03-11T00:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984269700,
+     "y": 4.9,
+     "mealTag": "none",
+     "value": 8829,
+     "timestamp": "2001-03-11T00:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984270000,
+     "y": 4.8,
+     "mealTag": "none",
+     "value": 8649,
+     "timestamp": "2001-03-11T00:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984270300,
+     "y": 4.8,
+     "mealTag": "none",
+     "value": 8649,
+     "timestamp": "2001-03-11T00:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984270600,
+     "y": 4.8,
+     "mealTag": "none",
+     "value": 8649,
+     "timestamp": "2001-03-11T00:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984270900,
+     "y": 4.7,
+     "mealTag": "none",
+     "value": 8469,
+     "timestamp": "2001-03-11T00:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984271200,
+     "y": 4.7,
+     "mealTag": "none",
+     "value": 8469,
+     "timestamp": "2001-03-11T00:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984271500,
+     "y": 4.7,
+     "mealTag": "none",
+     "value": 8469,
+     "timestamp": "2001-03-11T00:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984271800,
+     "y": 4.6,
+     "mealTag": "none",
+     "value": 8288,
+     "timestamp": "2001-03-11T00:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984272100,
+     "y": 4.6,
+     "mealTag": "none",
+     "value": 8288,
+     "timestamp": "2001-03-11T00:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984272400,
+     "y": 4.6,
+     "mealTag": "none",
+     "value": 8288,
+     "timestamp": "2001-03-11T01:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984272700,
+     "y": 4.6,
+     "mealTag": "none",
+     "value": 8288,
+     "timestamp": "2001-03-11T01:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984273000,
+     "y": 4.5,
+     "mealTag": "none",
+     "value": 8108,
+     "timestamp": "2001-03-11T01:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984273300,
+     "y": 4.5,
+     "mealTag": "none",
+     "value": 8108,
+     "timestamp": "2001-03-11T01:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984273600,
+     "y": 4.5,
+     "mealTag": "none",
+     "value": 8108,
+     "timestamp": "2001-03-11T01:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984273900,
+     "y": 4.4,
+     "mealTag": "none",
+     "value": 7928,
+     "timestamp": "2001-03-11T01:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984274200,
+     "y": 4.4,
+     "mealTag": "none",
+     "value": 7928,
+     "timestamp": "2001-03-11T01:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984274500,
+     "y": 4.4,
+     "mealTag": "none",
+     "value": 7928,
+     "timestamp": "2001-03-11T01:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984274800,
+     "y": 4.4,
+     "mealTag": "none",
+     "value": 7928,
+     "timestamp": "2001-03-11T01:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984275100,
+     "y": 4.3,
+     "mealTag": "none",
+     "value": 7748,
+     "timestamp": "2001-03-11T01:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984275400,
+     "y": 4.3,
+     "mealTag": "none",
+     "value": 7748,
+     "timestamp": "2001-03-11T01:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984275700,
+     "y": 4.3,
+     "mealTag": "none",
+     "value": 7748,
+     "timestamp": "2001-03-11T01:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984276000,
+     "y": 4.3,
+     "mealTag": "none",
+     "value": 7748,
+     "timestamp": "2001-03-11T02:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984276300,
+     "y": 4.3,
+     "mealTag": "none",
+     "value": 7748,
+     "timestamp": "2001-03-11T02:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984276600,
+     "y": 4.2,
+     "mealTag": "none",
+     "value": 7568,
+     "timestamp": "2001-03-11T02:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984276900,
+     "y": 4.2,
+     "mealTag": "none",
+     "value": 7568,
+     "timestamp": "2001-03-11T02:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984277200,
+     "y": 4.2,
+     "mealTag": "none",
+     "value": 7568,
+     "timestamp": "2001-03-11T02:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984277500,
+     "y": 4.2,
+     "mealTag": "none",
+     "value": 7568,
+     "timestamp": "2001-03-11T02:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984277800,
+     "y": 4.2,
+     "mealTag": "none",
+     "value": 7568,
+     "timestamp": "2001-03-11T02:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984278100,
+     "y": 4.2,
+     "mealTag": "none",
+     "value": 7568,
+     "timestamp": "2001-03-11T02:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984278400,
+     "y": 4.1,
+     "mealTag": "none",
+     "value": 7387,
+     "timestamp": "2001-03-11T02:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984278700,
+     "y": 4.1,
+     "mealTag": "none",
+     "value": 7387,
+     "timestamp": "2001-03-11T02:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984279000,
+     "y": 4.1,
+     "mealTag": "none",
+     "value": 7387,
+     "timestamp": "2001-03-11T02:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984279300,
+     "y": 4.1,
+     "mealTag": "none",
+     "value": 7387,
+     "timestamp": "2001-03-11T02:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984279600,
+     "y": 4.1,
+     "mealTag": "none",
+     "value": 7387,
+     "timestamp": "2001-03-11T03:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984279900,
+     "y": 4.1,
+     "mealTag": "none",
+     "value": 7387,
+     "timestamp": "2001-03-11T03:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984280200,
+     "y": 4.1,
+     "mealTag": "none",
+     "value": 7387,
+     "timestamp": "2001-03-11T03:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984280500,
+     "y": 4.1,
+     "mealTag": "none",
+     "value": 7387,
+     "timestamp": "2001-03-11T03:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984280800,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T03:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984281100,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T03:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984281400,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T03:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984281700,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T03:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984282000,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T03:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984282300,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T03:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984282600,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T03:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984282900,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T03:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984283200,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T04:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984283500,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T04:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984283800,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T04:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984284100,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T04:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984284400,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T04:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984284700,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T04:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984285000,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T04:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984285300,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T04:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984285600,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T04:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984285900,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T04:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984286200,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T04:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984286500,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T04:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984286800,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T05:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984287100,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T05:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984287400,
+     "y": 4,
+     "mealTag": "none",
+     "value": 7207,
+     "timestamp": "2001-03-11T05:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984287700,
+     "y": 4.1,
+     "mealTag": "none",
+     "value": 7387,
+     "timestamp": "2001-03-11T05:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984288000,
+     "y": 4.1,
+     "mealTag": "none",
+     "value": 7387,
+     "timestamp": "2001-03-11T05:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984288300,
+     "y": 4.1,
+     "mealTag": "none",
+     "value": 7387,
+     "timestamp": "2001-03-11T05:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984288600,
+     "y": 4.1,
+     "mealTag": "none",
+     "value": 7387,
+     "timestamp": "2001-03-11T05:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984288900,
+     "y": 4.1,
+     "mealTag": "none",
+     "value": 7387,
+     "timestamp": "2001-03-11T05:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984289200,
+     "y": 4.1,
+     "mealTag": "none",
+     "value": 7387,
+     "timestamp": "2001-03-11T05:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984289500,
+     "y": 4.1,
+     "mealTag": "none",
+     "value": 7387,
+     "timestamp": "2001-03-11T05:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984289800,
+     "y": 4.1,
+     "mealTag": "none",
+     "value": 7387,
+     "timestamp": "2001-03-11T05:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984290100,
+     "y": 4.1,
+     "mealTag": "none",
+     "value": 7387,
+     "timestamp": "2001-03-11T05:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984290400,
+     "y": 4.2,
+     "mealTag": "none",
+     "value": 7568,
+     "timestamp": "2001-03-11T06:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984290700,
+     "y": 4.2,
+     "mealTag": "none",
+     "value": 7568,
+     "timestamp": "2001-03-11T06:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984291000,
+     "y": 4.2,
+     "mealTag": "none",
+     "value": 7568,
+     "timestamp": "2001-03-11T06:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984291300,
+     "y": 4.2,
+     "mealTag": "none",
+     "value": 7568,
+     "timestamp": "2001-03-11T06:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984291600,
+     "y": 4.2,
+     "mealTag": "none",
+     "value": 7568,
+     "timestamp": "2001-03-11T06:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984291900,
+     "y": 4.3,
+     "mealTag": "none",
+     "value": 7748,
+     "timestamp": "2001-03-11T06:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984292200,
+     "y": 4.3,
+     "mealTag": "none",
+     "value": 7748,
+     "timestamp": "2001-03-11T06:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984292500,
+     "y": 4.3,
+     "mealTag": "none",
+     "value": 7748,
+     "timestamp": "2001-03-11T06:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984292800,
+     "y": 4.3,
+     "mealTag": "none",
+     "value": 7748,
+     "timestamp": "2001-03-11T06:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984293100,
+     "y": 4.3,
+     "mealTag": "none",
+     "value": 7748,
+     "timestamp": "2001-03-11T06:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984293400,
+     "y": 4.4,
+     "mealTag": "none",
+     "value": 7928,
+     "timestamp": "2001-03-11T06:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984293700,
+     "y": 4.4,
+     "mealTag": "none",
+     "value": 7928,
+     "timestamp": "2001-03-11T06:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984294000,
+     "y": 4.4,
+     "mealTag": "none",
+     "value": 7928,
+     "timestamp": "2001-03-11T07:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984294300,
+     "y": 4.4,
+     "mealTag": "none",
+     "value": 7928,
+     "timestamp": "2001-03-11T07:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984294600,
+     "y": 4.5,
+     "mealTag": "none",
+     "value": 8108,
+     "timestamp": "2001-03-11T07:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984294900,
+     "y": 4.5,
+     "mealTag": "none",
+     "value": 8108,
+     "timestamp": "2001-03-11T07:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984295200,
+     "y": 4.5,
+     "mealTag": "none",
+     "value": 8108,
+     "timestamp": "2001-03-11T07:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984295500,
+     "y": 4.5,
+     "mealTag": "none",
+     "value": 8108,
+     "timestamp": "2001-03-11T07:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984295800,
+     "y": 4.6,
+     "mealTag": "none",
+     "value": 8288,
+     "timestamp": "2001-03-11T07:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984296100,
+     "y": 4.6,
+     "mealTag": "none",
+     "value": 8288,
+     "timestamp": "2001-03-11T07:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984296400,
+     "y": 4.6,
+     "mealTag": "none",
+     "value": 8288,
+     "timestamp": "2001-03-11T07:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984296700,
+     "y": 4.7,
+     "mealTag": "none",
+     "value": 8469,
+     "timestamp": "2001-03-11T07:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984297000,
+     "y": 4.7,
+     "mealTag": "none",
+     "value": 8469,
+     "timestamp": "2001-03-11T07:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984297300,
+     "y": 4.7,
+     "mealTag": "none",
+     "value": 8469,
+     "timestamp": "2001-03-11T07:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984297600,
+     "y": 4.7,
+     "mealTag": "none",
+     "value": 8469,
+     "timestamp": "2001-03-11T08:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984297900,
+     "y": 4.8,
+     "mealTag": "none",
+     "value": 8649,
+     "timestamp": "2001-03-11T08:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984298200,
+     "y": 4.8,
+     "mealTag": "none",
+     "value": 8649,
+     "timestamp": "2001-03-11T08:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984298500,
+     "y": 4.8,
+     "mealTag": "none",
+     "value": 8649,
+     "timestamp": "2001-03-11T08:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984298800,
+     "y": 4.9,
+     "mealTag": "none",
+     "value": 8829,
+     "timestamp": "2001-03-11T08:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984299100,
+     "y": 4.9,
+     "mealTag": "none",
+     "value": 8829,
+     "timestamp": "2001-03-11T08:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984299400,
+     "y": 5,
+     "mealTag": "none",
+     "value": 9009,
+     "timestamp": "2001-03-11T08:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984299700,
+     "y": 5,
+     "mealTag": "none",
+     "value": 9009,
+     "timestamp": "2001-03-11T08:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984300000,
+     "y": 5,
+     "mealTag": "none",
+     "value": 9009,
+     "timestamp": "2001-03-11T08:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984300300,
+     "y": 5.1,
+     "mealTag": "none",
+     "value": 9189,
+     "timestamp": "2001-03-11T08:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984300600,
+     "y": 5.1,
+     "mealTag": "none",
+     "value": 9189,
+     "timestamp": "2001-03-11T08:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984300900,
+     "y": 5.1,
+     "mealTag": "none",
+     "value": 9189,
+     "timestamp": "2001-03-11T08:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984301200,
+     "y": 5.2,
+     "mealTag": "none",
+     "value": 9369,
+     "timestamp": "2001-03-11T09:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984301500,
+     "y": 5.2,
+     "mealTag": "none",
+     "value": 9369,
+     "timestamp": "2001-03-11T09:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984301800,
+     "y": 5.3,
+     "mealTag": "none",
+     "value": 9550,
+     "timestamp": "2001-03-11T09:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984302100,
+     "y": 5.3,
+     "mealTag": "none",
+     "value": 9550,
+     "timestamp": "2001-03-11T09:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984302400,
+     "y": 5.3,
+     "mealTag": "none",
+     "value": 9550,
+     "timestamp": "2001-03-11T09:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984302700,
+     "y": 5.4,
+     "mealTag": "none",
+     "value": 9730,
+     "timestamp": "2001-03-11T09:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984303000,
+     "y": 5.4,
+     "mealTag": "none",
+     "value": 9730,
+     "timestamp": "2001-03-11T09:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984303300,
+     "y": 5.5,
+     "mealTag": "none",
+     "value": 9910,
+     "timestamp": "2001-03-11T09:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984303600,
+     "y": 5.5,
+     "mealTag": "none",
+     "value": 9910,
+     "timestamp": "2001-03-11T09:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984303900,
+     "y": 5.6,
+     "mealTag": "none",
+     "value": 10090,
+     "timestamp": "2001-03-11T09:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984304200,
+     "y": 5.6,
+     "mealTag": "none",
+     "value": 10090,
+     "timestamp": "2001-03-11T09:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984304500,
+     "y": 5.6,
+     "mealTag": "none",
+     "value": 10090,
+     "timestamp": "2001-03-11T09:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984304800,
+     "y": 5.7,
+     "mealTag": "none",
+     "value": 10270,
+     "timestamp": "2001-03-11T10:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984305100,
+     "y": 5.7,
+     "mealTag": "none",
+     "value": 10270,
+     "timestamp": "2001-03-11T10:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984305400,
+     "y": 5.8,
+     "mealTag": "none",
+     "value": 10451,
+     "timestamp": "2001-03-11T10:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984305700,
+     "y": 5.8,
+     "mealTag": "none",
+     "value": 10451,
+     "timestamp": "2001-03-11T10:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984306000,
+     "y": 5.9,
+     "mealTag": "none",
+     "value": 10631,
+     "timestamp": "2001-03-11T10:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984306300,
+     "y": 5.9,
+     "mealTag": "none",
+     "value": 10631,
+     "timestamp": "2001-03-11T10:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984306600,
+     "y": 6,
+     "mealTag": "none",
+     "value": 10811,
+     "timestamp": "2001-03-11T10:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984306900,
+     "y": 6,
+     "mealTag": "none",
+     "value": 10811,
+     "timestamp": "2001-03-11T10:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984307200,
+     "y": 6.1,
+     "mealTag": "none",
+     "value": 10991,
+     "timestamp": "2001-03-11T10:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984307500,
+     "y": 6.1,
+     "mealTag": "none",
+     "value": 10991,
+     "timestamp": "2001-03-11T10:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984307800,
+     "y": 6.2,
+     "mealTag": "none",
+     "value": 11171,
+     "timestamp": "2001-03-11T10:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984308100,
+     "y": 6.2,
+     "mealTag": "none",
+     "value": 11171,
+     "timestamp": "2001-03-11T10:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984308400,
+     "y": 6.3,
+     "mealTag": "none",
+     "value": 11351,
+     "timestamp": "2001-03-11T11:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984308700,
+     "y": 6.3,
+     "mealTag": "none",
+     "value": 11351,
+     "timestamp": "2001-03-11T11:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984309000,
+     "y": 6.4,
+     "mealTag": "none",
+     "value": 11532,
+     "timestamp": "2001-03-11T11:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984309300,
+     "y": 6.4,
+     "mealTag": "none",
+     "value": 11532,
+     "timestamp": "2001-03-11T11:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984309600,
+     "y": 6.5,
+     "mealTag": "none",
+     "value": 11712,
+     "timestamp": "2001-03-11T11:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984309900,
+     "y": 6.5,
+     "mealTag": "none",
+     "value": 11712,
+     "timestamp": "2001-03-11T11:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984310200,
+     "y": 6.6,
+     "mealTag": "none",
+     "value": 11892,
+     "timestamp": "2001-03-11T11:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984310500,
+     "y": 6.6,
+     "mealTag": "none",
+     "value": 11892,
+     "timestamp": "2001-03-11T11:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984310800,
+     "y": 6.7,
+     "mealTag": "none",
+     "value": 12072,
+     "timestamp": "2001-03-11T11:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984311100,
+     "y": 6.7,
+     "mealTag": "none",
+     "value": 12072,
+     "timestamp": "2001-03-11T11:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984311400,
+     "y": 6.8,
+     "mealTag": "none",
+     "value": 12252,
+     "timestamp": "2001-03-11T11:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984311700,
+     "y": 6.8,
+     "mealTag": "none",
+     "value": 12252,
+     "timestamp": "2001-03-11T11:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984312000,
+     "y": 6.9,
+     "mealTag": "none",
+     "value": 12433,
+     "timestamp": "2001-03-11T12:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984312300,
+     "y": 6.9,
+     "mealTag": "none",
+     "value": 12433,
+     "timestamp": "2001-03-11T12:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984312600,
+     "y": 7,
+     "mealTag": "none",
+     "value": 12613,
+     "timestamp": "2001-03-11T12:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984312900,
+     "y": 7,
+     "mealTag": "none",
+     "value": 12613,
+     "timestamp": "2001-03-11T12:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984313200,
+     "y": 7.1,
+     "mealTag": "none",
+     "value": 12793,
+     "timestamp": "2001-03-11T12:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984313500,
+     "y": 7.2,
+     "mealTag": "none",
+     "value": 12973,
+     "timestamp": "2001-03-11T12:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984313800,
+     "y": 7.2,
+     "mealTag": "none",
+     "value": 12973,
+     "timestamp": "2001-03-11T12:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984314100,
+     "y": 7.3,
+     "mealTag": "none",
+     "value": 13153,
+     "timestamp": "2001-03-11T12:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984314400,
+     "y": 7.3,
+     "mealTag": "none",
+     "value": 13153,
+     "timestamp": "2001-03-11T12:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984314700,
+     "y": 7.4,
+     "mealTag": "none",
+     "value": 13333,
+     "timestamp": "2001-03-11T12:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984315000,
+     "y": 7.4,
+     "mealTag": "none",
+     "value": 13333,
+     "timestamp": "2001-03-11T12:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984315300,
+     "y": 7.5,
+     "mealTag": "none",
+     "value": 13514,
+     "timestamp": "2001-03-11T12:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984315600,
+     "y": 7.5,
+     "mealTag": "none",
+     "value": 13514,
+     "timestamp": "2001-03-11T13:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984315900,
+     "y": 7.6,
+     "mealTag": "none",
+     "value": 13694,
+     "timestamp": "2001-03-11T13:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984316200,
+     "y": 7.6,
+     "mealTag": "none",
+     "value": 13694,
+     "timestamp": "2001-03-11T13:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984316500,
+     "y": 7.7,
+     "mealTag": "none",
+     "value": 13874,
+     "timestamp": "2001-03-11T13:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984316800,
+     "y": 7.8,
+     "mealTag": "none",
+     "value": 14054,
+     "timestamp": "2001-03-11T13:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984317100,
+     "y": 7.8,
+     "mealTag": "none",
+     "value": 14054,
+     "timestamp": "2001-03-11T13:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984317400,
+     "y": 7.9,
+     "mealTag": "none",
+     "value": 14234,
+     "timestamp": "2001-03-11T13:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984317700,
+     "y": 7.9,
+     "mealTag": "none",
+     "value": 14234,
+     "timestamp": "2001-03-11T13:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984318000,
+     "y": 8,
+     "mealTag": "none",
+     "value": 14415,
+     "timestamp": "2001-03-11T13:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984318300,
+     "y": 8,
+     "mealTag": "none",
+     "value": 14415,
+     "timestamp": "2001-03-11T13:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984318600,
+     "y": 8.1,
+     "mealTag": "none",
+     "value": 14595,
+     "timestamp": "2001-03-11T13:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984318900,
+     "y": 8.1,
+     "mealTag": "none",
+     "value": 14595,
+     "timestamp": "2001-03-11T13:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984319200,
+     "y": 8.2,
+     "mealTag": "none",
+     "value": 14775,
+     "timestamp": "2001-03-11T14:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984319500,
+     "y": 8.3,
+     "mealTag": "none",
+     "value": 14955,
+     "timestamp": "2001-03-11T14:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984319800,
+     "y": 8.3,
+     "mealTag": "none",
+     "value": 14955,
+     "timestamp": "2001-03-11T14:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984320100,
+     "y": 8.4,
+     "mealTag": "none",
+     "value": 15135,
+     "timestamp": "2001-03-11T14:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984320400,
+     "y": 8.4,
+     "mealTag": "none",
+     "value": 15135,
+     "timestamp": "2001-03-11T14:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984320700,
+     "y": 8.5,
+     "mealTag": "none",
+     "value": 15315,
+     "timestamp": "2001-03-11T14:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984321000,
+     "y": 8.5,
+     "mealTag": "none",
+     "value": 15315,
+     "timestamp": "2001-03-11T14:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984321300,
+     "y": 8.6,
+     "mealTag": "none",
+     "value": 15496,
+     "timestamp": "2001-03-11T14:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984321600,
+     "y": 8.6,
+     "mealTag": "none",
+     "value": 15496,
+     "timestamp": "2001-03-11T14:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984321900,
+     "y": 8.7,
+     "mealTag": "none",
+     "value": 15676,
+     "timestamp": "2001-03-11T14:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984322200,
+     "y": 8.8,
+     "mealTag": "none",
+     "value": 15856,
+     "timestamp": "2001-03-11T14:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984322500,
+     "y": 8.8,
+     "mealTag": "none",
+     "value": 15856,
+     "timestamp": "2001-03-11T14:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984322800,
+     "y": 8.9,
+     "mealTag": "none",
+     "value": 16036,
+     "timestamp": "2001-03-11T15:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984323100,
+     "y": 8.9,
+     "mealTag": "none",
+     "value": 16036,
+     "timestamp": "2001-03-11T15:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984323400,
+     "y": 9,
+     "mealTag": "none",
+     "value": 16216,
+     "timestamp": "2001-03-11T15:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984323700,
+     "y": 9,
+     "mealTag": "none",
+     "value": 16216,
+     "timestamp": "2001-03-11T15:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984324000,
+     "y": 9.1,
+     "mealTag": "none",
+     "value": 16397,
+     "timestamp": "2001-03-11T15:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984324300,
+     "y": 9.1,
+     "mealTag": "none",
+     "value": 16397,
+     "timestamp": "2001-03-11T15:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984324600,
+     "y": 9.2,
+     "mealTag": "none",
+     "value": 16577,
+     "timestamp": "2001-03-11T15:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984324900,
+     "y": 9.2,
+     "mealTag": "none",
+     "value": 16577,
+     "timestamp": "2001-03-11T15:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984325200,
+     "y": 9.3,
+     "mealTag": "none",
+     "value": 16757,
+     "timestamp": "2001-03-11T15:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984325500,
+     "y": 9.3,
+     "mealTag": "none",
+     "value": 16757,
+     "timestamp": "2001-03-11T15:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984325800,
+     "y": 9.4,
+     "mealTag": "none",
+     "value": 16937,
+     "timestamp": "2001-03-11T15:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984326100,
+     "y": 9.4,
+     "mealTag": "none",
+     "value": 16937,
+     "timestamp": "2001-03-11T15:55:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984326400,
+     "y": 9.5,
+     "mealTag": "none",
+     "value": 17117,
+     "timestamp": "2001-03-11T16:00:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984326700,
+     "y": 9.5,
+     "mealTag": "none",
+     "value": 17117,
+     "timestamp": "2001-03-11T16:05:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984327000,
+     "y": 9.6,
+     "mealTag": "none",
+     "value": 17297,
+     "timestamp": "2001-03-11T16:10:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984327300,
+     "y": 9.6,
+     "mealTag": "none",
+     "value": 17297,
+     "timestamp": "2001-03-11T16:15:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984327600,
+     "y": 9.7,
+     "mealTag": "none",
+     "value": 17478,
+     "timestamp": "2001-03-11T16:20:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984327900,
+     "y": 9.8,
+     "mealTag": "none",
+     "value": 17658,
+     "timestamp": "2001-03-11T16:25:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984328200,
+     "y": 9.8,
+     "mealTag": "none",
+     "value": 17658,
+     "timestamp": "2001-03-11T16:30:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984328500,
+     "y": 9.8,
+     "mealTag": "none",
+     "value": 17658,
+     "timestamp": "2001-03-11T16:35:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984328800,
+     "y": 9.9,
+     "mealTag": "none",
+     "value": 17838,
+     "timestamp": "2001-03-11T16:40:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984329100,
+     "y": 9.9,
+     "mealTag": "none",
+     "value": 17838,
+     "timestamp": "2001-03-11T16:45:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984329400,
+     "y": 10,
+     "mealTag": "none",
+     "value": 18018,
+     "timestamp": "2001-03-11T16:50:00.000Z",
+     "calculated": false
+    },
+    {
+     "x": 984329700,
+     "y": 10,
+     "mealTag": "none",
+     "value": 18018,
+     "timestamp": "2001-03-11T16:55:00.000Z",
+     "calculated": false
+    }
+   ],
+   "cgmLow": [],
+   "deliveredBolus": [
+    {
+     "x": 984211200,
+     "y": 4,
+     "isInterrupted": false,
+     "isOverrideBelow": false,
+     "isOverrideAbove": false,
+     "isManual": false,
+     "carbsInput": 40,
+     "insulinDelivered": 4,
+     "totalInsulinRecommendation": 4,
+     "insulinProgrammed": 4,
+     "insulinRecommendationForCorrection": null,
+     "insulinRecommendationForCarbs": 4,
+     "insulinOnBoard": 0.5,
+     "initialDelivery": null,
+     "extendedDelivery": null,
+     "extendedBolusDuration": null,
+     "initialDeliveryPercentage": null,
+     "extendedDeliveryPercentage": null,
+     "highestBolusValue": 4,
+     "timestamp": "2001-03-10T08:00:00.000Z",
+     "durationString": null,
+     "presetVolume": null,
+     "bloodGlucoseInput": 9,
+     "bloodGlucoseInputSource": "UNKNOWN",
+     "type": "suggested",
+     "isUnknownComboBolus": null,
+     "group": "deliveredBolus",
+     "deviceName": "Tandem pump (via Tandem Source)",
+     "tooltipData": [
+      {
+       "isInterrupted": false,
+       "isOverrideBelow": false,
+       "isOverrideAbove": false,
+       "isManual": false,
+       "carbsInput": 40,
+       "insulinDelivered": 4,
+       "totalInsulinRecommendation": 4,
+       "insulinProgrammed": 4,
+       "insulinRecommendationForCorrection": null,
+       "insulinRecommendationForCarbs": 4,
+       "insulinOnBoard": 0.5,
+       "initialDelivery": null,
+       "extendedDelivery": null,
+       "extendedBolusDuration": null,
+       "initialDeliveryPercentage": null,
+       "extendedDeliveryPercentage": null,
+       "highestBolusValue": 4,
+       "timestamp": "2001-03-10T08:00:00.000Z",
+       "durationString": null,
+       "presetVolume": null,
+       "bloodGlucoseInput": 9,
+       "bloodGlucoseInputSource": "UNKNOWN",
+       "type": "suggested",
+       "isUnknownComboBolus": null,
+       "group": "deliveredBolus",
+       "deviceName": "Tandem pump (via Tandem Source)"
+      }
+     ]
+    },
+    {
+     "x": 984229200,
+     "y": 7.5,
+     "isInterrupted": false,
+     "isOverrideBelow": false,
+     "isOverrideAbove": false,
+     "isManual": false,
+     "carbsInput": 60,
+     "insulinDelivered": 7.5,
+     "totalInsulinRecommendation": 7.5,
+     "insulinProgrammed": 7.5,
+     "insulinRecommendationForCorrection": 1.5,
+     "insulinRecommendationForCarbs": 6,
+     "insulinOnBoard": 0.5,
+     "initialDelivery": null,
+     "extendedDelivery": null,
+     "extendedBolusDuration": null,
+     "initialDeliveryPercentage": null,
+     "extendedDeliveryPercentage": null,
+     "highestBolusValue": 7.5,
+     "timestamp": "2001-03-10T13:00:00.000Z",
+     "durationString": null,
+     "presetVolume": null,
+     "bloodGlucoseInput": 9,
+     "bloodGlucoseInputSource": "UNKNOWN",
+     "type": "suggested",
+     "isUnknownComboBolus": null,
+     "group": "deliveredBolus",
+     "deviceName": "Tandem pump (via Tandem Source)",
+     "tooltipData": [
+      {
+       "isInterrupted": false,
+       "isOverrideBelow": false,
+       "isOverrideAbove": false,
+       "isManual": false,
+       "carbsInput": 60,
+       "insulinDelivered": 7.5,
+       "totalInsulinRecommendation": 7.5,
+       "insulinProgrammed": 7.5,
+       "insulinRecommendationForCorrection": 1.5,
+       "insulinRecommendationForCarbs": 6,
+       "insulinOnBoard": 0.5,
+       "initialDelivery": null,
+       "extendedDelivery": null,
+       "extendedBolusDuration": null,
+       "initialDeliveryPercentage": null,
+       "extendedDeliveryPercentage": null,
+       "highestBolusValue": 7.5,
+       "timestamp": "2001-03-10T13:00:00.000Z",
+       "durationString": null,
+       "presetVolume": null,
+       "bloodGlucoseInput": 9,
+       "bloodGlucoseInputSource": "UNKNOWN",
+       "type": "suggested",
+       "isUnknownComboBolus": null,
+       "group": "deliveredBolus",
+       "deviceName": "Tandem pump (via Tandem Source)"
+      }
+     ]
+    },
+    {
+     "x": 984301200,
+     "y": 2,
+     "isInterrupted": false,
+     "isOverrideBelow": false,
+     "isOverrideAbove": false,
+     "isManual": false,
+     "carbsInput": 0,
+     "insulinDelivered": 2,
+     "totalInsulinRecommendation": 2,
+     "insulinProgrammed": 2,
+     "insulinRecommendationForCorrection": 2,
+     "insulinRecommendationForCarbs": null,
+     "insulinOnBoard": 0.5,
+     "initialDelivery": null,
+     "extendedDelivery": null,
+     "extendedBolusDuration": null,
+     "initialDeliveryPercentage": null,
+     "extendedDeliveryPercentage": null,
+     "highestBolusValue": 2,
+     "timestamp": "2001-03-11T09:00:00.000Z",
+     "durationString": null,
+     "presetVolume": null,
+     "bloodGlucoseInput": 9,
+     "bloodGlucoseInputSource": "UNKNOWN",
+     "type": "suggested",
+     "isUnknownComboBolus": null,
+     "group": "deliveredBolus",
+     "deviceName": "Tandem pump (via Tandem Source)",
+     "tooltipData": [
+      {
+       "isInterrupted": false,
+       "isOverrideBelow": false,
+       "isOverrideAbove": false,
+       "isManual": false,
+       "carbsInput": 0,
+       "insulinDelivered": 2,
+       "totalInsulinRecommendation": 2,
+       "insulinProgrammed": 2,
+       "insulinRecommendationForCorrection": 2,
+       "insulinRecommendationForCarbs": null,
+       "insulinOnBoard": 0.5,
+       "initialDelivery": null,
+       "extendedDelivery": null,
+       "extendedBolusDuration": null,
+       "initialDeliveryPercentage": null,
+       "extendedDeliveryPercentage": null,
+       "highestBolusValue": 2,
+       "timestamp": "2001-03-11T09:00:00.000Z",
+       "durationString": null,
+       "presetVolume": null,
+       "bloodGlucoseInput": 9,
+       "bloodGlucoseInputSource": "UNKNOWN",
+       "type": "suggested",
+       "isUnknownComboBolus": null,
+       "group": "deliveredBolus",
+       "deviceName": "Tandem pump (via Tandem Source)"
+      }
+     ]
+    }
+   ],
+   "automaticBolus": [
+    {
+     "x": 984193200,
+     "y": 1.25,
+     "isInterrupted": false,
+     "isOverrideBelow": false,
+     "isOverrideAbove": false,
+     "isManual": false,
+     "carbsInput": 0,
+     "insulinDelivered": 1.25,
+     "totalInsulinRecommendation": 1.25,
+     "insulinProgrammed": 1.25,
+     "insulinRecommendationForCorrection": 1.25,
+     "insulinRecommendationForCarbs": null,
+     "insulinOnBoard": 0.5,
+     "initialDelivery": null,
+     "extendedDelivery": null,
+     "extendedBolusDuration": null,
+     "initialDeliveryPercentage": null,
+     "extendedDeliveryPercentage": null,
+     "highestBolusValue": 1.25,
+     "timestamp": "2001-03-10T03:00:00.000Z",
+     "durationString": null,
+     "presetVolume": null,
+     "bloodGlucoseInput": 9,
+     "bloodGlucoseInputSource": "UNKNOWN",
+     "type": "suggested",
+     "isUnknownComboBolus": null,
+     "group": "automaticBolus",
+     "deviceName": "Tandem pump (via Tandem Source)",
+     "tooltipData": [
+      {
+       "isInterrupted": false,
+       "isOverrideBelow": false,
+       "isOverrideAbove": false,
+       "isManual": false,
+       "carbsInput": 0,
+       "insulinDelivered": 1.25,
+       "totalInsulinRecommendation": 1.25,
+       "insulinProgrammed": 1.25,
+       "insulinRecommendationForCorrection": 1.25,
+       "insulinRecommendationForCarbs": null,
+       "insulinOnBoard": 0.5,
+       "initialDelivery": null,
+       "extendedDelivery": null,
+       "extendedBolusDuration": null,
+       "initialDeliveryPercentage": null,
+       "extendedDeliveryPercentage": null,
+       "highestBolusValue": 1.25,
+       "timestamp": "2001-03-10T03:00:00.000Z",
+       "durationString": null,
+       "presetVolume": null,
+       "bloodGlucoseInput": 9,
+       "bloodGlucoseInputSource": "UNKNOWN",
+       "type": "suggested",
+       "isUnknownComboBolus": null,
+       "group": "automaticBolus",
+       "deviceName": "Tandem pump (via Tandem Source)"
+      }
+     ]
+    },
+    {
+     "x": 984236400,
+     "y": 0.75,
+     "isInterrupted": false,
+     "isOverrideBelow": false,
+     "isOverrideAbove": false,
+     "isManual": false,
+     "carbsInput": 0,
+     "insulinDelivered": 0.75,
+     "totalInsulinRecommendation": 0.75,
+     "insulinProgrammed": 0.75,
+     "insulinRecommendationForCorrection": 0.75,
+     "insulinRecommendationForCarbs": null,
+     "insulinOnBoard": 0.5,
+     "initialDelivery": null,
+     "extendedDelivery": null,
+     "extendedBolusDuration": null,
+     "initialDeliveryPercentage": null,
+     "extendedDeliveryPercentage": null,
+     "highestBolusValue": 0.75,
+     "timestamp": "2001-03-10T15:00:00.000Z",
+     "durationString": null,
+     "presetVolume": null,
+     "bloodGlucoseInput": 9,
+     "bloodGlucoseInputSource": "UNKNOWN",
+     "type": "suggested",
+     "isUnknownComboBolus": null,
+     "group": "automaticBolus",
+     "deviceName": "Tandem pump (via Tandem Source)",
+     "tooltipData": [
+      {
+       "isInterrupted": false,
+       "isOverrideBelow": false,
+       "isOverrideAbove": false,
+       "isManual": false,
+       "carbsInput": 0,
+       "insulinDelivered": 0.75,
+       "totalInsulinRecommendation": 0.75,
+       "insulinProgrammed": 0.75,
+       "insulinRecommendationForCorrection": 0.75,
+       "insulinRecommendationForCarbs": null,
+       "insulinOnBoard": 0.5,
+       "initialDelivery": null,
+       "extendedDelivery": null,
+       "extendedBolusDuration": null,
+       "initialDeliveryPercentage": null,
+       "extendedDeliveryPercentage": null,
+       "highestBolusValue": 0.75,
+       "timestamp": "2001-03-10T15:00:00.000Z",
+       "durationString": null,
+       "presetVolume": null,
+       "bloodGlucoseInput": 9,
+       "bloodGlucoseInputSource": "UNKNOWN",
+       "type": "suggested",
+       "isUnknownComboBolus": null,
+       "group": "automaticBolus",
+       "deviceName": "Tandem pump (via Tandem Source)"
+      }
+     ]
+    },
+    {
+     "x": 984283200,
+     "y": 1,
+     "isInterrupted": false,
+     "isOverrideBelow": false,
+     "isOverrideAbove": false,
+     "isManual": false,
+     "carbsInput": 0,
+     "insulinDelivered": 1,
+     "totalInsulinRecommendation": 1,
+     "insulinProgrammed": 1,
+     "insulinRecommendationForCorrection": 1,
+     "insulinRecommendationForCarbs": null,
+     "insulinOnBoard": 0.5,
+     "initialDelivery": null,
+     "extendedDelivery": null,
+     "extendedBolusDuration": null,
+     "initialDeliveryPercentage": null,
+     "extendedDeliveryPercentage": null,
+     "highestBolusValue": 1,
+     "timestamp": "2001-03-11T04:00:00.000Z",
+     "durationString": null,
+     "presetVolume": null,
+     "bloodGlucoseInput": 9,
+     "bloodGlucoseInputSource": "UNKNOWN",
+     "type": "suggested",
+     "isUnknownComboBolus": null,
+     "group": "automaticBolus",
+     "deviceName": "Tandem pump (via Tandem Source)",
+     "tooltipData": [
+      {
+       "isInterrupted": false,
+       "isOverrideBelow": false,
+       "isOverrideAbove": false,
+       "isManual": false,
+       "carbsInput": 0,
+       "insulinDelivered": 1,
+       "totalInsulinRecommendation": 1,
+       "insulinProgrammed": 1,
+       "insulinRecommendationForCorrection": 1,
+       "insulinRecommendationForCarbs": null,
+       "insulinOnBoard": 0.5,
+       "initialDelivery": null,
+       "extendedDelivery": null,
+       "extendedBolusDuration": null,
+       "initialDeliveryPercentage": null,
+       "extendedDeliveryPercentage": null,
+       "highestBolusValue": 1,
+       "timestamp": "2001-03-11T04:00:00.000Z",
+       "durationString": null,
+       "presetVolume": null,
+       "bloodGlucoseInput": 9,
+       "bloodGlucoseInputSource": "UNKNOWN",
+       "type": "suggested",
+       "isUnknownComboBolus": null,
+       "group": "automaticBolus",
+       "deviceName": "Tandem pump (via Tandem Source)"
+      }
+     ]
+    }
+   ],
+   "pumpControliqAutomaticMode": [
+    {
+     "type": "automatic",
+     "duration": 86399,
+     "timestamp": "2001-03-10T00:00:00.000Z",
+     "endTimestamp": "2001-03-10T23:59:59.000Z",
+     "x": 984182400,
+     "y": 0,
+     "interpolated": true
+    },
+    {
+     "type": "automatic",
+     "duration": 86399,
+     "timestamp": "2001-03-10T00:00:00.000Z",
+     "endTimestamp": "2001-03-10T23:59:59.000Z",
+     "x": 984182400,
+     "y": 1,
+     "interpolated": false
+    },
+    {
+     "type": "automatic",
+     "duration": 86399,
+     "timestamp": "2001-03-10T00:00:00.000Z",
+     "endTimestamp": "2001-03-10T23:59:59.000Z",
+     "x": 984268799,
+     "y": 1,
+     "interpolated": true
+    },
+    {
+     "type": "automatic",
+     "duration": 86399,
+     "timestamp": "2001-03-10T00:00:00.000Z",
+     "endTimestamp": "2001-03-10T23:59:59.000Z",
+     "x": 984268799,
+     "y": 0,
+     "interpolated": true
+    },
+    {
+     "type": "automatic",
+     "duration": 43200,
+     "timestamp": "2001-03-11T00:00:00.000Z",
+     "endTimestamp": "2001-03-11T12:00:00.000Z",
+     "x": 984268800,
+     "y": 0,
+     "interpolated": true
+    },
+    {
+     "type": "automatic",
+     "duration": 43200,
+     "timestamp": "2001-03-11T00:00:00.000Z",
+     "endTimestamp": "2001-03-11T12:00:00.000Z",
+     "x": 984268800,
+     "y": 1,
+     "interpolated": false
+    },
+    {
+     "type": "automatic",
+     "duration": 43200,
+     "timestamp": "2001-03-11T00:00:00.000Z",
+     "endTimestamp": "2001-03-11T12:00:00.000Z",
+     "x": 984312000,
+     "y": 1,
+     "interpolated": true
+    },
+    {
+     "type": "automatic",
+     "duration": 43200,
+     "timestamp": "2001-03-11T00:00:00.000Z",
+     "endTimestamp": "2001-03-11T12:00:00.000Z",
+     "x": 984312000,
+     "y": 0,
+     "interpolated": true
+    },
+    {
+     "type": "automatic",
+     "duration": 35999,
+     "timestamp": "2001-03-11T14:00:00.000Z",
+     "endTimestamp": "2001-03-11T23:59:59.000Z",
+     "x": 984319200,
+     "y": 0,
+     "interpolated": true
+    },
+    {
+     "type": "automatic",
+     "duration": 35999,
+     "timestamp": "2001-03-11T14:00:00.000Z",
+     "endTimestamp": "2001-03-11T23:59:59.000Z",
+     "x": 984319200,
+     "y": 1,
+     "interpolated": false
+    },
+    {
+     "type": "automatic",
+     "duration": 35999,
+     "timestamp": "2001-03-11T14:00:00.000Z",
+     "endTimestamp": "2001-03-11T23:59:59.000Z",
+     "x": 984355199,
+     "y": 1,
+     "interpolated": true
+    },
+    {
+     "type": "automatic",
+     "duration": 35999,
+     "timestamp": "2001-03-11T14:00:00.000Z",
+     "endTimestamp": "2001-03-11T23:59:59.000Z",
+     "x": 984355199,
+     "y": 0,
+     "interpolated": true
+    }
+   ],
+   "pumpControliqManualMode": [
+    {
+     "type": "no_cgm",
+     "duration": 7200,
+     "timestamp": "2001-03-11T12:00:00.000Z",
+     "endTimestamp": "2001-03-11T14:00:00.000Z",
+     "x": 984312000,
+     "y": 0,
+     "interpolated": true
+    },
+    {
+     "type": "no_cgm",
+     "duration": 7200,
+     "timestamp": "2001-03-11T12:00:00.000Z",
+     "endTimestamp": "2001-03-11T14:00:00.000Z",
+     "x": 984312000,
+     "y": 1,
+     "interpolated": false
+    },
+    {
+     "type": "no_cgm",
+     "duration": 7200,
+     "timestamp": "2001-03-11T12:00:00.000Z",
+     "endTimestamp": "2001-03-11T14:00:00.000Z",
+     "x": 984319200,
+     "y": 1,
+     "interpolated": true
+    },
+    {
+     "type": "no_cgm",
+     "duration": 7200,
+     "timestamp": "2001-03-11T12:00:00.000Z",
+     "endTimestamp": "2001-03-11T14:00:00.000Z",
+     "x": 984319200,
+     "y": 0,
+     "interpolated": true
+    }
+   ],
+   "pumpControliqSleepMode": [
+    {
+     "type": "sleep",
+     "duration": 21600,
+     "timestamp": "2001-03-10T00:00:00.000Z",
+     "endTimestamp": "2001-03-10T06:00:00.000Z",
+     "x": 984182400,
+     "y": 0,
+     "interpolated": true
+    },
+    {
+     "type": "sleep",
+     "duration": 21600,
+     "timestamp": "2001-03-10T00:00:00.000Z",
+     "endTimestamp": "2001-03-10T06:00:00.000Z",
+     "x": 984182400,
+     "y": 0.5,
+     "interpolated": false
+    },
+    {
+     "type": "sleep",
+     "duration": 21600,
+     "timestamp": "2001-03-10T00:00:00.000Z",
+     "endTimestamp": "2001-03-10T06:00:00.000Z",
+     "x": 984204000,
+     "y": 0.5,
+     "interpolated": true
+    },
+    {
+     "type": "sleep",
+     "duration": 21600,
+     "timestamp": "2001-03-10T00:00:00.000Z",
+     "endTimestamp": "2001-03-10T06:00:00.000Z",
+     "x": 984204000,
+     "y": 0,
+     "interpolated": true
+    },
+    {
+     "type": "sleep",
+     "duration": 3599,
+     "timestamp": "2001-03-10T23:00:00.000Z",
+     "endTimestamp": "2001-03-10T23:59:59.000Z",
+     "x": 984265200,
+     "y": 0,
+     "interpolated": true
+    },
+    {
+     "type": "sleep",
+     "duration": 3599,
+     "timestamp": "2001-03-10T23:00:00.000Z",
+     "endTimestamp": "2001-03-10T23:59:59.000Z",
+     "x": 984265200,
+     "y": 0.5,
+     "interpolated": false
+    },
+    {
+     "type": "sleep",
+     "duration": 3599,
+     "timestamp": "2001-03-10T23:00:00.000Z",
+     "endTimestamp": "2001-03-10T23:59:59.000Z",
+     "x": 984268799,
+     "y": 0.5,
+     "interpolated": true
+    },
+    {
+     "type": "sleep",
+     "duration": 3599,
+     "timestamp": "2001-03-10T23:00:00.000Z",
+     "endTimestamp": "2001-03-10T23:59:59.000Z",
+     "x": 984268799,
+     "y": 0,
+     "interpolated": true
+    },
+    {
+     "type": "sleep",
+     "duration": 21600,
+     "timestamp": "2001-03-11T00:00:00.000Z",
+     "endTimestamp": "2001-03-11T06:00:00.000Z",
+     "x": 984268800,
+     "y": 0,
+     "interpolated": true
+    },
+    {
+     "type": "sleep",
+     "duration": 21600,
+     "timestamp": "2001-03-11T00:00:00.000Z",
+     "endTimestamp": "2001-03-11T06:00:00.000Z",
+     "x": 984268800,
+     "y": 0.5,
+     "interpolated": false
+    },
+    {
+     "type": "sleep",
+     "duration": 21600,
+     "timestamp": "2001-03-11T00:00:00.000Z",
+     "endTimestamp": "2001-03-11T06:00:00.000Z",
+     "x": 984290400,
+     "y": 0.5,
+     "interpolated": true
+    },
+    {
+     "type": "sleep",
+     "duration": 21600,
+     "timestamp": "2001-03-11T00:00:00.000Z",
+     "endTimestamp": "2001-03-11T06:00:00.000Z",
+     "x": 984290400,
+     "y": 0,
+     "interpolated": true
+    }
+   ],
+   "pumpControliqExerciseMode": [
+    {
+     "type": "exercise",
+     "duration": 3600,
+     "timestamp": "2001-03-10T17:00:00.000Z",
+     "endTimestamp": "2001-03-10T18:00:00.000Z",
+     "x": 984243600,
+     "y": 0,
+     "interpolated": true
+    },
+    {
+     "type": "exercise",
+     "duration": 3600,
+     "timestamp": "2001-03-10T17:00:00.000Z",
+     "endTimestamp": "2001-03-10T18:00:00.000Z",
+     "x": 984243600,
+     "y": 0.5,
+     "interpolated": false
+    },
+    {
+     "type": "exercise",
+     "duration": 3600,
+     "timestamp": "2001-03-10T17:00:00.000Z",
+     "endTimestamp": "2001-03-10T18:00:00.000Z",
+     "x": 984247200,
+     "y": 0.5,
+     "interpolated": true
+    },
+    {
+     "type": "exercise",
+     "duration": 3600,
+     "timestamp": "2001-03-10T17:00:00.000Z",
+     "endTimestamp": "2001-03-10T18:00:00.000Z",
+     "x": 984247200,
+     "y": 0,
+     "interpolated": true
+    }
+   ],
+   "lgsPlgs": [
+    {
+     "x": 984200400,
+     "y": -1,
+     "timestamp": "2001-03-10T05:00:00.000Z",
+     "endTimestamp": "2001-03-10T05:20:00.000Z",
+     "startTime": 18000,
+     "duration": 1200,
+     "durationString": " 5:00am to  5:20am",
+     "visible": false
+    }
+   ],
+   "suspendBasal": [
+    {
+     "duration": 600,
+     "timestamp": "2001-03-11T10:00:00.000Z",
+     "endTimestamp": "2001-03-11T10:10:00.000Z",
+     "startTime": 36000,
+     "durationString": "10:00am to 10:10am",
+     "rateAtStart": 1,
+     "rateAtResume": 1,
+     "x": 984304800,
+     "y": 1
+    }
+   ],
+   "scheduledBasal": [
+    {
+     "rate": 1,
+     "duration": 3600,
+     "timestamp": "2001-03-10T07:00:00.000Z",
+     "endTimestamp": "2001-03-10T08:00:00.000Z",
+     "startTime": 25200,
+     "durationString": " 7:00am to  8:00am",
+     "x": 984207600,
+     "y": 1,
+     "interpolated": false,
+     "displayTooltip": true,
+     "unused": false
+    }
+   ],
+   "temporaryBasal": [],
+   "setSiteChange": [],
+   "reservoirChange": [],
+   "pumpAlarm": [
+    {
+     "x": 984305400,
+     "y": 0.1,
+     "timestamp": "2001-03-11T10:10:00.000Z",
+     "name": "Cartridge Loaded",
+     "alarmSeverity": "hazard"
+    }
+   ],
+   "cgmSensorChange": [],
+   "cgmDeviceDataBrand": "Dexcom",
+   "dailyInsulinTotals": {
+    "984225600": {
+     "totalOtherInsulinPerDay": 0,
+     "totalPumpInsulinPerDay": 37.5,
+     "hasPump": true,
+     "hasPen": false,
+     "totalInsulinPerDay": 37.5,
+     "bolusUnitsPerDay": 13.5,
+     "basalUnitsPerDay": 24,
+     "premixedUnitsPerDay": 0
+    },
+    "984312000": {
+     "totalOtherInsulinPerDay": 0,
+     "totalPumpInsulinPerDay": 27,
+     "hasPump": true,
+     "hasPen": false,
+     "totalInsulinPerDay": 27,
+     "bolusUnitsPerDay": 3,
+     "basalUnitsPerDay": 24,
+     "premixedUnitsPerDay": 0
+    }
+   }
+  }
+ },
+ "data2": {},
+ "data3": {
+  "devices": [
+   {
+    "id": "dev-1",
+    "serialNumber": "SN-FAKE-1",
+    "lastSyncTimestamp": "2001-03-10T00:00:00.000Z",
+    "lastSyncTimestampUtc": "2001-03-10T00:00:00.000Z",
+    "deviceOffset": "+00:00",
+    "displayName": "Tandem pump (via Tandem Source)",
+    "shortDisplayName": "Tandem",
+    "deviceOffsetPresent": true,
+    "guid": "00000000-0000-4000-8000-000000000001",
+    "properties": {
+     "cgmModel": "Dexcom G7",
+     "deviceVersion": "1"
+    },
+    "type": "pump",
+    "recalledTimestamp": null,
+    "referenceDeviceId": "ref-1",
+    "brand": "Tandem",
+    "model": "pump",
+    "deviceClassification": "pump"
+   },
+   {
+    "id": "dev-2",
+    "serialNumber": "SN-FAKE-2",
+    "lastSyncTimestamp": "2001-03-09T00:00:00.000Z",
+    "lastSyncTimestampUtc": "2001-03-09T00:00:00.000Z",
+    "deviceOffset": "+00:00",
+    "displayName": "t:slim X2",
+    "shortDisplayName": "t:slim X2",
+    "deviceOffsetPresent": true,
+    "guid": "00000000-0000-4000-8000-000000000002",
+    "properties": null,
+    "type": "pump",
+    "recalledTimestamp": null,
+    "referenceDeviceId": "ref-2",
+    "brand": "Tandem",
+    "model": "t:slim X2",
+    "deviceClassification": "pump"
+   }
+  ],
+  "deviceSettings": {
+   "pumps": {
+    "00000000-0000-4000-8000-000000000002": {
+     "2001-03-09T00:00:00.000Z": {
+      "id": "settings-0001",
+      "syncTimestamp": "2001-03-09T00:00:00.000Z",
+      "displayableTimestamp": "2001-03-09T00:00:00.000Z",
+      "settingsTimestamp": null,
+      "settingsTimestampUtc": null,
+      "generalSettings": {
+       "activeInsulinTime": 5,
+       "bgMeterUnits": "mmoll"
+      },
+      "cgmSettings": {},
+      "hybridClosedLoopSettings": {
+       "closedLoopEnabled": true,
+       "totalDailyInsulin": 40,
+       "weight": 70000
+      },
+      "basalSettings": {
+       "activeBasalProgram": "Weekday"
+      },
+      "bolusSettings": {
+       "maxBolus": 10,
+       "quickBolusEnabled": false
+      },
+      "deviceGuid": "00000000-0000-4000-8000-000000000002",
+      "profilesBolus": [
+       {
+        "isfSegments": {
+         "profileName": "Weekend",
+         "current": false,
+         "data": [
+          {
+           "segmentStart": 0,
+           "duration": 24,
+           "value": 3
+          }
+         ],
+         "graphData": [],
+         "additionalGraphData": {},
+         "dailyTotal": null
+        },
+        "targetBgSegments": {
+         "profileName": "Weekend",
+         "current": false,
+         "data": [
+          {
+           "segmentStart": 0,
+           "duration": 24,
+           "value": 7,
+           "valueLow": 0,
+           "valueHigh": 0
+          }
+         ],
+         "graphData": [],
+         "additionalGraphData": {},
+         "dailyTotal": null
+        },
+        "insulinToCarbRatioSegments": {
+         "profileName": "Weekend",
+         "current": false,
+         "data": [
+          {
+           "segmentStart": 0,
+           "duration": 24,
+           "value": 12
+          }
+         ],
+         "graphData": [],
+         "additionalGraphData": {},
+         "dailyTotal": null
+        },
+        "bgCorrectionThresholdSegments": {
+         "profileName": "Weekend",
+         "current": false,
+         "data": [],
+         "graphData": [],
+         "additionalGraphData": {},
+         "dailyTotal": null
+        }
+       },
+       {
+        "isfSegments": {
+         "profileName": "Weekday",
+         "current": true,
+         "data": [
+          {
+           "segmentStart": 0,
+           "duration": 24,
+           "value": 2
+          }
+         ],
+         "graphData": [],
+         "additionalGraphData": {},
+         "dailyTotal": null
+        },
+        "targetBgSegments": {
+         "profileName": "Weekday",
+         "current": true,
+         "data": [
+          {
+           "segmentStart": 0,
+           "duration": 24,
+           "value": 6,
+           "valueLow": 0,
+           "valueHigh": 0
+          }
+         ],
+         "graphData": [],
+         "additionalGraphData": {},
+         "dailyTotal": null
+        },
+        "insulinToCarbRatioSegments": {
+         "profileName": "Weekday",
+         "current": true,
+         "data": [
+          {
+           "segmentStart": 0,
+           "duration": 24,
+           "value": 10
+          }
+         ],
+         "graphData": [],
+         "additionalGraphData": {},
+         "dailyTotal": null
+        },
+        "bgCorrectionThresholdSegments": {
+         "profileName": "Weekday",
+         "current": true,
+         "data": [],
+         "graphData": [],
+         "additionalGraphData": {},
+         "dailyTotal": null
+        }
+       }
+      ],
+      "pumpProfilesBasal": [
+       {
+        "segments": []
+       },
+       {
+        "segments": []
+       }
+      ]
+     }
+    }
+   },
+   "meters": {}
+  },
+  "activePumpGuid": "00000000-0000-4000-8000-000000000001"
+ }
+}
