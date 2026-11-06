@@ -43,8 +43,11 @@ import {
   getThresholds,
   toDisplay,
   toDisplayDelta,
+  calendarBucketKey,
 } from './analytics.js';
 import { PERSONA_PROMPT } from './prompt.js';
+import { ensureHealthFresh, bucketHealth, healthSources } from './health.js';
+import { getHealth } from './store.js';
 
 // A FACTORY, not a singleton. Each transport (each stdio process, or each HTTP
 // session) needs its OWN McpServer: the SDK forbids connecting one server to
@@ -564,6 +567,84 @@ server.registerTool(
         unit: units === 'mgdl' ? 'mg/dL' : 'mmol/L',
         bucketCount: rows.length,
         buckets: rows,
+      });
+    } catch (err) {
+      return errorResult(err.message);
+    }
+  }
+);
+
+// --- get_health_context ---------------------------------------------------
+server.registerTool(
+  'get_health_context',
+  {
+    title: 'Activity, sleep, heart and weight beside glucose and insulin',
+    description:
+      'Context view: Google Health data (steps, active minutes, workouts, sleep, ' +
+      'resting heart rate, HRV, weight, body fat) bucketed by day, week or month, ' +
+      'each bucket next to the same glucose/insulin/carb row get_trend returns. ' +
+      'Use for "does my glucose move with my sleep / activity / weight" questions.\n\n' +
+      'Descriptive only: co-movement in a few buckets is not cause and effect. ' +
+      'Health data comes from the Google Health app (phone, watch and scale data ' +
+      'synced through Health Connect).\n\n' +
+      'Returns: bucketCount, buckets (each: bucket key, the get_trend row fields ' +
+      'when Glooko data exists, and health: steps {total, perDay, days}, ' +
+      'activeMinutes {perDay, days}, exercise {count, minutes, types}, sleep ' +
+      '{nights, avgMinutesAsleep, avgMinutesAwake, avgStageMinutes}, ' +
+      'restingHeartRate {avgBpm, days}, hrv {avgRmssdMs, days}, weight {medianKg, ' +
+      'weighIns}, bodyFat {medianPercent, readings}; null where no data), ' +
+      'sources (which platform/app each type came from), healthSync (whether the ' +
+      'Google pull worked; when ok is false, relay its hint to the patient), and notes.',
+    inputSchema: {
+      start: z.string().describe(startDesc),
+      end: z.string().describe(endDesc),
+      granularity: z
+        .enum(['day', 'week', 'month'])
+        .default('week')
+        .describe('Optional (default: "week"). Bucket size: "day", "week" (Monday start) or "month".'),
+      units: unitsSchema,
+      lower: lowerSchema,
+      upper: upperSchema,
+    },
+  },
+  async ({ start, end, granularity, units: unitsIn, lower: lowerIn, upper: upperIn }) => {
+    try {
+      const { units, lower, upper } = resolveThresholdInputs({ units: unitsIn, lower: lowerIn, upper: upperIn });
+      const s = assertIsoDate(start, 'start');
+      const e = assertIsoDate(end, 'end');
+      assertWithinCap(s, e, CAPS.summaryMaxDays, 'get_health_context');
+      const sEpoch = Math.floor(Date.parse(s) / 1000);
+      const eEpoch = Math.floor(Date.parse(e) / 1000);
+      // Health sync has its own lock and never throws, so Google cannot block Glooko.
+      const [bundle, healthSync] = await Promise.all([
+        getProcessedRange(s, e),
+        ensureHealthFresh(sEpoch),
+      ]);
+      const trend = bucketTrend(
+        bundle.timeline,
+        getThresholds(units, lower, upper),
+        { mode: 'calendar', granularity, windowStart: sEpoch, windowEnd: eEpoch, units },
+        bundle.dailyInsulin
+      );
+      // Health rows are stored in Glooko's frame (local time as if UTC), so the
+      // same window and bucket keys apply directly.
+      const health = getHealth(sEpoch, eEpoch);
+      const hb = bucketHealth(health, (ep) => calendarBucketKey(ep, granularity).replace(/^W:/, ''));
+      const byKey = new Map(trend.map((r) => [r.bucket, r]));
+      const keys = [...new Set([...byKey.keys(), ...hb.keys()])].sort();
+      const buckets = keys.map((k) => ({ ...(byKey.get(k) || { bucket: k }), health: hb.get(k) || null }));
+      return jsonResult({
+        window: { start: s, end: e },
+        granularity,
+        unit: units === 'mgdl' ? 'mg/dL' : 'mmol/L',
+        bucketCount: buckets.length,
+        buckets,
+        sources: healthSources(health),
+        healthSync,
+        notes: [
+          'Descriptive only (n = 1). Buckets that move together are a hypothesis to discuss with the care team, not a finding; never base a setting change on this view alone.',
+          'Days are local days. Health times are the phone\'s local time; Glooko times are the pump clock. The t:slim X2 clock is set by hand, so around a daylight-saving change (or travel) before the pump clock is corrected, Glooko times can be an hour off from health times. Treat hour-level matches as +/-1 h.',
+        ],
       });
     } catch (err) {
       return errorResult(err.message);

@@ -1,0 +1,401 @@
+{
+ "_comment": "Synthetic Google Health API v4 responses: real field names from the v4 REST reference, fabricated values, ids, apps and times.",
+ "weight": [
+  {
+   "dataPoints": [
+    {
+     "dataSource": {
+      "platform": "HEALTH_CONNECT",
+      "recordingMethod": "ACTIVELY_MEASURED",
+      "application": {
+       "packageName": "com.example.scale"
+      },
+      "device": {
+       "formFactor": "SCALE",
+       "manufacturer": "Example"
+      }
+     },
+     "weight": {
+      "sampleTime": {
+       "physicalTime": "2001-03-10T12:30:00Z",
+       "utcOffset": "-18000s"
+      },
+      "weightGrams": 80500
+     }
+    }
+   ],
+   "nextPageToken": "p2"
+  },
+  {
+   "dataPoints": [
+    {
+     "dataSource": {
+      "platform": "HEALTH_CONNECT",
+      "recordingMethod": "ACTIVELY_MEASURED",
+      "application": {
+       "packageName": "com.example.scale"
+      },
+      "device": {
+       "formFactor": "SCALE",
+       "manufacturer": "Example"
+      }
+     },
+     "weight": {
+      "sampleTime": {
+       "physicalTime": "2001-03-11T12:40:00Z",
+       "utcOffset": "-18000s"
+      },
+      "weightGrams": 80100
+     }
+    }
+   ]
+  }
+ ],
+ "body-fat": [
+  {
+   "dataPoints": [
+    {
+     "dataSource": {
+      "platform": "HEALTH_CONNECT",
+      "recordingMethod": "ACTIVELY_MEASURED",
+      "application": {
+       "packageName": "com.example.scale"
+      },
+      "device": {
+       "formFactor": "SCALE",
+       "manufacturer": "Example"
+      }
+     },
+     "bodyFat": {
+      "sampleTime": {
+       "physicalTime": "2001-03-10T12:30:00Z",
+       "utcOffset": "-18000s"
+      },
+      "percentage": 22.4
+     }
+    }
+   ]
+  }
+ ],
+ "sleep": [
+  {
+   "dataPoints": [
+    {
+     "dataSource": {
+      "platform": "HEALTH_CONNECT",
+      "recordingMethod": "ACTIVELY_MEASURED",
+      "application": {
+       "packageName": "com.example.watch"
+      },
+      "device": {
+       "formFactor": "WATCH",
+       "manufacturer": "Example"
+      }
+     },
+     "sleep": {
+      "interval": {
+       "startTime": "2001-03-10T04:00:00Z",
+       "endTime": "2001-03-10T11:30:00Z",
+       "startUtcOffset": "-18000s",
+       "endUtcOffset": "-18000s"
+      },
+      "type": "STAGES",
+      "metadata": {
+       "nap": false,
+       "mainSleep": true,
+       "processed": true
+      },
+      "summary": {
+       "minutesAsleep": "410",
+       "minutesAwake": "40",
+       "minutesInSleepPeriod": "450",
+       "stagesSummary": [
+        {
+         "type": "DEEP",
+         "minutes": "70",
+         "count": "4"
+        },
+        {
+         "type": "LIGHT",
+         "minutes": "250",
+         "count": "20"
+        },
+        {
+         "type": "REM",
+         "minutes": "90",
+         "count": "5"
+        },
+        {
+         "type": "AWAKE",
+         "minutes": "40",
+         "count": "12"
+        }
+       ]
+      }
+     }
+    },
+    {
+     "dataSource": {
+      "platform": "HEALTH_CONNECT",
+      "recordingMethod": "ACTIVELY_MEASURED",
+      "application": {
+       "packageName": "com.example.watch"
+      },
+      "device": {
+       "formFactor": "WATCH",
+       "manufacturer": "Example"
+      }
+     },
+     "sleep": {
+      "interval": {
+       "startTime": "2001-03-11T19:00:00Z",
+       "endTime": "2001-03-11T19:40:00Z",
+       "startUtcOffset": "-18000s",
+       "endUtcOffset": "-18000s"
+      },
+      "type": "CLASSIC",
+      "metadata": {
+       "nap": true,
+       "mainSleep": false
+      },
+      "summary": {
+       "minutesAsleep": "35",
+       "minutesAwake": "5",
+       "minutesInSleepPeriod": "40",
+       "stagesSummary": []
+      }
+     }
+    }
+   ]
+  }
+ ],
+ "exercise": [
+  {
+   "dataPoints": [
+    {
+     "dataSource": {
+      "platform": "HEALTH_CONNECT",
+      "recordingMethod": "ACTIVELY_MEASURED",
+      "application": {
+       "packageName": "com.example.watch"
+      },
+      "device": {
+       "formFactor": "WATCH",
+       "manufacturer": "Example"
+      }
+     },
+     "exercise": {
+      "interval": {
+       "startTime": "2001-03-11T20:00:00Z",
+       "endTime": "2001-03-11T20:45:00Z",
+       "startUtcOffset": "-18000s",
+       "endUtcOffset": "-18000s"
+      },
+      "exerciseType": "RUNNING",
+      "displayName": "Run",
+      "activeDuration": "2400s",
+      "metricsSummary": {
+       "averageHeartRateBeatsPerMinute": "142",
+       "caloriesKcal": 410.5,
+       "steps": "5200"
+      }
+     }
+    }
+   ]
+  }
+ ],
+ "daily-resting-heart-rate": [
+  {
+   "dataPoints": [
+    {
+     "dataSource": {
+      "platform": "HEALTH_CONNECT",
+      "recordingMethod": "ACTIVELY_MEASURED",
+      "application": {
+       "packageName": "com.example.watch"
+      },
+      "device": {
+       "formFactor": "WATCH",
+       "manufacturer": "Example"
+      }
+     },
+     "dailyRestingHeartRate": {
+      "date": {
+       "year": 2001,
+       "month": 3,
+       "day": 10
+      },
+      "beatsPerMinute": "58",
+      "dailyRestingHeartRateMetadata": {
+       "calculationMethod": "WITH_SLEEP"
+      }
+     }
+    },
+    {
+     "dataSource": {
+      "platform": "HEALTH_CONNECT",
+      "recordingMethod": "ACTIVELY_MEASURED",
+      "application": {
+       "packageName": "com.example.watch"
+      },
+      "device": {
+       "formFactor": "WATCH",
+       "manufacturer": "Example"
+      }
+     },
+     "dailyRestingHeartRate": {
+      "date": {
+       "year": 2001,
+       "month": 3,
+       "day": 11
+      },
+      "beatsPerMinute": "60"
+     }
+    }
+   ]
+  }
+ ],
+ "daily-heart-rate-variability": [
+  {
+   "dataPoints": [
+    {
+     "dataSource": {
+      "platform": "HEALTH_CONNECT",
+      "recordingMethod": "ACTIVELY_MEASURED",
+      "application": {
+       "packageName": "com.example.watch"
+      },
+      "device": {
+       "formFactor": "WATCH",
+       "manufacturer": "Example"
+      }
+     },
+     "dailyHeartRateVariability": {
+      "date": {
+       "year": 2001,
+       "month": 3,
+       "day": 10
+      },
+      "averageHeartRateVariabilityMilliseconds": 45.5
+     }
+    },
+    {
+     "dataSource": {
+      "platform": "HEALTH_CONNECT",
+      "recordingMethod": "ACTIVELY_MEASURED",
+      "application": {
+       "packageName": "com.example.watch"
+      },
+      "device": {
+       "formFactor": "WATCH",
+       "manufacturer": "Example"
+      }
+     },
+     "dailyHeartRateVariability": {
+      "date": {
+       "year": 2001,
+       "month": 3,
+       "day": 11
+      },
+      "averageHeartRateVariabilityMilliseconds": 41.5
+     }
+    }
+   ]
+  }
+ ],
+ "rollup:steps": {
+  "rollupDataPoints": [
+   {
+    "civilStartTime": {
+     "date": {
+      "year": 2001,
+      "month": 3,
+      "day": 10
+     }
+    },
+    "civilEndTime": {
+     "date": {
+      "year": 2001,
+      "month": 3,
+      "day": 11
+     }
+    },
+    "steps": {
+     "countSum": "8000"
+    }
+   },
+   {
+    "civilStartTime": {
+     "date": {
+      "year": 2001,
+      "month": 3,
+      "day": 11
+     }
+    },
+    "civilEndTime": {
+     "date": {
+      "year": 2001,
+      "month": 3,
+      "day": 12
+     }
+    },
+    "steps": {
+     "countSum": "12000"
+    }
+   }
+  ]
+ },
+ "rollup:active-minutes": {
+  "rollupDataPoints": [
+   {
+    "civilStartTime": {
+     "date": {
+      "year": 2001,
+      "month": 3,
+      "day": 10
+     }
+    },
+    "civilEndTime": {
+     "date": {
+      "year": 2001,
+      "month": 3,
+      "day": 11
+     }
+    },
+    "activeMinutes": {
+     "activeMinutesRollupByActivityLevel": [
+      {
+       "activityLevel": "LIGHT",
+       "activeMinutesSum": "100"
+      },
+      {
+       "activityLevel": "MODERATE",
+       "activeMinutesSum": "20"
+      },
+      {
+       "activityLevel": "VIGOROUS",
+       "activeMinutesSum": "10"
+      }
+     ]
+    }
+   }
+  ]
+ },
+ "error:not-linked": {
+  "error": {
+   "code": 400,
+   "message": "The account is not linked to Google Health.",
+   "status": "FAILED_PRECONDITION",
+   "details": [
+    {
+     "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+     "reason": "ACCOUNT_NOT_LINKED",
+     "domain": "health.googleapis.com",
+     "metadata": {
+      "redirect_uri": "https://example.invalid/signup"
+     }
+    }
+   ]
+  }
+ }
+}

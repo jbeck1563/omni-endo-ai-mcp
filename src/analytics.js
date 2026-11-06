@@ -858,7 +858,7 @@ const MGDL_PER_MMOL_TREND = 18.0182;
  * Map a UTC epoch (seconds) to a calendar bucket key for the given granularity.
  * Keys sort lexically into chronological order.
  */
-function calendarBucketKey(epochSeconds, granularity) {
+export function calendarBucketKey(epochSeconds, granularity) {
   const d = new Date(epochSeconds * 1000);
   const y = d.getUTCFullYear();
   const m = d.getUTCMonth(); // 0-11

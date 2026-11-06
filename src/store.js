@@ -120,6 +120,42 @@ export function initDb(dbPath = process.env.OMNI_DB_PATH || '/data/omni-endo.db'
       key   TEXT PRIMARY KEY,
       value TEXT NOT NULL
     );
+    -- Google Health (src/health.js). Additive and independent of Glooko: not in
+    -- the self-heal wipe below and not read by getStreamMaxima, so a Glooko
+    -- re-pull never touches them and they never distort Glooko coverage.
+    -- *_local epochs are local wall-clock time encoded as if UTC (physicalTime
+    -- + utcOffset), the same frame as Glooko's epochs.
+    CREATE TABLE IF NOT EXISTS health_sample (
+      type        TEXT NOT NULL,      -- 'weight' (kg) | 'body_fat' (%); later body
+                                      -- composition types land here too, e.g.
+                                      -- 'muscle_mass' (kg), 'body_water' (%),
+                                      -- 'bone_mass' (kg), 'visceral_fat' (index), 'bmr' (kcal)
+      utc_epoch   INTEGER NOT NULL,
+      local_epoch INTEGER NOT NULL,
+      value       REAL NOT NULL,
+      platform    TEXT,               -- e.g. HEALTH_CONNECT, FITBIT
+      app         TEXT NOT NULL DEFAULT '',  -- source package name ('' if unknown)
+      PRIMARY KEY (type, utc_epoch, app)
+    );
+    CREATE TABLE IF NOT EXISTS health_session (
+      type        TEXT NOT NULL,      -- 'sleep' | 'exercise'
+      start_utc   INTEGER NOT NULL,
+      end_utc     INTEGER NOT NULL,
+      start_local INTEGER NOT NULL,
+      end_local   INTEGER NOT NULL,
+      subtype     TEXT,               -- exercise type, or 'main' / 'nap' for sleep
+      json        TEXT NOT NULL,      -- normalised details (stage minutes, avg HR, ...)
+      platform    TEXT,
+      app         TEXT,
+      PRIMARY KEY (type, start_utc)
+    );
+    CREATE TABLE IF NOT EXISTS health_daily (
+      day_local TEXT NOT NULL,        -- 'YYYY-MM-DD' in the user's time zone
+      type      TEXT NOT NULL,        -- 'steps' | 'active_min' | 'rhr' | 'hrv'
+      value     REAL NOT NULL,
+      platform  TEXT,
+      PRIMARY KEY (day_local, type)
+    );
   `);
 
   // Self-heal: if this archive was written by an older schema, its tables for
@@ -640,6 +676,72 @@ export function closeDb() {
     db.close();
     db = null;
   }
+}
+
+// --- Google Health -------------------------------------------------------
+
+/** Upsert normalised Google Health rows (see src/health.js) in one transaction. */
+export function ingestHealth({ samples = [], sessions = [], daily = [] }) {
+  const conn = d();
+  const smp = conn.prepare(
+    `INSERT INTO health_sample (type, utc_epoch, local_epoch, value, platform, app)
+     VALUES (?, ?, ?, ?, ?, ?)
+     ON CONFLICT(type, utc_epoch, app) DO UPDATE SET
+       local_epoch=excluded.local_epoch, value=excluded.value, platform=excluded.platform`
+  );
+  const ses = conn.prepare(
+    `INSERT INTO health_session
+       (type, start_utc, end_utc, start_local, end_local, subtype, json, platform, app)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT(type, start_utc) DO UPDATE SET
+       end_utc=excluded.end_utc, start_local=excluded.start_local,
+       end_local=excluded.end_local, subtype=excluded.subtype, json=excluded.json,
+       platform=excluded.platform, app=excluded.app`
+  );
+  const day = conn.prepare(
+    `INSERT INTO health_daily (day_local, type, value, platform) VALUES (?, ?, ?, ?)
+     ON CONFLICT(day_local, type) DO UPDATE SET value=excluded.value, platform=excluded.platform`
+  );
+  conn.exec('BEGIN');
+  try {
+    for (const r of samples) smp.run(r.type, r.utcEpoch, r.localEpoch, r.value, r.platform ?? null, r.app ?? '');
+    for (const r of sessions)
+      ses.run(r.type, r.startUtc, r.endUtc, r.startLocal, r.endLocal, r.subtype ?? null,
+        JSON.stringify(r.details ?? {}), r.platform ?? null, r.app ?? null);
+    for (const r of daily) day.run(r.day, r.type, r.value, r.platform ?? null);
+    conn.exec('COMMIT');
+  } catch (err) {
+    conn.exec('ROLLBACK');
+    throw err;
+  }
+}
+
+/** Health rows whose local time falls in [startLocal, endLocal] (epoch seconds, Glooko frame). */
+export function getHealth(startLocal, endLocal) {
+  const conn = d();
+  const dayOf = (e) => new Date(e * 1000).toISOString().slice(0, 10);
+  const samples = conn
+    .prepare(
+      `SELECT type, utc_epoch utcEpoch, local_epoch localEpoch, value, platform, app
+       FROM health_sample WHERE local_epoch BETWEEN ? AND ? ORDER BY local_epoch`
+    )
+    .all(startLocal, endLocal);
+  // A session belongs to the window by its end (a night is dated by its wake time).
+  const sessions = conn
+    .prepare(
+      `SELECT type, start_utc startUtc, end_utc endUtc, start_local startLocal,
+              end_local endLocal, subtype, json, platform, app
+       FROM health_session WHERE end_local BETWEEN ? AND ? ORDER BY start_local`
+    )
+    .all(startLocal, endLocal)
+    .map(({ json, ...r }) => ({ ...r, details: JSON.parse(json) }));
+  const daily = conn
+    .prepare(
+      `SELECT day_local day, type, value, platform FROM health_daily
+       WHERE day_local BETWEEN ? AND ? ORDER BY day_local`
+    )
+    .all(dayOf(startLocal), dayOf(endLocal));
+  return { samples, sessions, daily };
 }
 
 // Test helper: wipe everything.
