@@ -44,6 +44,7 @@ import {
   toDisplay,
   toDisplayDelta,
   calendarBucketKey,
+  buildControlIqReview,
 } from './analytics.js';
 import { PERSONA_PROMPT } from './prompt.js';
 import { ensureHealthFresh, bucketHealth, healthSources } from './health.js';
@@ -784,6 +785,53 @@ server.registerTool(
         }));
       }
       return jsonResult(result);
+    } catch (err) {
+      return errorResult(err.message);
+    }
+  }
+);
+
+// --- get_controliq_review ------------------------------------------------
+server.registerTool(
+  'get_controliq_review',
+  {
+    title: 'Control-IQ day review (algorithm behaviour per day and hour)',
+    description:
+      'How hard Tandem Control-IQ worked, day by day. Per pump-local day: ' +
+      'minutes and percent in automatic, sleep, exercise and manual mode (plus ' +
+      'other and unknown/no-data, so each day sums to 1440 min), automatic ' +
+      'correction bolus count and units, user-initiated bolus units, basal ' +
+      'units, total daily dose, and the automatic-correction share of TDD.\n\n' +
+      'Also a period summary and 24 hour-of-day rows (automatic correction ' +
+      'count/units and the number of days with one in that hour, mode share), ' +
+      'both over COMPLETE days only with n stated. Days with missing mode data, ' +
+      'a provisional or absent daily total, or bolus events that disagree with ' +
+      'Glooko\'s daily bolus are flagged with reasons and left out of the ' +
+      'aggregates.\n\n' +
+      'basalVsProfile is not available: the archive has no time-resolved ' +
+      'delivered basal rate; its missing field says exactly what is absent.\n\n' +
+      'Output is descriptive. Relay its caveat: patterns are indirect ' +
+      'evidence, the patient should discuss them with their endocrinologist ' +
+      'before changing settings, and never present a new setting value as an ' +
+      'instruction.\n\n' +
+      'Days and hours follow the pump clock (Glooko pump-local time).\n\n' +
+      'Returns: caveat, notes, summary, byHour, basalVsProfile, days.',
+    inputSchema: {
+      start: z.string().describe(startDesc),
+      end: z.string().describe(endDesc),
+    },
+  },
+  async ({ start, end }) => {
+    try {
+      const s = assertIsoDate(start, 'start');
+      const e = assertIsoDate(end, 'end');
+      assertWithinCap(s, e, CAPS.summaryMaxDays, 'get_controliq_review');
+      const bundle = await getProcessedRange(s, e);
+      return jsonResult({
+        window: { start: s, end: e },
+        device: bundle.device,
+        ...buildControlIqReview(bundle, Date.parse(s) / 1000, Date.parse(e) / 1000),
+      });
     } catch (err) {
       return errorResult(err.message);
     }

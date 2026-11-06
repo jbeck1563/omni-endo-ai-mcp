@@ -1575,3 +1575,172 @@ export function detectDevice(settingsJson, rawJson) {
         : null,
   };
 }
+
+// --- Control-IQ day review ------------------------------------------------
+
+// One exclusive mode per minute so a day sums to 24 h. Sleep and Exercise run
+// inside automatic; manual means the algorithm was off, so it wins over both.
+const REVIEW_MODE_ORDER = ['manual', 'exercise', 'sleep', 'automatic'];
+const REVIEW_MODES = [...REVIEW_MODE_ORDER, 'other', 'unknown'];
+
+export const BASAL_VS_PROFILE_MISSING =
+  'Hourly basal-vs-profile deviation is omitted: the archive holds no delivered ' +
+  'basal RATE over time. basal_state stores only delivery states ' +
+  '(normal/suspend/max/limited, no units); the rate on Glooko\'s scheduledBasal / ' +
+  'temporaryBasal segments is not persisted, and the rate Control-IQ actually ' +
+  'delivered each 5 minutes is not in the Glooko data this server pulls. Only ' +
+  'per-day basal units (daily_insulin) exist. The profile basal schedule is ' +
+  'kept only inside the raw settings JSON (pumpProfilesBasal); ' +
+  'profileBasalSegmentsStored says whether it holds any segments for this window.';
+
+export const CONTROLIQ_CAVEAT =
+  'Descriptive only. A recurring pattern (for example the algorithm correcting ' +
+  'at the same hour on most days) is indirect evidence about the profile ' +
+  'settings, not a diagnosis; check the n of days and the confidence on each ' +
+  'figure. Discuss with your endocrinologist before changing settings. This ' +
+  'tool never suggests a new setting value.';
+
+const r2 = (v) => +v.toFixed(2);
+const r1 = (v) => +v.toFixed(1);
+const confidenceFor = (n) => (n >= 14 ? 'high' : n >= 7 ? 'medium' : 'low');
+
+/**
+ * Per-day Control-IQ review over [sEpoch, eEpoch) (seconds). Epochs are pump
+ * local wall-clock time (Glooko labels them Z), so UTC day and hour of an
+ * epoch ARE the local day and hour. Takes the getProcessedRange bundle.
+ * Aggregates use only complete days; incomplete days are listed with reasons.
+ */
+export function buildControlIqReview(bundle, sEpoch, eEpoch) {
+  const modes = bundle.pumpModes || [];
+  const boluses = (bundle.timeline || []).filter((i) => i.type === 'BOLUS');
+  const dailyByDay = new Map((bundle.dailyInsulin || []).map((d) => [d.dayUtc, d]));
+  const isAuto = (b) => b.class === 'Automatic Correction Bolus';
+
+  const days = [];
+  const hourAcc = Array.from({ length: 24 }, () => ({
+    minutes: Object.fromEntries(REVIEW_MODES.map((m) => [m, 0])),
+    autoCount: 0,
+    autoUnits: 0,
+    autoDays: 0,
+  }));
+
+  for (let day0 = Math.floor(sEpoch / 86400) * 86400; day0 < eEpoch; day0 += 86400) {
+    const day1 = day0 + 86400;
+    const date = new Date(day0 * 1000).toISOString().slice(0, 10);
+    const dayModes = modes.filter((m) => m.endEpoch > day0 && m.startEpoch < day1);
+    const minutes = Object.fromEntries(REVIEW_MODES.map((m) => [m, 0]));
+    const minuteMode = new Array(1440);
+    for (let i = 0; i < 1440; i++) {
+      const t = day0 + i * 60 + 30;
+      let mode = 'unknown';
+      if (t >= sEpoch && t < eEpoch) {
+        const active = new Set(
+          dayModes.filter((m) => t >= m.startEpoch && t < m.endEpoch).map((m) => m.mode)
+        );
+        if (active.size) mode = REVIEW_MODE_ORDER.find((m) => active.has(m)) || 'other';
+      }
+      minuteMode[i] = mode;
+      minutes[mode] += 1;
+    }
+
+    const inDay = boluses.filter((b) => b.epoch >= Math.max(day0, sEpoch) && b.epoch < Math.min(day1, eEpoch));
+    const auto = inDay.filter(isAuto);
+    const autoUnits = r2(auto.reduce((a, b) => a + (b.units || 0), 0));
+    const manualUnits = r2(inDay.filter((b) => !isAuto(b)).reduce((a, b) => a + (b.units || 0), 0));
+    const di = dailyByDay.get(date);
+    const tdd = di?.totalUnits ?? null;
+
+    const incomplete = [];
+    if (day0 < sEpoch || day1 > eEpoch) incomplete.push('day only partly inside the window');
+    if (minutes.unknown > 60) incomplete.push(`no pump-mode data for ${minutes.unknown} min`);
+    if (!di) incomplete.push('no Glooko daily insulin total');
+    else if (!di.complete) incomplete.push('daily insulin total is provisional (day not over)');
+    if (di?.bolusUnits != null && Math.abs(di.bolusUnits - (autoUnits + manualUnits)) > 0.05)
+      incomplete.push(
+        `bolus events (${r2(autoUnits + manualUnits)} U) do not match Glooko daily bolus (${di.bolusUnits} U)`
+      );
+
+    const row = {
+      date,
+      complete: incomplete.length === 0,
+      ...(incomplete.length ? { incompleteReasons: incomplete } : {}),
+      modes: Object.fromEntries(
+        REVIEW_MODES.map((m) => [m, { minutes: minutes[m], percent: r1((minutes[m] / 1440) * 100) }])
+      ),
+      autoBolus: { count: auto.length, units: autoUnits },
+      manualBolusUnits: manualUnits,
+      basalUnits: di?.basalUnits ?? null,
+      totalDailyDose: tdd,
+      autoBolusShareOfTddPercent: tdd ? r1((autoUnits / tdd) * 100) : null,
+    };
+    days.push(row);
+
+    if (!row.complete) continue;
+    for (let i = 0; i < 1440; i++) hourAcc[Math.floor(i / 60)].minutes[minuteMode[i]] += 1;
+    const seenHours = new Set();
+    for (const b of auto) {
+      const h = new Date(b.epoch * 1000).getUTCHours();
+      hourAcc[h].autoCount += 1;
+      hourAcc[h].autoUnits += b.units || 0;
+      seenHours.add(h);
+    }
+    for (const h of seenHours) hourAcc[h].autoDays += 1;
+  }
+
+  const full = days.filter((d) => d.complete);
+  const n = full.length;
+  const sum = (f) => full.reduce((a, d) => a + f(d), 0);
+  const tddSum = sum((d) => d.totalDailyDose || 0);
+  const autoSum = sum((d) => d.autoBolus.units);
+
+  const summary = {
+    daysInWindow: days.length,
+    completeDays: n,
+    incompleteDays: days.filter((d) => !d.complete).map((d) => d.date),
+    confidence: confidenceFor(n),
+  };
+  if (n) {
+    Object.assign(summary, {
+      meanModePercent: Object.fromEntries(
+        REVIEW_MODES.map((m) => [m, r1(sum((d) => d.modes[m].minutes) / (n * 1440) * 100)])
+      ),
+      meanAutoBolusPerDay: { count: r1(sum((d) => d.autoBolus.count) / n), units: r2(autoSum / n) },
+      meanManualBolusUnitsPerDay: r2(sum((d) => d.manualBolusUnits) / n),
+      meanTotalDailyDose: r2(tddSum / n),
+      autoBolusShareOfTddPercent: tddSum ? r1((autoSum / tddSum) * 100) : null,
+    });
+  }
+
+  const byHour = hourAcc.map((h, hour) => ({
+    hour,
+    nDays: n,
+    autoBolus: {
+      count: h.autoCount,
+      units: r2(h.autoUnits),
+      daysWithAutoBolus: h.autoDays,
+    },
+    modePercent: Object.fromEntries(
+      REVIEW_MODES.map((m) => [m, n ? r1((h.minutes[m] / (n * 60)) * 100) : null])
+    ),
+  }));
+
+  return {
+    caveat: CONTROLIQ_CAVEAT,
+    notes: [
+      'Days and hours are the pump\'s own clock (Glooko stores pump-local time). If the pump clock was wrong (e.g. not moved for a daylight-saving change), hour-of-day figures for those days are shifted.',
+      'Modes are made exclusive per minute (manual > exercise > sleep > automatic > other) so each day sums to 1440 min; "unknown" is time with no mode data.',
+      'manualBolusUnits is every user-initiated bolus (meal and correction), not insulin given in Manual mode.',
+      'Period summary and byHour use complete days only (n = completeDays); incomplete days stay in days[] with their reasons.',
+    ],
+    summary,
+    byHour,
+    basalVsProfile: {
+      available: false,
+      missing: BASAL_VS_PROFILE_MISSING,
+      profileBasalSegmentsStored: (bundle.settingsHistory || []).some((s) =>
+        (s.settings?.pumpProfilesBasal || []).some((p) => p.segments?.length)
+      ),
+    },
+    days,
+  };
+}

@@ -119,6 +119,8 @@
 > `node --no-warnings test-health.mjs` feeds a synthetic Google Health fixture
 > (`test-health.fixture.json`) through ingest and `get_health_context`, including an
 > unlinked account.
+> `node --no-warnings test-controliq.mjs` runs the same Tandem fixture through
+> `get_controliq_review` (mode minutes per day, bolus split, flagged incomplete days).
 > `node test-mydata.mjs` covers the payload shape, anonymous / wrong-credential /
 > Bearer-instead-of-Basic requests, and re-execs itself without `OMNI_MYDATA_BASIC` to prove
 > the fail-closed branch. It uses the existing `__OMNI_FETCH_STUB__` seam, so it never
@@ -1151,6 +1153,23 @@ These are point-in-time markers, not amounts. They are most useful as context fo
 **Returns**
 
 `siteChanges` (also as `podChanges`), `cartridgeChanges` and `sensorChanges` arrays of UTC timestamps, plus a count for each.
+
+---
+
+#### `POST /get_controliq_review`
+
+Control-IQ algorithm behaviour per pump-local day: minutes and percent in automatic, sleep, exercise and manual mode (plus other and unknown, so a day sums to 24 h), automatic correction bolus count and units, user bolus units, total daily dose and the automatic share of it. Adds a period summary and 24 hour-of-day rows over complete days only, with n; incomplete days are flagged with reasons. Hourly basal-vs-profile deviation is not available (no time-resolved delivered basal rate is stored); the output says what is missing. Descriptive only: discuss any pattern with your endocrinologist before changing settings.
+
+**Parameters**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `start` | string | Yes | Window start, UTC ISO 8601 |
+| `end` | string | Yes | Window end, UTC ISO 8601 |
+
+**Returns**
+
+`caveat`, `notes`, `summary`, `byHour`, `basalVsProfile`, `days`.
 
 ---
 
