@@ -179,6 +179,8 @@ function session(type, iv, subtype, details, dp) {
   };
 }
 
+const ROLLUP = 'ALL_SOURCES_ROLLUP';
+
 export const parse = {
   weight: (dp) => {
     const g = num(dp.weight?.weightGrams);
@@ -189,7 +191,9 @@ export const parse = {
     const s = dp.sleep || {};
     const stages = {};
     for (const st of s.summary?.stagesSummary || []) stages[String(st.type).toLowerCase()] = num(st.minutes);
-    return session('sleep', s.interval, s.metadata?.nap ? 'nap' : 'main', {
+    // Real Health Connect sleeps carry metadata.mainSleep and no nap flag.
+    const main = !s.metadata?.nap && s.metadata?.mainSleep !== false;
+    return session('sleep', s.interval, main ? 'main' : 'nap', {
       minutesAsleep: num(s.summary?.minutesAsleep),
       minutesAwake: num(s.summary?.minutesAwake),
       minutesInSleepPeriod: num(s.summary?.minutesInSleepPeriod),
@@ -217,10 +221,12 @@ export const parse = {
     const value = num(v.averageHeartRateVariabilityMilliseconds);
     return v.date && value != null ? { day: dateStr(v.date), type: 'hrv', value, platform: source(dp).platform } : null;
   },
-  // Rollups: one point per civil day.
+  // Rollups: one point per civil day, already deduplicated by Google across
+  // sources (a phone and a watch both counting the same walk count once), so
+  // they carry no single data source.
   stepsRollup: (p) => {
     const value = num(p.steps?.countSum);
-    return value == null ? null : { day: dateStr(p.civilStartTime?.date), type: 'steps', value };
+    return value == null ? null : { day: dateStr(p.civilStartTime?.date), type: 'steps', value, platform: ROLLUP };
   },
   // Active minutes = MODERATE + VIGOROUS (LIGHT left out, as Fitbit's "active minutes" did).
   activeMinutesRollup: (p) => {
@@ -229,7 +235,7 @@ export const parse = {
     const value = lv
       .filter((x) => x.activityLevel === 'MODERATE' || x.activityLevel === 'VIGOROUS')
       .reduce((a, x) => a + (num(x.activeMinutesSum) || 0), 0);
-    return { day: dateStr(p.civilStartTime?.date), type: 'active_min', value };
+    return { day: dateStr(p.civilStartTime?.date), type: 'active_min', value, platform: ROLLUP };
   },
 };
 

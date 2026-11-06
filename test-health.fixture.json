@@ -122,9 +122,9 @@
       },
       "type": "STAGES",
       "metadata": {
-       "nap": false,
-       "mainSleep": true,
-       "processed": true
+       "processed": true,
+       "externalId": "synthetic-1",
+       "mainSleep": true
       },
       "summary": {
        "minutesAsleep": "410",
@@ -152,8 +152,18 @@
          "count": "12"
         }
        ]
-      }
-     }
+      },
+      "stages": [
+       {
+        "startTime": "2001-03-10T04:00:00Z",
+        "startUtcOffset": "-18000s",
+        "endTime": "2001-03-10T04:30:00Z",
+        "endUtcOffset": "-18000s",
+        "type": "LIGHT"
+       }
+      ]
+     },
+     "name": "users/me/dataTypes/sleep/dataPoints/synthetic-0101"
     },
     {
      "dataSource": {
@@ -176,7 +186,8 @@
       },
       "type": "CLASSIC",
       "metadata": {
-       "nap": true,
+       "processed": true,
+       "externalId": "synthetic-2",
        "mainSleep": false
       },
       "summary": {

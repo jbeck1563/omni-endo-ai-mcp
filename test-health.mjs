@@ -108,6 +108,7 @@ assert.deepStrictEqual(d11.health.exercise, { count: 1, minutes: 40, types: { RU
 assert.strictEqual(d11.health.sleep, null, 'nap is not a night');
 assert.strictEqual(d11.health.weight.medianKg, 80.1, 'second page read');
 assert.deepStrictEqual(day.sources.weight, { 'HEALTH_CONNECT / com.example.scale': 1, FITBIT: 1 });
+assert.deepStrictEqual(day.sources.steps, { ALL_SOURCES_ROLLUP: 2 });
 
 // 2. Local-epoch mapping: physicalTime + utcOffset (-5 h), Glooko's frame.
 const h = getHealth(Date.parse(start) / 1000, Date.parse(end) / 1000);

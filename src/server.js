@@ -593,7 +593,7 @@ server.registerTool(
       '{nights, avgMinutesAsleep, avgMinutesAwake, avgStageMinutes}, ' +
       'restingHeartRate {avgBpm, days}, hrv {avgRmssdMs, days}, weight {medianKg, ' +
       'weighIns}, bodyFat {medianPercent, readings}; null where no data), ' +
-      'sources (which platform/app each type came from), healthSync (whether the ' +
+      'sources (which platform/app each type came from; steps and active minutes are Google\'s deduplicated all-source daily totals, ALL_SOURCES_ROLLUP), healthSync (whether the ' +
       'Google pull worked; when ok is false, relay its hint to the patient), and notes.',
     inputSchema: {
       start: z.string().describe(startDesc),
