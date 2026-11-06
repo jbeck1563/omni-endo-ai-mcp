@@ -1655,7 +1655,7 @@ export function buildControlIqReview(bundle, sEpoch, eEpoch) {
     if (minutes.unknown > 60) incomplete.push(`no pump-mode data for ${minutes.unknown} min`);
     if (!di) incomplete.push('no Glooko daily insulin total');
     else if (!di.complete) incomplete.push('daily insulin total is provisional (day not over)');
-    if (di?.bolusUnits != null && Math.abs(di.bolusUnits - (autoUnits + manualUnits)) > 0.05)
+    if (di?.bolusUnits != null && Math.abs(di.bolusUnits - (autoUnits + manualUnits)) >= 0.1 - 1e-9)
       incomplete.push(
         `bolus events (${r2(autoUnits + manualUnits)} U) do not match Glooko daily bolus (${di.bolusUnits} U)`
       );
@@ -1730,6 +1730,7 @@ export function buildControlIqReview(bundle, sEpoch, eEpoch) {
       'Days and hours are the pump\'s own clock (Glooko stores pump-local time). If the pump clock was wrong (e.g. not moved for a daylight-saving change), hour-of-day figures for those days are shifted.',
       'Modes are made exclusive per minute (manual > exercise > sleep > automatic > other) so each day sums to 1440 min; "unknown" is time with no mode data.',
       'manualBolusUnits is every user-initiated bolus (meal and correction), not insulin given in Manual mode.',
+      'Glooko rounds its daily bolus total to 0.1 U, so a bolus-event mismatch under 0.1 U is not flagged.',
       'Period summary and byHour use complete days only (n = completeDays); incomplete days stay in days[] with their reasons.',
     ],
     summary,

@@ -103,5 +103,20 @@ assert.strictEqual(part.days.length, 1);
 assert.ok(part.days[0].incompleteReasons.includes('day only partly inside the window'));
 assert.strictEqual(part.summary.completeDays, 0);
 
+// 7. Glooko rounds its daily bolus to 0.1 U: a 0.05 U gap is not flagged, 0.1 U is.
+const { buildControlIqReview } = await import('./src/analytics.js');
+const mismatch = (glookoBolus) =>
+  buildControlIqReview(
+    {
+      pumpModes: [{ mode: 'automatic', startEpoch: 0, endEpoch: 86400 }],
+      timeline: [{ type: 'BOLUS', epoch: 3600, units: 1.65, class: 'Meal Bolus' }],
+      dailyInsulin: [{ dayUtc: '1970-01-01', bolusUnits: glookoBolus, totalUnits: 10, complete: true }],
+    },
+    0,
+    86400
+  ).days[0].complete;
+assert.strictEqual(mismatch(1.7), true);
+assert.strictEqual(mismatch(1.75), false);
+
 console.log('OK: get_controliq_review');
 process.exit(0);
