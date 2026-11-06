@@ -13,7 +13,7 @@
 >
 > Upstream, and all credit for this server: **[rilhia/omni-endo-ai-mcp](https://github.com/rilhia/omni-endo-ai-mcp)**.
 > Everything below this banner is the original author's documentation and still applies,
-> except where section 3 extends it for Tandem pumps. This fork adds three things for one
+> except where sections 3 and 4 extend it. This fork adds four things for one
 > self-hosted deployment. If you want the real project, go upstream.
 >
 > ### 1. `POST /my-data` — a raw Glooko passthrough for the companion web UI
@@ -85,10 +85,40 @@
 > the last ones uploaded some other way, possibly long ago. Glooko times are the pump's local
 > clock written as UTC.
 >
+> ### 4. Google Health context: `get_health_context`
+>
+> **What.** A read-only pull of the Google Health API (the hub the Google Health app fills
+> from Health Connect on Android: Garmin Connect, Renpho Health, the phone itself) and one
+> tool, `get_health_context(start, end, granularity)`. It puts steps, active minutes,
+> workouts, sleep, resting HR, HRV, weight and body fat beside the same per-bucket
+> glucose/insulin row `get_trend` returns.
+>
+> **How.** `src/health.js` refreshes an OAuth token from `OMNI_GHEALTH_CLIENT_ID`,
+> `OMNI_GHEALTH_CLIENT_SECRET` and `OMNI_GHEALTH_REFRESH_TOKEN` (a one-user client with the
+> `googlehealth.activity_and_fitness`, `.sleep` and `.health_metrics_and_measurements`
+> read-only scopes), pages `dataPoints`, and reads daily `dailyRollUp` totals in windows
+> inside the API's caps. Rows land in three additive tables (`health_sample`,
+> `health_session`, `health_daily`): no `SCHEMA_VERSION` bump, outside the Glooko wipe.
+> The first health tool call tops up under its own lock, so Google can never block Glooko;
+> a failure (for example an account not yet linked to Google Health) comes back as a
+> `healthSync` status with a fix-it hint.
+>
+> **Why.** Context for glucose: activity, sleep and weight move insulin need. Each point is
+> stored at `physicalTime + utcOffset`, the same local-time-as-UTC frame as Glooko, so joins
+> need no time-zone library.
+>
+> **Known gaps.** The Google Health API carries only weight and body fat %, not muscle,
+> water, bone or visceral fat; `health_sample` takes those types later from another source
+> without a schema change. The t:slim X2 clock is set by hand, so around a daylight-saving
+> change Glooko can be an hour off from health times.
+>
 > ### Checks
 >
 > `node --no-warnings test-tandem.mjs` feeds a synthetic Tandem fixture
 > (`test-tandem.fixture.json`) through ingest and the MCP tools.
+> `node --no-warnings test-health.mjs` feeds a synthetic Google Health fixture
+> (`test-health.fixture.json`) through ingest and `get_health_context`, including an
+> unlinked account.
 > `node test-mydata.mjs` covers the payload shape, anonymous / wrong-credential /
 > Bearer-instead-of-Basic requests, and re-execs itself without `OMNI_MYDATA_BASIC` to prove
 > the fail-closed branch. It uses the existing `__OMNI_FETCH_STUB__` seam, so it never
