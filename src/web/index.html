@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Omni-Endo Report</title>
+<link rel="icon" href="data:,">
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #fff; --ink: #1b1f24; --muted: #5d6673; --line: #dfe3e8;
+    --accent: #2457c5; --low: #c2410c; --ok: #15803d; --high: #b7791f; --warn-bg: #fff7e6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151a; --card: #1b2028; --ink: #e6e9ee; --muted: #9aa4b2; --line: #2c333d;
+      --accent: #7aa2f7; --low: #f08a5d; --ok: #4ade80; --high: #f2c14e; --warn-bg: #2a2416;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header, main { max-width: 1100px; margin: 0 auto; padding: 16px; }
+  header h1 { margin: 0; font-size: 1.35rem; }
+  header p { margin: 4px 0 0; color: var(--muted); }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-bottom: 16px; min-width: 0; }
+  h2 { margin: 0 0 12px; font-size: 1.05rem; }
+  h3 { margin: 16px 0 8px; font-size: .95rem; }
+  .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
+  label { display: flex; flex-direction: column; gap: 4px; font-size: .8rem; color: var(--muted); }
+  input, button { font: inherit; padding: 7px 10px; border-radius: 7px; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+  button { cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .muted { color: var(--muted); }
+  .small { font-size: .82rem; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .tile { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; min-width: 0; }
+  .tile b { display: block; font-size: 1.35rem; }
+  .tile span { font-size: .8rem; color: var(--muted); }
+  .bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; margin: 8px 0 4px; background: var(--line); }
+  .bar div { height: 100%; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: .85rem; }
+  th, td { text-align: right; padding: 5px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; }
+  dt { color: var(--muted); }
+  dd { margin: 0; overflow-wrap: anywhere; }
+  .caveat { background: var(--warn-bg); border-left: 3px solid var(--high); padding: 8px 12px; border-radius: 6px; font-size: .85rem; }
+  .hours { display: grid; grid-template-columns: repeat(24, 1fr); gap: 2px; align-items: end; height: 70px; }
+  .hours div { background: var(--accent); border-radius: 2px 2px 0 0; min-height: 1px; }
+  .hourlabels { display: grid; grid-template-columns: repeat(24, 1fr); font-size: .65rem; color: var(--muted); text-align: center; }
+  pre { white-space: pre-wrap; overflow-wrap: anywhere; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px; max-height: 420px; overflow: auto; font-size: .8rem; }
+  .hidden { display: none; }
+  .err { color: var(--low); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Omni-Endo report</h1>
+  <p id="device">Loading…</p>
+</header>
+<main>
+  <section>
+    <div class="row">
+      <label>From <input type="date" id="start"></label>
+      <label>To (inclusive) <input type="date" id="end"></label>
+      <button data-days="7">7 d</button><button data-days="14">14 d</button>
+      <button data-days="30">30 d</button><button data-days="90">90 d</button>
+      <button class="primary" id="load">Load</button>
+    </div>
+    <p id="status" class="small muted">Ready.</p>
+  </section>
+
+  <div id="report" class="hidden">
+    <section>
+      <h2>Glucose</h2>
+      <div class="tiles" id="glucoseTiles"></div>
+      <div class="bar" id="tirBar"></div>
+      <p class="small muted" id="tirLegend"></p>
+      <dl id="bestWorst"></dl>
+    </section>
+
+    <div class="grid2">
+      <section>
+        <h2>Insulin</h2>
+        <dl id="insulin"></dl>
+        <h3>Boluses by type</h3>
+        <dl id="bolusTypes"></dl>
+      </section>
+      <section>
+        <h2 id="modesTitle">Mode time</h2>
+        <div class="bar" id="modeBar"></div>
+        <dl id="modes"></dl>
+      </section>
+    </div>
+
+    <section id="ciqSection" class="hidden">
+      <h2>Control-IQ day review</h2>
+      <p class="small" id="ciqSummary"></p>
+      <h3>Automatic correction boluses by hour <span class="muted small">(pump clock, complete days only)</span></h3>
+      <div class="hours" id="ciqHours"></div>
+      <div class="hourlabels" id="ciqHourLabels"></div>
+      <h3>Per day</h3>
+      <div class="scroll"><table id="ciqDays"></table></div>
+      <p class="caveat" id="ciqCaveat"></p>
+    </section>
+
+    <section id="healthSection" class="hidden">
+      <h2>Health context <span class="muted small">(Google Health, weekly)</span></h2>
+      <div class="scroll"><table id="healthTable"></table></div>
+      <p class="small muted" id="healthNote"></p>
+    </section>
+
+    <section>
+      <h2>Settings in force</h2>
+      <div id="settings"></div>
+    </section>
+
+    <section>
+      <h2>AI review prompt</h2>
+      <p class="small muted">Copy this into a chat with an AI assistant (Claude, ChatGPT, Gemini). It carries the numbers above and the rules the reviewer must follow.</p>
+      <div class="row"><button class="primary" id="copy">Copy prompt</button></div>
+      <pre id="prompt"></pre>
+    </section>
+
+    <section>
+      <h2>Deep-dive exports</h2>
+      <p class="small muted">When the reviewer asks for a 48–72 h window, set it here and upload the files it asks for.</p>
+      <div class="row">
+        <label>From <input type="datetime-local" id="xStart"></label>
+        <label>To <input type="datetime-local" id="xEnd"></label>
+        <button data-export="timeline">Glucose timeline</button>
+        <button data-export="bolus">Enriched bolus log</button>
+        <button data-export="hourly">Hourly trends</button>
+      </div>
+      <p class="small muted" id="xStatus">Glucose timeline is limited to 21 days, the bolus log to 92.</p>
+    </section>
+  </div>
+</main>
+<script>
+'use strict';
+// Every number on this page comes from the server's MCP tools (/api/*). The page
+// only formats; it never parses Glooko data. Glooko times are the pump's own
+// clock written with a Z, so dates and hours are read straight off the ISO
+// string (UTC getters), never shifted into the browser's time zone.
+const $ = (id) => document.getElementById(id);
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const num = (v, d = 1) => (v == null || !Number.isFinite(+v) ? '—' : (+v).toFixed(d));
+const day = (iso) => (iso ? iso.slice(0, 10) : '—');
+const stamp = (iso) => (iso ? iso.slice(0, 16).replace('T', ' ') : '—');
+const addDays = (ymd, n) => new Date(Date.parse(ymd + 'T00:00:00Z') + n * 864e5).toISOString().slice(0, 10);
+const dl = (rows) => rows.filter((r) => r && r[1] != null).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
+
+let config = null;
+let report = null;
+
+async function getJson(path) {
+  // location.origin, not a relative path: a page opened as http://user:pass@host/
+  // has credentials in its base URL, and fetch() refuses to resolve against that.
+  const res = await fetch(new URL(path, location.origin), { headers: { Accept: 'application/json' } });
+  let body = null;
+  try { body = await res.json(); } catch { /* proxy error page */ }
+  if (!res.ok) throw new Error(body?.error || `HTTP ${res.status}`);
+  return body;
+}
+
+function windowParams() {
+  const s = $('start').value, e = $('end').value;
+  if (!s || !e || e < s) throw new Error('Pick a start date on or before the end date.');
+  return { start: `${s}T00:00:00.000Z`, end: `${addDays(e, 1)}T00:00:00.000Z` };
+}
+
+function isControlIq() {
+  const d = report?.summary?.device || config?.device;
+  return /control-iq/i.test(d?.algorithm || '');
+}
+
+function deviceLine(d) {
+  if (!d) return 'Device unknown';
+  return [d.pumpBrand && `${d.pumpBrand} ${d.pumpModel || ''}`.trim(), d.algorithm, d.cgm].filter(Boolean).join(' · ');
+}
+
+// --- rendering ---------------------------------------------------------------
+
+function renderGlucose(s) {
+  const g = s.glucoseControl || {};
+  const u = config.unit;
+  $('glucoseTiles').innerHTML = [
+    ['Average', `${num(g.averageBG)} ${u}`],
+    ['GMI (est. A1c)', `${num(g.gmiEstimatedA1c)} %`],
+    ['Time in range', `${num(g.timeInRange)} %`],
+    ['CV', `${num(g.coefficientOfVariation)} % · ${g.variabilityFlag || '—'}`],
+    ['Std dev', `${num(g.stdDev)} ${u}`],
+    ['CGM readings', g.cgmReadingCount ?? '—'],
+  ].map(([k, v]) => `<div class="tile"><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join('');
+  const low = +g.timeLow || 0, tir = +g.timeInRange || 0, high = +g.timeHigh || 0;
+  $('tirBar').innerHTML = `<div style="width:${low}%;background:var(--low)"></div><div style="width:${tir}%;background:var(--ok)"></div><div style="width:${high}%;background:var(--high)"></div>`;
+  $('tirLegend').textContent = `Low (< ${config.lower}) ${num(low)} % · In range (${config.lower}–${config.upper} ${u}) ${num(tir)} % · High (> ${config.upper}) ${num(high)} %`;
+  const bw = s.bestWorst || {};
+  const fmt = (x, key) => (x ? `${x[key]} — TIR ${num(x.tir)} %, CV ${num(x.cv)} %` : null);
+  $('bestWorst').innerHTML = dl([
+    ['Best day', fmt(bw.bestDay, 'day')], ['Worst day', fmt(bw.worstDay, 'day')],
+    ['Best hour', fmt(bw.bestHour, 'hour')], ['Worst hour', fmt(bw.worstHour, 'hour')],
+    ['Highest', s.glucoseExtremes?.highest ? `${s.glucoseExtremes.highest.value} ${u} (${s.glucoseExtremes.highest.count}×)` : null],
+    ['Lowest', s.glucoseExtremes?.lowest ? `${s.glucoseExtremes.lowest.value} ${u} (${s.glucoseExtremes.lowest.count}×)` : null],
+  ]);
+}
+
+function insulinFacts(s) {
+  const i = s.insulin || {};
+  const basal = i.averageBasalUnitsPerDay;
+  const tdd = basal != null && i.bolusUnitsPerDay != null ? basal + i.bolusUnitsPerDay : null;
+  const perDay = i.observedDays ? i.bolusEventCount / i.observedDays : null;
+  return { i, basal, tdd, perDay };
+}
+
+function renderInsulin(s) {
+  const { i, basal, tdd, perDay } = insulinFacts(s);
+  $('insulin').innerHTML = dl([
+    ['Total daily dose', tdd != null ? `${num(tdd, 2)} U/day` : 'basal total unavailable'],
+    ['Basal', basal != null ? `${num(basal, 2)} U/day (${num(i.basalPercent)} %)` : null],
+    ['Bolus', i.bolusUnitsPerDay != null ? `${num(i.bolusUnitsPerDay, 2)} U/day${i.bolusPercent != null ? ` (${num(i.bolusPercent)} %)` : ''}` : null],
+    ['Average bolus', i.avgUnitsPerBolus != null ? `${num(i.avgUnitsPerBolus, 2)} U` : null],
+    ['Boluses per day', perDay != null ? num(perDay) : null],
+    ['Carbs', s.carbs ? `${num(s.carbs.carbsPerDay, 0)} g/day, ${s.carbs.carbEntryCount} entries` : null],
+  ]);
+  const b = s.bolusArchitecture || {};
+  $('bolusTypes').innerHTML = dl([
+    ['Meal', b.meal], ['Meal + correction', b.mealWithCorrection],
+    ['Correction (calculator)', b.systemCorrection], ['Correction (manual)', b.manualCorrection],
+    ['Automatic correction (algorithm)', b.automaticCorrection],
+  ]);
+}
+
+const MODE_COLORS = { automatic: 'var(--ok)', sleep: 'var(--accent)', exercise: 'var(--high)', manual: 'var(--low)', limited: 'var(--low)', activity: 'var(--high)' };
+const MODE_ORDER = ['automatic', 'sleep', 'exercise', 'activity', 'limited', 'manual'];
+
+function modeRows() {
+  // Control-IQ: the exclusive per-minute split from the day review (sums to 100).
+  // Otherwise: pump_mode intervals for the window, which may overlap.
+  if (isControlIq() && report.controlIq?.summary?.completeDays) {
+    return { exclusive: true, rows: Object.entries(report.controlIq.summary.meanModePercent).filter(([, v]) => v > 0) };
+  }
+  const m = report.pumpModes;
+  if (!m || m.error || !m.available) return null;
+  return { exclusive: false, rows: Object.entries(m.modes).map(([k, v]) => [k, v.percent]) };
+}
+
+function renderModes() {
+  $('modesTitle').textContent = isControlIq() ? 'Control-IQ mode time' : 'Mode time';
+  const mr = modeRows();
+  if (!mr) { $('modeBar').innerHTML = ''; $('modes').innerHTML = dl([['Modes', 'no pump-mode data for this window']]); return; }
+  const rows = [...mr.rows].sort((a, b) => MODE_ORDER.indexOf(a[0]) - MODE_ORDER.indexOf(b[0]));
+  $('modeBar').innerHTML = mr.exclusive
+    ? rows.map(([k, v]) => `<div style="width:${v}%;background:${MODE_COLORS[k] || 'var(--muted)'}" title="${esc(k)}"></div>`).join('')
+    : '';
+  $('modes').innerHTML = dl(rows.map(([k, v]) => [k, `${num(v)} %`])) +
+    `<dt></dt><dd class="small muted">${mr.exclusive ? `Mean over ${report.controlIq.summary.completeDays} complete day(s).` : 'Share of the window; modes can overlap.'}</dd>`;
+}
+
+function renderControlIq() {
+  const r = report.controlIq;
+  const show = isControlIq() && r && !r.error;
+  $('ciqSection').classList.toggle('hidden', !show);
+  if (!show) return;
+  const s = r.summary;
+  $('ciqSummary').textContent = s.completeDays
+    ? `${s.completeDays} of ${s.daysInWindow} day(s) complete (confidence: ${s.confidence}). Per day: ${num(s.meanAutoBolusPerDay.count)} automatic corrections, ${num(s.meanAutoBolusPerDay.units, 2)} U, ${num(s.autoBolusShareOfTddPercent)} % of a ${num(s.meanTotalDailyDose, 2)} U total daily dose.`
+    : `No complete days in this window (${s.daysInWindow} day(s) seen), so no period figures.`;
+  const max = Math.max(1, ...r.byHour.map((h) => h.autoBolus.count));
+  $('ciqHours').innerHTML = r.byHour.map((h) => `<div style="height:${(h.autoBolus.count / max) * 100}%" title="${String(h.hour).padStart(2, '0')}:00 — ${h.autoBolus.count} automatic corrections on ${h.autoBolus.daysWithAutoBolus} of ${h.nDays} days"></div>`).join('');
+  $('ciqHourLabels').innerHTML = r.byHour.map((h) => `<span>${h.hour % 6 === 0 ? h.hour : ''}</span>`).join('');
+  const pct = (d, k) => num(d.modes[k]?.percent, 0);
+  $('ciqDays').innerHTML = '<tr><th>Day</th><th>Auto %</th><th>Sleep %</th><th>Exercise %</th><th>Manual %</th><th>No data %</th><th>Auto corrections</th><th>User bolus U</th><th>TDD U</th><th>Complete</th></tr>' +
+    r.days.map((d) => `<tr><td>${esc(d.date)}</td><td>${pct(d, 'automatic')}</td><td>${pct(d, 'sleep')}</td><td>${pct(d, 'exercise')}</td><td>${pct(d, 'manual')}</td><td>${pct(d, 'unknown')}</td><td>${d.autoBolus.count} · ${num(d.autoBolus.units, 2)} U</td><td>${num(d.manualBolusUnits, 2)}</td><td>${num(d.totalDailyDose, 2)}</td><td title="${esc((d.incompleteReasons || []).join('; '))}">${d.complete ? 'yes' : 'no'}</td></tr>`).join('');
+  $('ciqCaveat').textContent = r.caveat;
+}
+
+function healthRows() {
+  const h = report.health;
+  if (!h || h.error) return [];
+  return (h.buckets || []).filter((b) => b.health && Object.values(b.health).some((v) => v));
+}
+
+function renderHealth() {
+  const rows = healthRows();
+  $('healthSection').classList.toggle('hidden', !rows.length);
+  if (!rows.length) return;
+  const hrs = (m) => (m == null ? '—' : `${(m / 60).toFixed(1)} h`);
+  $('healthTable').innerHTML = '<tr><th>Week of</th><th>Steps/day</th><th>Active min/day</th><th>Workouts</th><th>Sleep</th><th>Resting HR</th><th>Weight</th><th>TIR %</th></tr>' +
+    rows.map((b) => { const x = b.health; return `<tr><td>${esc(b.bucket)}</td><td>${x.steps ? x.steps.perDay : '—'}</td><td>${x.activeMinutes ? num(x.activeMinutes.perDay, 0) : '—'}</td><td>${x.exercise ? `${x.exercise.count} · ${x.exercise.minutes} min` : '—'}</td><td>${x.sleep ? hrs(x.sleep.avgMinutesAsleep) : '—'}</td><td>${x.restingHeartRate ? num(x.restingHeartRate.avgBpm, 0) : '—'}</td><td>${x.weight ? `${num(x.weight.medianKg)} kg` : '—'}</td><td>${num(b.glucose?.timeInRange)}</td></tr>`; }).join('');
+  $('healthNote').textContent = report.health.notes?.[0] || '';
+}
+
+function segText(list, fmt) {
+  return (list || []).map((x) => `${x.from}=${fmt(x.value)}`).join(' | ') || 'not reported';
+}
+
+function settingsBlocks(s, u) {
+  return (s.settings || []).map((st) => ({
+    effective: stamp(st.effective),
+    rows: [
+      ['Profile', st.activeProfile],
+      ['Duration of insulin action', st.DIA_hours != null ? `${st.DIA_hours} h` : 'not reported'],
+      ['Max basal rate', st.maxBasalRate != null ? `${st.maxBasalRate} U/h` : null],
+      ['Target', segText(st.targetBg, (v) => `${v} ${u}`)],
+      ['Correction factor (ISF)', segText(st.isf, (v) => `1 U:${v} ${u}`)],
+      ['Carb ratio', segText(st.carbRatio, (v) => `1 U:${v} g`)],
+    ],
+  }));
+}
+
+function renderSettings(s) {
+  const blocks = settingsBlocks(s, config.unit);
+  $('settings').innerHTML = blocks.length
+    ? blocks.map((b) => `<h3>Effective ${esc(b.effective)}</h3><dl>${dl(b.rows)}</dl>`).join('')
+    : `<p class="muted">${esc(s.settingsNote || 'No pump settings stored for this window.')}</p>`;
+}
+
+// --- the copy-paste prompt -----------------------------------------------------
+
+function deviceFacts(d) {
+  const algo = d?.algorithm || '';
+  if (/control-iq/i.test(algo)) {
+    return `- Pump: ${d.pumpBrand} ${d.pumpModel} running Control-IQ. CGM: ${d.cgm || 'unknown'}.
+- Control-IQ does NOT learn an adaptive basal from Total Daily Insulin. It adjusts basal every 5 minutes around the user's programmed Personal Profile, aiming at fixed treatment ranges (narrower in Sleep mode, raised in Exercise mode), and may deliver an Automatic Correction Bolus (a fraction of the calculated correction, at most about once an hour) when glucose is predicted high.
+- Profile basal, carb ratio, correction factor, target and Duration of Insulin Action are the user's own settings (listed below); the DIA is user-set, not a fixed algorithm constant.
+- Mode time below is measured from the pump's own mode records (automatic, sleep, exercise, manual). In manual mode the algorithm was off, so excursions then are not algorithm decisions.
+- Automatic correction boluses are counted separately from user boluses. Many automatic corrections in one time slot suggest that slot's profile is under-dosed — as indirect evidence only.`;
+  }
+  if (/smartadjust|omnipod/i.test(algo + ' ' + (d?.pumpBrand || ''))) {
+    return `- Pump: ${d.pumpBrand} ${d.pumpModel || ''} running ${algo || 'SmartAdjust'}. CGM: ${d.cgm || 'unknown'}.
+- SmartAdjust adapts its basal to recent Total Daily Insulin. Mode time below is measured from the pump's own mode records (automated, limited, activity, manual).
+- The DIA listed below is the user's bolus-calculator setting.`;
+  }
+  return '- The pump and algorithm could not be identified from the data. Ask the user which system they use before reasoning about algorithm behaviour.';
+}
+
+function buildPrompt() {
+  const s = report.summary, u = config.unit, d = s.device || config.device;
+  const algo = d?.algorithm || 'the automated insulin delivery algorithm';
+  const g = s.glucoseControl || {}, bw = s.bestWorst || {}, b = s.bolusArchitecture || {};
+  const { i, basal, tdd, perDay } = insulinFacts(s);
+  const L = [];
+  const push = (...x) => L.push(...x);
+
+  push(`# PERSONA
+Act as a Senior Clinical Endocrinologist and Automated Insulin Delivery (AID) systems expert, with deep knowledge of ${algo}${d?.pumpModel ? ` on the ${d.pumpBrand} ${d.pumpModel}` : ''}, metabolic trend analysis and model predictive control. You say it as it is and do not soften findings to please the patient. You are not rude, but you are not trying to make friends.
+
+# MISSION
+Conduct a multi-phase clinical audit of the dataset below. Your goal is to:
+1. **System efficacy:** determine whether ${algo} is keeping glucose in range or whether there is a persistent drift.
+2. **Algorithm effort:** find where the algorithm works hardest (automatic corrections, mode time) and what that says about the profile it works around.
+3. **Systemic mismatches:** detect recurring anomalies (post-meal spikes, overnight instability, suspension patterns) that suggest a setting worth reviewing.
+4. **Behavioural interference:** quantify manual-mode time and user bolusing habits and their effect on the algorithm.
+
+# DEVICE FACTS
+${deviceFacts(d)}
+
+# CLINICAL RESEARCH DIRECTIVE
+Before your triage, research current evidence rather than relying only on training: how ${algo} works, the international consensus CGM targets (TIR > 70 %, time below range < 4 %, CV ≤ 36 %), and real-world studies on patterns like the ones in the data below.
+
+# CAVEAT RULE (MANDATORY)
+- Every pattern you report must state its evidence count (number of days or events behind it) and how confident you are.
+- Any observation that touches pump settings or doses must end with: "Discuss with your endocrinologist before changing settings."
+- Never give a recommended new setting value (basal rate, carb ratio, correction factor, target, DIA) as an instruction. Describe the evidence; the change is for the patient and their care team.
+
+# WORKFLOW PROTOCOL
+1. **PHASE 1: INITIAL TRIAGE [CURRENT STEP]:** analyse the aggregates below: basal/bolus split, automatic corrections, mode time.
+2. **PHASE 2: CONTEXTUAL INQUIRY:** ask the user specific questions about behaviours, habits or trust in the system that could explain outliers.
+3. **PHASE 3: ANOMALY SELECTION:** pick a 48–72 hour "Critical Interest Window" for a deep dive.
+4. **PHASE 4: HIGH-FIDELITY AUDIT:** ask for the exports you need for that window (glucose timeline, enriched bolus log, hourly trends); the user downloads them from the report page and uploads them here.
+
+# CONSTRAINTS
+- Times are the pump's own clock (written with a trailing Z by Glooko, but local time). Quote them as "yyyy-MM-dd HH:mm".
+- Glucose values are in ${u}.
+- Do not offer final conclusions until Phase 3. Your first response is triage, research and window selection.
+
+---
+
+=== REPORT DATE RANGE ===
+Start: ${stamp(s.reportRange?.start)}
+End:   ${stamp(s.reportRange?.end)}
+Days with data: ${s.reportRange?.days ?? '—'}
+
+=== DEVICE ===
+${deviceLine(d)}
+
+=== SYSTEM SETTINGS (over period) ===`);
+  const blocks = settingsBlocks(s, u);
+  if (!blocks.length) push(s.settingsNote || 'Pump settings unavailable for this window.');
+  for (const bl of blocks) push(`[EFFECTIVE: ${bl.effective}]`, ...bl.rows.filter((r) => r[1] != null).map(([k, v]) => `${k}: ${v}`), '');
+  if (/control-iq/i.test(d?.algorithm || '')) push('Note: Tandem Source does not send pump settings to Glooko, so these may be the last settings uploaded another way, possibly long ago. Confirm them with the user.', '');
+
+  push(`=== CLINICAL PERFORMANCE ===
+[GLUCOSE CONTROL]
+• Average glucose: ${num(g.averageBG)} ${u}
+• GMI (est. A1c): ${num(g.gmiEstimatedA1c)} %
+• Standard deviation: ${num(g.stdDev)} ${u}
+• Coefficient of variation: ${num(g.coefficientOfVariation)} % (${g.variabilityFlag || '—'})
+• Time in range (${config.lower}–${config.upper} ${u}): ${num(g.timeInRange)} % | Low: ${num(g.timeLow)} % | High: ${num(g.timeHigh)} %
+• CGM readings: ${g.cgmReadingCount ?? '—'}
+
+[BEST/WORST DAYS]
+• Best day: ${bw.bestDay ? `${bw.bestDay.day} (${num(bw.bestDay.tir)} % TIR)` : 'N/A'}
+• Worst day: ${bw.worstDay ? `${bw.worstDay.day} (${num(bw.worstDay.tir)} % TIR)` : 'N/A'}
+
+[BEST/WORST HOURS] (pump clock, pooled across days)
+• Best hour: ${bw.bestHour ? `${bw.bestHour.hour} (${num(bw.bestHour.tir)} % TIR)` : 'N/A'}
+• Worst hour: ${bw.worstHour ? `${bw.worstHour.hour} (${num(bw.worstHour.tir)} % TIR)` : 'N/A'}
+
+[INSULIN DELIVERY]
+• Total daily dose: ${tdd != null ? `${num(tdd, 2)} U` : 'unavailable (no basal totals)'}
+• Basal: ${basal != null ? `${num(basal, 2)} U/day (${num(i.basalPercent)} %)` : 'unavailable'}
+• Bolus: ${num(i.bolusUnitsPerDay, 2)} U/day${i.bolusPercent != null ? ` (${num(i.bolusPercent)} %)` : ''}, automatic corrections included
+• Average bolus: ${num(i.avgUnitsPerBolus, 2)} U
+• Boluses per day: ${perDay != null ? num(perDay) : '—'}
+
+[BOLUS ARCHITECTURE] (counts over the period)
+• Meal boluses (carbs only): ${b.meal ?? 0}
+• Meal with correction: ${b.mealWithCorrection ?? 0}
+• Correction, bolus calculator (no carbs): ${b.systemCorrection ?? 0}
+• Correction, manual (no carbs): ${b.manualCorrection ?? 0}
+• Automatic correction boluses (delivered by ${algo}): ${b.automaticCorrection ?? 0}
+
+[CARBOHYDRATES]
+• Average daily carbs: ${num(s.carbs?.carbsPerDay, 0)} g
+• Total carbs: ${num(s.carbs?.carbsGrams, 0)} g in ${s.carbs?.carbEntryCount ?? 0} entries`);
+
+  const hr = healthRows();
+  if (hr.length) {
+    const w = (sel, wt) => { let t = 0, n = 0; for (const r of hr) { const x = sel(r.health), k = wt(r.health); if (x != null && k) { t += x * k; n += k; } } return n ? { v: t / n, n } : null; };
+    const steps = w((h) => h.steps?.perDay, (h) => h.steps?.days);
+    const sleep = w((h) => h.sleep?.avgMinutesAsleep, (h) => h.sleep?.nights);
+    const rhr = w((h) => h.restingHeartRate?.avgBpm, (h) => h.restingHeartRate?.days);
+    const weights = hr.filter((r) => r.health.weight);
+    const ex = hr.reduce((a, r) => a + (r.health.exercise?.count || 0), 0);
+    push('', '[HEALTH CONTEXT] (Google Health; descriptive only, not cause and effect)');
+    if (steps) push(`• Average daily steps: ${Math.round(steps.v)} (${steps.n} days)`);
+    if (sleep) push(`• Average sleep: ${(sleep.v / 60).toFixed(1)} h per night (${sleep.n} nights)`);
+    if (rhr) push(`• Resting heart rate: ${Math.round(rhr.v)} bpm (${rhr.n} days)`);
+    if (ex) push(`• Workouts logged: ${ex}`);
+    if (weights.length) push(`• Weight: ${num(weights[0].health.weight.medianKg)} kg (week of ${weights[0].bucket}) → ${num(weights.at(-1).health.weight.medianKg)} kg (week of ${weights.at(-1).bucket})`);
+  }
+
+  push('', '[SYSTEM AUTOMATION]');
+  const mr = modeRows();
+  if (!mr) push('• Mode time: no pump-mode data for this window');
+  else {
+    for (const [k, v] of mr.rows) push(`• ${k[0].toUpperCase() + k.slice(1)} mode: ${num(v)} %`);
+    push(mr.exclusive ? `• (mean of ${report.controlIq.summary.completeDays} complete day(s); each minute counted once)` : '• (share of the window; modes can overlap)');
+  }
+
+  const r = report.controlIq;
+  if (/control-iq/i.test(d?.algorithm || '') && r && !r.error && r.summary.completeDays) {
+    const sm = r.summary;
+    const top = [...r.byHour].filter((h) => h.autoBolus.count).sort((a, b2) => b2.autoBolus.count - a.autoBolus.count).slice(0, 3);
+    push('', `[CONTROL-IQ DAY REVIEW] (${sm.completeDays} complete of ${sm.daysInWindow} day(s); confidence: ${sm.confidence})
+• Automatic corrections: ${num(sm.meanAutoBolusPerDay.count)} per day, ${num(sm.meanAutoBolusPerDay.units, 2)} U per day, ${num(sm.autoBolusShareOfTddPercent)} % of total daily dose
+• User-initiated bolus: ${num(sm.meanManualBolusUnitsPerDay, 2)} U per day
+• Mean total daily dose (complete days): ${num(sm.meanTotalDailyDose, 2)} U`);
+    if (top.length) push(`• Hours with the most automatic corrections: ${top.map((h) => `${String(h.hour).padStart(2, '0')}:00 (${h.autoBolus.count} on ${h.autoBolus.daysWithAutoBolus} of ${h.nDays} days)`).join(', ')}`);
+    if (sm.incompleteDays?.length) push(`• Left out as incomplete: ${sm.incompleteDays.join(', ')}`);
+    push(`• Server caveat: ${r.caveat}`);
+  }
+
+  push(`==========================================
+
+# INSTRUCTIONS FOR YOUR FIRST RESPONSE
+1. **Clinical snapshot:** a professional summary of status against the consensus targets.
+2. **Algorithm triage:** basal/bolus balance, automatic corrections and mode time, each with its evidence count.
+3. **Behavioural curiosity:** name the anomalies and ask the user to explain them.
+4. **Targeted data request:** name the deep-dive window and which exports you need.
+Apply the CAVEAT RULE to every point.
+
+[STOP] Awaiting triage and research selection.`);
+  return L.join('\n');
+}
+
+// --- loading -------------------------------------------------------------------
+
+async function load() {
+  let w;
+  try { w = windowParams(); } catch (e) { $('status').textContent = e.message; return; }
+  $('status').textContent = 'Loading from the archive…';
+  $('load').disabled = true;
+  try {
+    report = await getJson(`/api/report?start=${encodeURIComponent(w.start)}&end=${encodeURIComponent(w.end)}`);
+    const s = report.summary;
+    if (s.error) throw new Error(s.error);
+    $('report').classList.remove('hidden');
+    $('device').textContent = `${deviceLine(s.device || config.device)} · ${config.online ? 'synced from Glooko' : 'offline archive'} · archive ${day(config.archive.earliest)} to ${day(config.archive.latest)}`;
+    renderGlucose(s); renderInsulin(s); renderModes(); renderControlIq(); renderHealth(); renderSettings(s);
+    $('prompt').textContent = buildPrompt();
+    $('xStart').value = w.start.slice(0, 16);
+    $('xEnd').value = w.end.slice(0, 16);
+    const partErrors = ['pumpModes', 'controlIq', 'health'].filter((k) => report[k]?.error).map((k) => `${k}: ${report[k].error}`);
+    $('status').textContent = (s.note ? s.note + ' ' : '') + (partErrors.length ? `Partly loaded (${partErrors.join('; ')})` : `Loaded ${new Date().toLocaleTimeString()}.`);
+  } catch (e) {
+    $('status').innerHTML = `<span class="err">Error: ${esc(e.message)}</span>`;
+  } finally {
+    $('load').disabled = false;
+  }
+}
+
+async function download(type) {
+  const s = $('xStart').value, e = $('xEnd').value;
+  if (!s || !e) { $('xStatus').textContent = 'Set both ends of the window.'; return; }
+  const start = `${s}:00.000Z`, end = `${e}:00.000Z`;
+  $('xStatus').textContent = `Preparing ${type}…`;
+  try {
+    const data = await getJson(`/api/export?type=${type}&start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+    a.download = `omni-endo_${type}_${s.slice(0, 10)}_${e.slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    $('xStatus').textContent = `Downloaded ${a.download}.`;
+  } catch (err) {
+    $('xStatus').innerHTML = `<span class="err">Error: ${esc(err.message)}</span>`;
+  }
+}
+
+function setPreset(days) {
+  const end = $('end').value || day(config?.archive?.latest) || new Date().toISOString().slice(0, 10);
+  const earliest = day(config?.archive?.earliest);
+  const start = addDays(end, 1 - days);
+  $('end').value = end;
+  $('start').value = config?.archive?.earliest && start < earliest ? earliest : start;
+}
+
+document.querySelectorAll('[data-days]').forEach((b) => (b.onclick = () => { setPreset(+b.dataset.days); load(); }));
+document.querySelectorAll('[data-export]').forEach((b) => (b.onclick = () => download(b.dataset.export)));
+$('load').onclick = load;
+$('copy').onclick = async () => {
+  try { await navigator.clipboard.writeText($('prompt').textContent); $('copy').textContent = 'Copied'; }
+  catch { $('copy').textContent = 'Copy failed: select the text below'; }
+  setTimeout(() => ($('copy').textContent = 'Copy prompt'), 1500);
+};
+
+(async () => {
+  try {
+    config = await getJson('/api/config');
+    $('device').textContent = deviceLine(config.device);
+    if (!config.archive.latest) { $('status').textContent = 'The archive holds no CGM data yet. If the server is syncing, try again in a few minutes.'; }
+    setPreset(14);
+    await load();
+  } catch (e) {
+    $('status').innerHTML = `<span class="err">Error: ${esc(e.message)}</span>`;
+  }
+})();
+</script>
+</body>
+</html>
