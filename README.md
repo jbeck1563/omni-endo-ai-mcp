@@ -13,7 +13,7 @@
 >
 > Upstream, and all credit for this server: **[rilhia/omni-endo-ai-mcp](https://github.com/rilhia/omni-endo-ai-mcp)**.
 > Everything below this banner is the original author's documentation and still applies,
-> except where sections 3 and 4 extend it. This fork adds four things for one
+> except where sections 3 to 5 extend it. This fork adds five things for one
 > self-hosted deployment. If you want the real project, go upstream.
 >
 > ### 1. `POST /my-data` — a raw Glooko passthrough for the companion web UI
@@ -112,6 +112,27 @@
 > without a schema change. The t:slim X2 clock is set by hand, so around a daylight-saving
 > change Glooko can be an hour off from health times.
 >
+> ### 5. The report page: `GET /` with `OMNI_WEB=1`
+>
+> **What.** The companion web UI, rebuilt inside this server. One static page
+> (`src/web/index.html`, no build step) shows glucose control, insulin with automatic
+> corrections counted, mode time, the Control-IQ day review, Google Health context when
+> present, the settings in force, a copy-paste AI review prompt, and JSON exports (glucose
+> timeline, enriched bolus log, hourly trends) for a deep-dive window.
+>
+> **How.** The page reads `GET /api/config` (configured unit and range, device, archive span),
+> `GET /api/report?start&end` (`get_diabetes_summary`, `get_basal_delivery` modes,
+> `get_controliq_review`, `get_health_context`) and `GET /api/export?type&start&end`. Each
+> endpoint calls the MCP tools in process through an in-memory MCP client, so the page shows
+> the same numbers from the same archive as any MCP client; the browser parses no Glooko
+> data. The prompt states device facts (Control-IQ, user-set DIA, mode time from the pump's
+> mode records) and the caveat rule: evidence counts, "discuss with your endocrinologist
+> before changing settings", never a new setting value as an instruction.
+>
+> **Auth.** Same Basic credential and fail-closed rule as `/my-data` (`OMNI_MYDATA_BASIC`;
+> 503 when unset). `/mcp` and its Bearer are unchanged, and `/my-data` still works for the
+> old UI.
+>
 > ### Checks
 >
 > `node --no-warnings test-tandem.mjs` feeds a synthetic Tandem fixture
@@ -121,6 +142,8 @@
 > unlinked account.
 > `node --no-warnings test-controliq.mjs` runs the same Tandem fixture through
 > `get_controliq_review` (mode minutes per day, bolus split, flagged incomplete days).
+> `node --no-warnings test-web.mjs` covers the page and `/api/*`: 401 without the credential,
+> 200 and valid JSON with it from the synthetic fixture, and 503 without `OMNI_MYDATA_BASIC`.
 > `node test-mydata.mjs` covers the payload shape, anonymous / wrong-credential /
 > Bearer-instead-of-Basic requests, and re-execs itself without `OMNI_MYDATA_BASIC` to prove
 > the fail-closed branch. It uses the existing `__OMNI_FETCH_STUB__` seam, so it never

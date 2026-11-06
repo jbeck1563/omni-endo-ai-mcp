@@ -27,13 +27,16 @@
  */
 
 import http from 'http';
+import { readFileSync } from 'fs';
 import { randomUUID, timingSafeEqual } from 'crypto';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { createServer } from './server.js';
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
+import { createServer, glucoseDefaults } from './server.js';
 import { glookoConfigured } from './range.js';
 import { fetchGlookoRange } from './glooko.js';
 import { ensureFreshOnFirstCall } from './sync.js';
-import { initDb } from './store.js';
+import { initDb, getEarliestCgmEpoch, getLatestCgmEpoch, getMeta } from './store.js';
 
 const PORT = parseInt(process.env.OMNI_HTTP_PORT || '3000', 10);
 const HOST = process.env.OMNI_HTTP_HOST || '127.0.0.1';
@@ -57,6 +60,14 @@ const TOKEN = process.env.OMNI_HTTP_TOKEN || null;
 // "just for now" mode where it answers without a credential.
 const MYDATA = process.env.OMNI_MYDATA === '1';
 const MYDATA_BASIC = process.env.OMNI_MYDATA_BASIC || null;
+
+// Optional report page, the replacement for the separate omni-endo-ai web app.
+// With OMNI_WEB=1, GET / serves src/web/index.html and GET /api/* serves the JSON
+// it renders. Same Basic credential (OMNI_MYDATA_BASIC) and the same fail-closed
+// rule as /my-data; /mcp keeps its Bearer and is untouched. The API calls the MCP
+// tools themselves (in process, see callTool), so the page shows exactly what an
+// MCP client would get, from the archive, with no parsing in the browser.
+const WEB = process.env.OMNI_WEB === '1';
 
 // Constant-time compare of the full Authorization header against the expected
 // Basic credential. Length is compared first because timingSafeEqual throws on a
@@ -143,19 +154,19 @@ async function createSessionTransport() {
   return transport;
 }
 
-// POST /my-data — { startDate, endDate } -> { startDate, endDate, data1, data2, data3 }.
-// Credentials in the body (which the UI still sends) are ignored: this always uses
-// GLOOKO_EMAIL / GLOOKO_PASSWORD from the environment.
-async function handleMyData(req, res) {
-  if (req.method !== 'POST') return notFound(res);
+// The Basic check shared by /my-data and the web page. Writes the refusal and
+// returns false when the caller may not proceed. FAIL CLOSED: no configured
+// credential means 503 for everyone.
+function basicGate(req, res, route) {
   if (!MYDATA_BASIC) {
     console.error(
-      '[omni-endo-ai] /my-data refused: OMNI_MYDATA=1 but OMNI_MYDATA_BASIC is unset.'
+      `[omni-endo-ai] ${route} refused: OMNI_MYDATA_BASIC is unset.`
     );
     res.writeHead(503, { 'Content-Type': 'application/json' });
-    return res.end(
-      JSON.stringify({ error: 'Server misconfigured: /my-data has no credential set.' })
+    res.end(
+      JSON.stringify({ error: `Server misconfigured: ${route} has no credential set.` })
     );
+    return false;
   }
   if (!basicOk(req)) {
     // The realm makes a browser prompt for credentials by itself, so this holds
@@ -164,8 +175,18 @@ async function handleMyData(req, res) {
       'Content-Type': 'application/json',
       'WWW-Authenticate': 'Basic realm="omni-endo", charset="UTF-8"',
     });
-    return res.end(JSON.stringify({ error: 'unauthorized' }));
+    res.end(JSON.stringify({ error: 'unauthorized' }));
+    return false;
   }
+  return true;
+}
+
+// POST /my-data — { startDate, endDate } -> { startDate, endDate, data1, data2, data3 }.
+// Credentials in the body (which the UI still sends) are ignored: this always uses
+// GLOOKO_EMAIL / GLOOKO_PASSWORD from the environment.
+async function handleMyData(req, res) {
+  if (req.method !== 'POST') return notFound(res);
+  if (!basicGate(req, res, '/my-data')) return;
   if (!glookoConfigured()) {
     res.writeHead(503, { 'Content-Type': 'application/json' });
     return res.end(
@@ -196,9 +217,108 @@ async function handleMyData(req, res) {
   }
 }
 
+
+// --- Web page and its JSON API (OMNI_WEB=1) -------------------------------
+
+const PAGE = WEB ? readFileSync(new URL('./web/index.html', import.meta.url)) : null;
+
+// One in-process MCP client for the page. Calling the registered tools (rather
+// than the analytics functions directly) keeps a single code path: same input
+// validation, same caps, same output shape as /mcp.
+let pageClient = null;
+async function callTool(name, args) {
+  if (!pageClient) {
+    pageClient = (async () => {
+      const [a, b] = InMemoryTransport.createLinkedPair();
+      await createServer().connect(a);
+      const client = new Client({ name: 'omni-endo-web', version: '1.0.0' });
+      await client.connect(b);
+      return client;
+    })();
+  }
+  const r = await (await pageClient).callTool({ name, arguments: args });
+  const text = r.content?.[0]?.text ?? '';
+  if (r.isError) return { error: text || `${name} failed` };
+  return JSON.parse(text);
+}
+
+function sendJson(res, status, obj) {
+  res.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
+  res.end(JSON.stringify(obj));
+}
+
+const iso = (epoch) => (epoch ? new Date(epoch * 1000).toISOString() : null);
+
+// Deep-dive exports the page offers for download, each one MCP tool.
+const EXPORTS = {
+  timeline: (w) => callTool('get_glucose', { ...w, band: 'all' }),
+  bolus: (w) => callTool('get_enriched_bolus_log', w),
+  hourly: (w) => callTool('get_hourly_trends', w),
+};
+
+async function handleWeb(req, res, url) {
+  if (req.method !== 'GET') return notFound(res);
+  if (!basicGate(req, res, url.pathname)) return;
+
+  if (url.pathname === '/') {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
+    return res.end(PAGE);
+  }
+
+  try {
+    if (url.pathname === '/api/config') {
+      const g = glucoseDefaults();
+      return sendJson(res, 200, {
+        unit: g.units === 'mgdl' ? 'mg/dL' : 'mmol/L',
+        lower: g.lower,
+        upper: g.upper,
+        online: glookoConfigured(),
+        device: JSON.parse(getMeta('device') || 'null'),
+        archive: { earliest: iso(getEarliestCgmEpoch()), latest: iso(getLatestCgmEpoch()) },
+      });
+    }
+
+    const w = { start: url.searchParams.get('start'), end: url.searchParams.get('end') };
+    if (!w.start || !w.end) return badRequest(res, 'start and end are required');
+
+    if (url.pathname === '/api/report') {
+      // Each part is independent: one failing (e.g. a span cap) leaves the
+      // others intact and comes back as { error }. The summary runs first so any
+      // Glooko top-up for the window happens once, before the others read it.
+      const summary = await callTool('get_diabetes_summary', w);
+      const [basal, controlIq, health] = await Promise.all([
+        callTool('get_basal_delivery', { ...w, includeIntervals: false }),
+        callTool('get_controliq_review', w),
+        callTool('get_health_context', { ...w, granularity: 'week' }),
+      ]);
+      return sendJson(res, 200, {
+        window: w,
+        summary,
+        pumpModes: basal.error ? basal : basal.pumpModes.summary,
+        controlIq,
+        health,
+      });
+    }
+
+    if (url.pathname === '/api/export') {
+      const run = EXPORTS[url.searchParams.get('type')];
+      if (!run) return badRequest(res, 'type must be one of: ' + Object.keys(EXPORTS).join(', '));
+      const out = await run(w);
+      return sendJson(res, out.error ? 400 : 200, out);
+    }
+  } catch (err) {
+    console.error('[omni-endo-ai] web API failed:', err.message);
+    return sendJson(res, 500, { error: err.message });
+  }
+  return notFound(res);
+}
+
 const httpServer = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || HOST}`);
   if (MYDATA && url.pathname === '/my-data') return handleMyData(req, res);
+  if (WEB && (url.pathname === '/' || url.pathname.startsWith('/api/'))) {
+    return handleWeb(req, res, url);
+  }
   if (url.pathname !== MCP_PATH) return notFound(res);
   if (!tokenOk(req)) return unauthorized(res);
 

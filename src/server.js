@@ -50,6 +50,23 @@ import { PERSONA_PROMPT } from './prompt.js';
 import { ensureHealthFresh, bucketHealth, healthSources } from './health.js';
 import { getHealth } from './store.js';
 
+/**
+ * The server's configured glucose unit and low/high boundaries (OMNI_UNITS,
+ * OMNI_LOWER, OMNI_UPPER). Exported so the web page (http.js) labels values
+ * with the same unit and range the tools compute with.
+ */
+export function glucoseDefaults() {
+  const u = (process.env.OMNI_UNITS || 'mmol').trim().toLowerCase();
+  const units = u === 'mgdl' ? 'mgdl' : 'mmol'; // anything unrecognised -> mmol
+  const lo = parseFloat(process.env.OMNI_LOWER);
+  const hi = parseFloat(process.env.OMNI_UPPER);
+  return {
+    units,
+    lower: Number.isFinite(lo) ? lo : units === 'mgdl' ? 70 : 3.9,
+    upper: Number.isFinite(hi) ? hi : units === 'mgdl' ? 180 : 10.0,
+  };
+}
+
 // A FACTORY, not a singleton. Each transport (each stdio process, or each HTTP
 // session) needs its OWN McpServer: the SDK forbids connecting one server to
 // more than one transport. createServer() builds a fully-registered server.
@@ -61,21 +78,10 @@ const server = new McpServer({
 
 // --- Glucose unit & boundary defaults -------------------------------------
 // The user sets their preferred unit and target boundaries ONCE in the
-// environment (.env). Tools then use those by default. The per-call units/
-// lower/upper parameters are OPTIONAL overrides: omit them to use the
-// configured defaults, or pass them for a one-off (e.g. "time under 4.5").
-const ENV_UNITS = (() => {
-  const u = (process.env.OMNI_UNITS || 'mmol').trim().toLowerCase();
-  return u === 'mgdl' ? 'mgdl' : 'mmol'; // anything unrecognised -> mmol
-})();
-const ENV_LOWER = (() => {
-  const v = parseFloat(process.env.OMNI_LOWER);
-  return Number.isFinite(v) ? v : ENV_UNITS === 'mgdl' ? 70 : 3.9;
-})();
-const ENV_UPPER = (() => {
-  const v = parseFloat(process.env.OMNI_UPPER);
-  return Number.isFinite(v) ? v : ENV_UNITS === 'mgdl' ? 180 : 10.0;
-})();
+// environment (.env); see glucoseDefaults(). Tools then use those by default.
+// The per-call units/lower/upper parameters are OPTIONAL overrides: omit them
+// to use the configured defaults, or pass them for a one-off.
+const { units: ENV_UNITS, lower: ENV_LOWER, upper: ENV_UPPER } = glucoseDefaults();
 
 // Resolve the effective unit/boundaries for a call: a provided parameter wins,
 // otherwise the environment default applies.
