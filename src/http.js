@@ -286,10 +286,11 @@ async function handleWeb(req, res, url) {
       // others intact and comes back as { error }. The summary runs first so any
       // Glooko top-up for the window happens once, before the others read it.
       const summary = await callTool('get_diabetes_summary', w);
-      const [basal, controlIq, health] = await Promise.all([
+      const [basal, controlIq, health, tddTrend] = await Promise.all([
         callTool('get_basal_delivery', { ...w, includeIntervals: false }),
         callTool('get_controliq_review', w),
         callTool('get_health_context', { ...w, granularity: 'week' }),
+        callTool('get_tdd_trend', w),
       ]);
       return sendJson(res, 200, {
         window: w,
@@ -297,6 +298,7 @@ async function handleWeb(req, res, url) {
         pumpModes: basal.error ? basal : basal.pumpModes.summary,
         controlIq,
         health,
+        tddTrend,
       });
     }
 

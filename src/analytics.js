@@ -1745,3 +1745,137 @@ export function buildControlIqReview(bundle, sEpoch, eEpoch) {
     days,
   };
 }
+
+// --- Weekly total daily dose trend ------------------------------------------
+
+export const TDD_TREND_CAVEAT =
+  'Descriptive only. Rising TDD with flat glucose and time in range means more ' +
+  'insulin is doing the same job (needs went up: weight, activity, illness, ' +
+  'hormones); rising TDD with rising glucose means more insulin is not keeping ' +
+  'up. TDD per kg and units per gram of logged carbs are rough proxies, not a ' +
+  'measured insulin sensitivity. Check the n of weeks and days behind each ' +
+  'figure. Discuss with your endocrinologist before changing settings. This tool ' +
+  'never suggests a new setting value.';
+
+const MIN_COMPLETE_DAYS_PER_WEEK = 5;
+const WEEK = 7 * 86400;
+
+/**
+ * Week-over-week total daily dose over [sEpoch, eEpoch) (seconds, pump-local
+ * epochs as everywhere else). Weeks are Monday-start calendar weeks. A day
+ * counts only when it lies wholly inside the window and Glooko has a final
+ * daily total for it. Weeks with fewer than 5 such days are listed but kept
+ * out of the change, rolling mean and slope. weights is Google Health weight
+ * samples ({ localEpoch, value } in kg); thresholds as getThresholds returns.
+ */
+export function buildTddTrend(bundle, weights, thresholds, units, sEpoch, eEpoch) {
+  const dailyByDay = new Map((bundle.dailyInsulin || []).map((d) => [d.dayUtc, d]));
+  const timeline = bundle.timeline || [];
+  const weeks = new Map();
+  const weekOf = (epoch) => {
+    const dow = (new Date(epoch * 1000).getUTCDay() + 6) % 7;
+    return Math.floor(epoch / 86400) * 86400 - dow * 86400;
+  };
+
+  for (let day0 = Math.floor(sEpoch / 86400) * 86400; day0 < eEpoch; day0 += 86400) {
+    const w0 = weekOf(day0);
+    if (!weeks.has(w0)) weeks.set(w0, { w0, daysInWindow: 0, days: [] });
+    const w = weeks.get(w0);
+    w.daysInWindow += 1;
+    const di = dailyByDay.get(new Date(day0 * 1000).toISOString().slice(0, 10));
+    if (day0 < sEpoch || day0 + 86400 > eEpoch || !di?.complete || di.totalUnits == null) continue;
+    const items = timeline.filter((i) => i.epoch >= day0 && i.epoch < day0 + 86400);
+    w.days.push({ di, items });
+  }
+
+  const rows = [...weeks.values()].map(({ w0, daysInWindow, days }) => {
+    const n = days.length;
+    const included = n >= MIN_COMPLETE_DAYS_PER_WEEK;
+    const row = {
+      week: new Date(w0 * 1000).toISOString().slice(0, 10),
+      daysInWindow,
+      completeDays: n,
+      included,
+    };
+    if (!included)
+      row.excludedReason = `${n} complete day(s); at least ${MIN_COMPLETE_DAYS_PER_WEEK} needed for the trend`;
+    if (!n) return row;
+
+    const sum = (f) => days.reduce((a, d) => a + (f(d) || 0), 0);
+    const tdd = sum((d) => d.di.totalUnits);
+    const basal = sum((d) => d.di.basalUnits);
+    const bolusesOf = (d) => d.items.filter((i) => i.type === 'BOLUS');
+    const auto = sum((d) =>
+      bolusesOf(d).filter((b) => b.class === 'Automatic Correction Bolus').reduce((a, b) => a + (b.units || 0), 0)
+    );
+    const carbs = sum((d) => bolusesOf(d).reduce((a, b) => a + (b.carbs > 0 ? b.carbs : 0), 0));
+    const carbEntries = sum((d) => bolusesOf(d).filter((b) => b.carbs > 0).length);
+    const cgm = days.flatMap((d) => d.items.filter((i) => i.type === 'CGM').map((i) => i.val));
+    const inRange = cgm.filter((v) => v >= thresholds.low && v <= thresholds.high).length;
+
+    Object.assign(row, {
+      meanTdd: r2(tdd / n),
+      meanBasal: r2(basal / n),
+      meanBolus: r2(sum((d) => d.di.bolusUnits) / n),
+      meanAutoCorrectionUnits: r2(auto / n),
+      basalPercent: tdd ? r1((basal / tdd) * 100) : null,
+      bolusPercent: tdd ? r1(100 - (basal / tdd) * 100) : null,
+      glucose: {
+        mean: cgm.length ? toDisplay(cgm.reduce((a, v) => a + v, 0) / cgm.length, units) : null,
+        timeInRange: cgm.length ? r1((inRange / cgm.length) * 100) : null,
+        cgmReadings: cgm.length,
+      },
+    });
+    const proxies = {};
+    const kg = weights.filter((x) => x.localEpoch >= w0 && x.localEpoch < w0 + WEEK).map((x) => x.value);
+    if (kg.length) {
+      const sorted = [...kg].sort((a, b) => a - b);
+      const med = (sorted[(sorted.length - 1) >> 1] + sorted[sorted.length >> 1]) / 2;
+      proxies.tddPerKg = { value: +(tdd / n / med).toFixed(3), weightKg: r1(med), weighIns: kg.length };
+    }
+    if (carbs > 0)
+      proxies.tddUnitsPerGramLoggedCarbs = { value: +(tdd / carbs).toFixed(3), carbsGrams: Math.round(carbs), carbEntries };
+    row.proxies = proxies;
+    return row;
+  });
+
+  // Change, rolling mean and slope use included weeks only.
+  const byW0 = new Map([...weeks.keys()].map((w0, i) => [w0, rows[i]]));
+  const firstW0 = weeks.keys().next().value;
+  for (const [w0, row] of byW0) {
+    if (!row.included) continue;
+    const prev = byW0.get(w0 - WEEK);
+    row.changeVsPreviousWeek = prev?.included
+      ? { units: r2(row.meanTdd - prev.meanTdd), percent: prev.meanTdd ? r1(((row.meanTdd - prev.meanTdd) / prev.meanTdd) * 100) : null }
+      : null;
+    const last4 = [0, 1, 2, 3].map((k) => byW0.get(w0 - k * WEEK)).filter((r) => r?.included);
+    row.rolling4WeekMeanTdd = { value: r2(last4.reduce((a, r) => a + r.meanTdd, 0) / last4.length), nWeeks: last4.length };
+  }
+
+  const pts = [...byW0].filter(([, r]) => r.included).map(([w0, r]) => [(w0 - firstW0) / WEEK, r.meanTdd]);
+  let slope = null;
+  if (pts.length >= 2) {
+    const mx = pts.reduce((a, p) => a + p[0], 0) / pts.length;
+    const my = pts.reduce((a, p) => a + p[1], 0) / pts.length;
+    const sxx = pts.reduce((a, p) => a + (p[0] - mx) ** 2, 0);
+    slope = r2(pts.reduce((a, p) => a + (p[0] - mx) * (p[1] - my), 0) / sxx);
+  }
+
+  return {
+    caveat: TDD_TREND_CAVEAT,
+    notes: [
+      'Weeks are Monday to Sunday on the pump clock (Glooko pump-local days). TDD, basal and bolus are Glooko\'s own daily totals; automatic correction units are summed from the stored bolus events.',
+      `A complete day lies wholly inside the window and has a final Glooko daily total. Weeks with fewer than ${MIN_COMPLETE_DAYS_PER_WEEK} complete days stay in weeks[] (included: false) but are left out of changeVsPreviousWeek, rolling4WeekMeanTdd and the slope.`,
+      'changeVsPreviousWeek compares with the calendar week before; null when that week is missing or not included. rolling4WeekMeanTdd averages the included weeks among this week and the three before it.',
+      'tddPerKg uses the median Google Health weigh-in inside the same week and is omitted when there is none. tddUnitsPerGramLoggedCarbs is the week\'s TDD over its logged carbs, so unlogged meals inflate it. Neither is an insulin sensitivity or carb ratio.',
+      'Glucose mean and time in range cover the CGM readings on the same complete days.',
+    ],
+    trend: {
+      weeksInWindow: rows.length,
+      includedWeeks: pts.length,
+      slopeUnitsPerWeek: slope,
+      confidence: pts.length >= 8 ? 'high' : pts.length >= 4 ? 'medium' : 'low',
+    },
+    weeks: rows,
+  };
+}

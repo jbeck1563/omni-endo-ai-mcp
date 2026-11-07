@@ -52,6 +52,7 @@
   .hours div { background: var(--accent); border-radius: 2px 2px 0 0; min-height: 1px; }
   .hourlabels { display: grid; grid-template-columns: repeat(24, 1fr); font-size: .65rem; color: var(--muted); text-align: center; }
   pre { white-space: pre-wrap; overflow-wrap: anywhere; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px; max-height: 420px; overflow: auto; font-size: .8rem; }
+  .chart { display: block; width: 100%; height: auto; margin: 8px 0; }
   .hidden { display: none; }
   .err { color: var(--low); }
 </style>
@@ -106,6 +107,15 @@
       <h3>Per day</h3>
       <div class="scroll"><table id="ciqDays"></table></div>
       <p class="caveat" id="ciqCaveat"></p>
+    </section>
+
+    <section id="tddSection" class="hidden">
+      <h2>Weekly total daily dose</h2>
+      <p class="small" id="tddSummary"></p>
+      <svg id="tddChart" class="chart" role="img" aria-label="Weekly mean total daily dose"></svg>
+      <p class="small muted">Bars: weekly mean TDD (faded = under 5 complete days, left out of the trend). Line: 4-week rolling mean. Pick 90 d for a longer trend.</p>
+      <div class="scroll"><table id="tddTable"></table></div>
+      <p class="caveat" id="tddCaveat"></p>
     </section>
 
     <section id="healthSection" class="hidden">
@@ -277,6 +287,32 @@ function renderControlIq() {
   $('ciqDays').innerHTML = '<tr><th>Day</th><th>Auto %</th><th>Sleep %</th><th>Exercise %</th><th>Manual %</th><th>No data %</th><th>Auto corrections</th><th>User bolus U</th><th>TDD U</th><th>Complete</th></tr>' +
     r.days.map((d) => `<tr><td>${esc(d.date)}</td><td>${pct(d, 'automatic')}</td><td>${pct(d, 'sleep')}</td><td>${pct(d, 'exercise')}</td><td>${pct(d, 'manual')}</td><td>${pct(d, 'unknown')}</td><td>${d.autoBolus.count} · ${num(d.autoBolus.units, 2)} U</td><td>${num(d.manualBolusUnits, 2)}</td><td>${num(d.totalDailyDose, 2)}</td><td title="${esc((d.incompleteReasons || []).join('; '))}">${d.complete ? 'yes' : 'no'}</td></tr>`).join('');
   $('ciqCaveat').textContent = r.caveat;
+}
+
+function renderTddTrend() {
+  const r = report.tddTrend;
+  const weeks = r && !r.error ? r.weeks : [];
+  $('tddSection').classList.toggle('hidden', !weeks.length);
+  if (!weeks.length) return;
+  const t = r.trend;
+  $('tddSummary').textContent = t.slopeUnitsPerWeek != null
+    ? `Weekly mean TDD changes ${t.slopeUnitsPerWeek >= 0 ? '+' : ''}${num(t.slopeUnitsPerWeek, 2)} U per week (slope over ${t.includedWeeks} of ${t.weeksInWindow} week(s); confidence: ${t.confidence}).`
+    : `Only ${t.includedWeeks} of ${t.weeksInWindow} week(s) have 5 or more complete days, so no trend line.`;
+  const W = 400, H = 140, pad = 20, bw = (W - pad) / weeks.length;
+  const max = Math.max(1, ...weeks.map((w) => w.meanTdd || 0)) * 1.1;
+  const y = (v) => H - pad - (v / max) * (H - 2 * pad);
+  const bars = weeks.map((w, i) => w.meanTdd == null ? '' :
+    `<rect x="${pad + i * bw + bw * 0.15}" y="${y(w.meanTdd)}" width="${bw * 0.7}" height="${H - pad - y(w.meanTdd)}" fill="var(--accent)" opacity="${w.included ? 1 : 0.3}"><title>${esc(w.week)}: ${num(w.meanTdd, 1)} U/day, ${w.completeDays} complete day(s)</title></rect>`).join('');
+  const line = weeks.map((w, i) => (w.rolling4WeekMeanTdd ? `${pad + (i + 0.5) * bw},${y(w.rolling4WeekMeanTdd.value)}` : null)).filter(Boolean).join(' ');
+  const labelEvery = Math.ceil(weeks.length / 5);
+  const labels = weeks.map((w, i) => (i % labelEvery ? '' : `<text x="${pad + (i + 0.5) * bw}" y="${H - 4}" text-anchor="middle" font-size="12" fill="var(--muted)">${esc(w.week.slice(5))}</text>`)).join('');
+  $('tddChart').setAttribute('viewBox', `0 0 ${W} ${H}`);
+  $('tddChart').innerHTML = `<text x="0" y="12" font-size="12" fill="var(--muted)">${num(max, 0)} U</text><line x1="${pad}" x2="${W}" y1="${H - pad}" y2="${H - pad}" stroke="var(--line)"/>${bars}${line ? `<polyline points="${line}" fill="none" stroke="var(--high)" stroke-width="2"/>` : ''}${labels}`;
+  const chg = (c) => (c ? `${c.units >= 0 ? '+' : ''}${num(c.units, 1)} (${c.percent >= 0 ? '+' : ''}${num(c.percent, 0)} %)` : '—');
+  const p = (w) => w.proxies || {};
+  $('tddTable').innerHTML = `<tr><th>Week of</th><th>Days</th><th>TDD</th><th>Δ vs prev</th><th>4-wk mean</th><th>Basal</th><th>Bolus</th><th>Auto corr.</th><th>Basal %</th><th>U/kg</th><th>U/g carbs</th><th>Mean ${esc(config.unit)}</th><th>TIR %</th></tr>` +
+    weeks.map((w) => `<tr${w.included ? '' : ' class="muted"'} title="${esc(w.excludedReason || '')}"><td>${esc(w.week)}</td><td>${w.completeDays}/${w.daysInWindow}${w.included ? '' : ' *'}</td><td>${num(w.meanTdd, 1)}</td><td>${chg(w.changeVsPreviousWeek)}</td><td>${num(w.rolling4WeekMeanTdd?.value, 1)}</td><td>${num(w.meanBasal, 1)}</td><td>${num(w.meanBolus, 1)}</td><td>${num(w.meanAutoCorrectionUnits, 1)}</td><td>${num(w.basalPercent, 0)}</td><td>${num(p(w).tddPerKg?.value, 2)}</td><td>${num(p(w).tddUnitsPerGramLoggedCarbs?.value, 2)}</td><td>${num(w.glucose?.mean)}</td><td>${num(w.glucose?.timeInRange, 0)}</td></tr>`).join('');
+  $('tddCaveat').textContent = `* under 5 complete days, not in the trend. ${r.caveat}`;
 }
 
 function healthRows() {
@@ -493,11 +529,11 @@ async function load() {
     if (s.error) throw new Error(s.error);
     $('report').classList.remove('hidden');
     $('device').textContent = `${deviceLine(s.device || config.device)} · ${config.online ? 'synced from Glooko' : 'offline archive'} · archive ${day(config.archive.earliest)} to ${day(config.archive.latest)}`;
-    renderGlucose(s); renderInsulin(s); renderModes(); renderControlIq(); renderHealth(); renderSettings(s);
+    renderGlucose(s); renderInsulin(s); renderModes(); renderControlIq(); renderTddTrend(); renderHealth(); renderSettings(s);
     $('prompt').textContent = buildPrompt();
     $('xStart').value = w.start.slice(0, 16);
     $('xEnd').value = w.end.slice(0, 16);
-    const partErrors = ['pumpModes', 'controlIq', 'health'].filter((k) => report[k]?.error).map((k) => `${k}: ${report[k].error}`);
+    const partErrors = ['pumpModes', 'controlIq', 'tddTrend', 'health'].filter((k) => report[k]?.error).map((k) => `${k}: ${report[k].error}`);
     $('status').textContent = (s.note ? s.note + ' ' : '') + (partErrors.length ? `Partly loaded (${partErrors.join('; ')})` : `Loaded ${new Date().toLocaleTimeString()}.`);
   } catch (e) {
     $('status').innerHTML = `<span class="err">Error: ${esc(e.message)}</span>`;

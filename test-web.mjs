@@ -95,6 +95,7 @@ if (NOBASIC) {
   assert.strictEqual(rep.pumpModes.modes.sleep.minutes, 780);
   assert.strictEqual(rep.controlIq.summary.completeDays, 2);
   assert.match(rep.controlIq.caveat, /Discuss with your endocrinologist before changing settings/);
+  assert.deepStrictEqual(rep.tddTrend.weeks.map((x) => [x.week, x.completeDays, x.included]), [['2001-03-05', 2, false]]);
   const wk = rep.health.buckets.find((b) => b.health);
   assert.deepStrictEqual(wk.health.steps, { total: 20000, perDay: 10000, days: 2 });
 
