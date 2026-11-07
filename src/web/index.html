@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Omni-Endo Report</title>
+<title>Ridgeline T1D</title>
 <link rel="icon" href="data:,">
 <style>
   :root {
@@ -19,7 +19,9 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
   header, main { max-width: 1100px; margin: 0 auto; padding: 16px; }
-  header h1 { margin: 0; font-size: 1.35rem; }
+  header h1 { margin: 0; font-size: 1.35rem; display: flex; align-items: center; gap: 8px; }
+  header .mark { color: var(--accent); flex: none; }
+  header .tag { margin: 2px 0 0; font-size: .8rem; color: var(--muted); letter-spacing: .04em; }
   header p { margin: 4px 0 0; color: var(--muted); }
   section { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-bottom: 16px; min-width: 0; }
   h2 { margin: 0 0 12px; font-size: 1.05rem; }
@@ -56,7 +58,8 @@
 </head>
 <body>
 <header>
-  <h1>Omni-Endo report</h1>
+  <h1><svg class="mark" viewBox="0 0 32 16" width="32" height="16" aria-hidden="true"><path d="M1 15 9 4l5 7 4-5 13 9Z" fill="currentColor"/></svg>Ridgeline T1D</h1>
+  <p class="tag">Stay on the ridge.</p>
   <p id="device">Loading…</p>
 </header>
 <main>
@@ -512,7 +515,7 @@ async function download(type) {
     const data = await getJson(`/api/export?type=${type}&start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`);
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
-    a.download = `omni-endo_${type}_${s.slice(0, 10)}_${e.slice(0, 10)}.json`;
+    a.download = `ridgeline_${type}_${s.slice(0, 10)}_${e.slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(a.href);
     $('xStatus').textContent = `Downloaded ${a.download}.`;

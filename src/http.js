@@ -43,7 +43,7 @@ const HOST = process.env.OMNI_HTTP_HOST || '127.0.0.1';
 const MCP_PATH = process.env.OMNI_HTTP_PATH || '/mcp';
 const TOKEN = process.env.OMNI_HTTP_TOKEN || null;
 
-// Optional raw-passthrough route for the omni-endo-ai web UI. That app POSTs
+// Optional raw-passthrough route for the Ridgeline web UI. That app POSTs
 // /my-data with browser-typed Glooko credentials and expects back the three raw
 // Glooko payloads. fetchGlookoRange() already returns exactly that shape, so
 // serving it here lets the UI drop its own login entirely: one Glooko session
@@ -61,7 +61,7 @@ const TOKEN = process.env.OMNI_HTTP_TOKEN || null;
 const MYDATA = process.env.OMNI_MYDATA === '1';
 const MYDATA_BASIC = process.env.OMNI_MYDATA_BASIC || null;
 
-// Optional report page, the replacement for the separate omni-endo-ai web app.
+// Optional report page, the successor to the old standalone web app.
 // With OMNI_WEB=1, GET / serves src/web/index.html and GET /api/* serves the JSON
 // it renders. Same Basic credential (OMNI_MYDATA_BASIC) and the same fail-closed
 // rule as /my-data; /mcp keeps its Bearer and is untouched. The API calls the MCP
@@ -160,7 +160,7 @@ async function createSessionTransport() {
 function basicGate(req, res, route) {
   if (!MYDATA_BASIC) {
     console.error(
-      `[omni-endo-ai] ${route} refused: OMNI_MYDATA_BASIC is unset.`
+      `[ridgeline] ${route} refused: OMNI_MYDATA_BASIC is unset.`
     );
     res.writeHead(503, { 'Content-Type': 'application/json' });
     res.end(
@@ -173,7 +173,7 @@ function basicGate(req, res, route) {
     // even if the reverse proxy in front is misconfigured or absent.
     res.writeHead(401, {
       'Content-Type': 'application/json',
-      'WWW-Authenticate': 'Basic realm="omni-endo", charset="UTF-8"',
+      'WWW-Authenticate': 'Basic realm="ridgeline", charset="UTF-8"',
     });
     res.end(JSON.stringify({ error: 'unauthorized' }));
     return false;
@@ -211,7 +211,7 @@ async function handleMyData(req, res) {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(result));
   } catch (err) {
-    console.error('[omni-endo-ai] /my-data failed:', err.message);
+    console.error('[ridgeline] /my-data failed:', err.message);
     res.writeHead(502, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: err.message }));
   }
@@ -231,7 +231,7 @@ async function callTool(name, args) {
     pageClient = (async () => {
       const [a, b] = InMemoryTransport.createLinkedPair();
       await createServer().connect(a);
-      const client = new Client({ name: 'omni-endo-web', version: '1.0.0' });
+      const client = new Client({ name: 'ridgeline-web', version: '1.0.0' });
       await client.connect(b);
       return client;
     })();
@@ -307,7 +307,7 @@ async function handleWeb(req, res, url) {
       return sendJson(res, out.error ? 400 : 200, out);
     }
   } catch (err) {
-    console.error('[omni-endo-ai] web API failed:', err.message);
+    console.error('[ridgeline] web API failed:', err.message);
     return sendJson(res, 500, { error: err.message });
   }
   return notFound(res);
@@ -344,7 +344,7 @@ const httpServer = http.createServer(async (req, res) => {
 
     await transport.handleRequest(req, res, body);
   } catch (err) {
-    console.error('[omni-endo-ai] HTTP request error:', err);
+    console.error('[ridgeline] HTTP request error:', err);
     if (!res.headersSent) badRequest(res);
   }
 });
@@ -352,17 +352,17 @@ const httpServer = http.createServer(async (req, res) => {
 function main() {
   httpServer.listen(PORT, HOST, () => {
     console.error(
-      `[omni-endo-ai] MCP server running on http://${HOST}:${PORT}${MCP_PATH} (Streamable HTTP / SSE, stateful).`
+      `[ridgeline] MCP server running on http://${HOST}:${PORT}${MCP_PATH} (Streamable HTTP / SSE, stateful).`
     );
     if (!TOKEN) {
       console.error(
-        '[omni-endo-ai] WARNING: OMNI_HTTP_TOKEN is not set, the endpoint is ' +
+        '[ridgeline] WARNING: OMNI_HTTP_TOKEN is not set, the endpoint is ' +
           'unauthenticated. Only acceptable on a trusted local interface.'
       );
     }
     if (HOST === '0.0.0.0' && !TOKEN) {
       console.error(
-        '[omni-endo-ai] WARNING: bound to 0.0.0.0 WITHOUT a token. Your health ' +
+        '[ridgeline] WARNING: bound to 0.0.0.0 WITHOUT a token. Your health ' +
           'data is exposed to the network. Set OMNI_HTTP_TOKEN.'
       );
     }
@@ -376,24 +376,24 @@ function main() {
     // will retry the load and surface the error to the user.
     if (glookoConfigured()) {
       console.error(
-        '[omni-endo-ai] Warming archive on startup (cold start if empty, else top-up)...'
+        '[ridgeline] Warming archive on startup (cold start if empty, else top-up)...'
       );
       // Fire and forget: do not block the event loop / listener.
       (async () => {
         try {
           initDb();
-          await ensureFreshOnFirstCall((m) => console.error(`[omni-endo] ${m}`));
-          console.error('[omni-endo-ai] Startup archive warm-up complete.');
+          await ensureFreshOnFirstCall((m) => console.error(`[ridgeline] ${m}`));
+          console.error('[ridgeline] Startup archive warm-up complete.');
         } catch (err) {
           console.error(
-            '[omni-endo-ai] Startup warm-up failed (will retry on first tool call):',
+            '[ridgeline] Startup warm-up failed (will retry on first tool call):',
             err.message
           );
         }
       })();
     } else {
       console.error(
-        '[omni-endo-ai] No Glooko credentials: running in OFFLINE mode, serving ' +
+        '[ridgeline] No Glooko credentials: running in OFFLINE mode, serving ' +
           'only the existing database. No data will be downloaded.'
       );
     }

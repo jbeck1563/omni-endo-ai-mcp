@@ -78,7 +78,7 @@ assert.strictEqual(body.startDate, '2026-07-01T00:00:00.000Z');
 // 2. No credential -> 401, and a realm so a browser prompts on its own.
 const anon = await post('/my-data', dates);
 assert.strictEqual(anon.status, 401);
-assert.match(anon.headers.get('www-authenticate') || '', /^Basic realm="omni-endo"/);
+assert.match(anon.headers.get('www-authenticate') || '', /^Basic realm="ridgeline"/);
 
 // 3. Wrong credential -> 401. Also covers the equal-length case, so the compare
 //    is exercised rather than short-circuited on length alone.

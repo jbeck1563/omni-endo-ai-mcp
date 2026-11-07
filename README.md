@@ -1,249 +1,149 @@
-<div align="center">
-  <kbd><img src="docs/images/Omni-Endo-AI-MCP.png" alt="Omni-Endo AI Header" width="100%"></kbd>
-</div>
+# Ridgeline T1D
 
-# OMNI-ENDO AI (MCP)
-**Clinical Audit & Triage Tool: connect your diabetes data directly to an AI assistant**
+**Stay on the ridge.** Staying in range is walking a ridge: a drop on the high side, a drop on the low side, and you are the one walking it. Ridgeline T1D is a self-hosted MCP server and report page that put your own Glooko data (Tandem t:slim X2 with Control-IQ, or Omnipod 5) in front of you and your AI assistant, so you manage your diabetes with your eyes open.
+
+Originally forked from [rilhia/omni-endo-ai-mcp](https://github.com/rilhia/omni-endo-ai-mcp); this project now develops independently.
 
 > [!IMPORTANT]
-> **Not medical advice.** This tool is for understanding your data and helping you ask better questions of your diabetes care team. It is not a medical device and must never be used to make changes to your therapy. See the [full disclaimer](#disclaimer).
+> **Not medical advice.** This tool is for understanding your data and asking better questions of your diabetes care team. It is not a medical device and must never be used to change your therapy. See the [disclaimer](#disclaimer).
 
 > [!NOTE]
-> ## This is a fork
->
-> Upstream, and all credit for this server: **[rilhia/omni-endo-ai-mcp](https://github.com/rilhia/omni-endo-ai-mcp)**.
-> Everything below this banner is the original author's documentation and still applies,
-> except where sections 3 to 5 extend it. This fork adds five things for one
-> self-hosted deployment. If you want the real project, go upstream.
->
-> ### 1. `POST /my-data` — a raw Glooko passthrough for the companion web UI
->
-> **What.** With `OMNI_MYDATA=1`, the HTTP transport serves one extra route alongside
-> `/mcp`. Given `{startDate, endDate}` it returns `{startDate, endDate, data1, data2, data3}`
-> — the three raw Glooko payloads, straight from `fetchGlookoRange()`, bypassing the SQLite
-> archive and the range caps.
->
-> **How.** The companion UI [omni-endo-ai](https://github.com/rilhia/omni-endo-ai) posts
-> exactly that shape to its own `/my-data`, after asking for your Glooko password in the
-> browser. This server already holds a Glooko session and `fetchGlookoRange()` already
-> returns that identical object, so a reverse proxy can route the UI's `/my-data` here and
-> the UI never logs in at all. (Our UI fork,
-> [jbeck1563/omni-endo-ai](https://github.com/jbeck1563/omni-endo-ai), drops the credential
-> fields to match.)
->
-> **Why.** Two apps were each logging into Glooko separately. Now there is one session and
-> no credential in the browser.
->
-> **Auth.** `OMNI_MYDATA_BASIC` holds `user:password` and the route requires HTTP Basic —
-> not the `OMNI_HTTP_TOKEN` Bearer, because a browser cannot be made to send a Bearer on a
-> page's own `fetch()`, but it does replay Basic automatically on same-origin requests. The
-> full header is compared in constant time, and a 401 carries a realm so a browser prompts
-> by itself. **With `OMNI_MYDATA=1` and no `OMNI_MYDATA_BASIC` the route refuses to serve**
-> rather than defaulting to open — it would otherwise hand anyone who can reach the port a
-> live pull of your glucose history using the server's own Glooko credentials. Put a proxy
-> with the same credential in front as well; the app-level check is what protects the port
-> from anything already inside your Docker network. `/mcp` is unaffected and still Bearer.
->
-> ### 2. Batched older-gap backfill
->
-> **What.** A query starting before the archive floor used to issue the whole gap as one
-> `pullAndIngest`. Against Glooko's live API a wide orientation probe (`start=2000-01-01`,
-> which `get_diabetes_summary`'s own description invites) measured 5+ minutes or hung —
-> past any client-side tool-call timeout. It now walks backward in year-sized batches,
-> reusing the cold-start shape, and stops after `MAX_EMPTY_BATCHES` consecutive empty years.
->
-> **Why the extra table.** A probe that finds nothing never moves the earliest-CGM epoch, so
-> the same empty span would be re-fetched from Glooko on *every* future wide query. A new
-> `meta` key-value table remembers the oldest epoch already probed. It is purely additive, so
-> `SCHEMA_VERSION` is deliberately **not** bumped — that would trigger the self-heal wipe and
-> force a destructive re-sync of a populated archive.
->
-> ### 3. Tandem t:slim X2 (Control-IQ) through Glooko
->
-> **What.** Glooko's Tandem Source link delivers a Tandem pump's data in series this server
-> never requested. Control-IQ automatic correction boluses arrive only in `automaticBolus`
-> (disjoint from `deliveredBolus`; Glooko's daily bolus total is the sum of both), so they were
-> silently dropped. Tandem settings snapshots have no `maxBasalRate` and several named
-> profiles, which made `get_diabetes_summary` and `get_enriched_bolus_log` throw.
->
-> **How.** The client now also requests `automaticBolus`, the Control-IQ, Omnipod 5 and
-> generic pump-mode series (including `pumpOp5LimitedMode`, which `limited` basal state
-> always read but never fetched), `scheduledBasal`/`temporaryBasal`/`suspendBasal`/`lgsPlgs`,
-> `reservoirChange` and `pumpAlarm`. Automatic boluses get the class
-> `Automatic Correction Bolus`. A new `pump_mode` table holds possibly-overlapping
-> automatic / manual / sleep / exercise / limited / activity intervals, surfaced as
-> `pumpModes` in `get_basal_delivery`. Site changes are stored as `site` (old `pod` rows still
-> read), cartridge changes as `cartridge`. Settings use the active profile and every field is
-> optional. `get_diabetes_summary` adds `device` (pump, CGM, algorithm). Tool descriptions
-> and the prompt are device-neutral, with a short Control-IQ section.
->
-> **Archive.** `SCHEMA_VERSION` is 6, so an online archive is wiped and re-pulled once. An
-> offline archive (no Glooko credentials, e.g. the example database) is never wiped, since it
-> could not be re-pulled; it keeps working at its old version.
->
-> **Known gaps.** Tandem Source supplies no pump settings to Glooko: the settings shown are
-> the last ones uploaded some other way, possibly long ago. Glooko times are the pump's local
-> clock written as UTC.
->
-> ### 4. Google Health context: `get_health_context`
->
-> **What.** A read-only pull of the Google Health API (the hub the Google Health app fills
-> from Health Connect on Android: Garmin Connect, Renpho Health, the phone itself) and one
-> tool, `get_health_context(start, end, granularity)`. It puts steps, active minutes,
-> workouts, sleep, resting HR, HRV, weight and body fat beside the same per-bucket
-> glucose/insulin row `get_trend` returns.
->
-> **How.** `src/health.js` refreshes an OAuth token from `OMNI_GHEALTH_CLIENT_ID`,
-> `OMNI_GHEALTH_CLIENT_SECRET` and `OMNI_GHEALTH_REFRESH_TOKEN` (a one-user client with the
-> `googlehealth.activity_and_fitness`, `.sleep` and `.health_metrics_and_measurements`
-> read-only scopes), pages `dataPoints`, and reads daily `dailyRollUp` totals in windows
-> inside the API's caps. Rows land in three additive tables (`health_sample`,
-> `health_session`, `health_daily`): no `SCHEMA_VERSION` bump, outside the Glooko wipe.
-> The first health tool call tops up under its own lock, so Google can never block Glooko;
-> a failure (for example an account not yet linked to Google Health) comes back as a
-> `healthSync` status with a fix-it hint.
->
-> **Why.** Context for glucose: activity, sleep and weight move insulin need. Each point is
-> stored at `physicalTime + utcOffset`, the same local-time-as-UTC frame as Glooko, so joins
-> need no time-zone library.
->
-> **Known gaps.** The Google Health API carries only weight and body fat %, not muscle,
-> water, bone or visceral fat; `health_sample` takes those types later from another source
-> without a schema change. The t:slim X2 clock is set by hand, so around a daylight-saving
-> change Glooko can be an hour off from health times.
->
-> ### 5. The report page: `GET /` with `OMNI_WEB=1`
->
-> **What.** The companion web UI, rebuilt inside this server. One static page
-> (`src/web/index.html`, no build step) shows glucose control, insulin with automatic
-> corrections counted, mode time, the Control-IQ day review, Google Health context when
-> present, the settings in force, a copy-paste AI review prompt, and JSON exports (glucose
-> timeline, enriched bolus log, hourly trends) for a deep-dive window.
->
-> **How.** The page reads `GET /api/config` (configured unit and range, device, archive span),
-> `GET /api/report?start&end` (`get_diabetes_summary`, `get_basal_delivery` modes,
-> `get_controliq_review`, `get_health_context`) and `GET /api/export?type&start&end`. Each
-> endpoint calls the MCP tools in process through an in-memory MCP client, so the page shows
-> the same numbers from the same archive as any MCP client; the browser parses no Glooko
-> data. The prompt states device facts (Control-IQ, user-set DIA, mode time from the pump's
-> mode records) and the caveat rule: evidence counts, "discuss with your endocrinologist
-> before changing settings", never a new setting value as an instruction.
->
-> **Auth.** Same Basic credential and fail-closed rule as `/my-data` (`OMNI_MYDATA_BASIC`;
-> 503 when unset). `/mcp` and its Bearer are unchanged, and `/my-data` still works for the
-> old UI.
->
-> ### Checks
->
-> `node --no-warnings test-tandem.mjs` feeds a synthetic Tandem fixture
-> (`test-tandem.fixture.json`) through ingest and the MCP tools.
-> `node --no-warnings test-health.mjs` feeds a synthetic Google Health fixture
-> (`test-health.fixture.json`) through ingest and `get_health_context`, including an
-> unlinked account.
-> `node --no-warnings test-controliq.mjs` runs the same Tandem fixture through
-> `get_controliq_review` (mode minutes per day, bolus split, flagged incomplete days).
-> `node --no-warnings test-web.mjs` covers the page and `/api/*`: 401 without the credential,
-> 200 and valid JSON with it from the synthetic fixture, and 503 without `OMNI_MYDATA_BASIC`.
-> `node test-mydata.mjs` covers the payload shape, anonymous / wrong-credential /
-> Bearer-instead-of-Basic requests, and re-execs itself without `OMNI_MYDATA_BASIC` to prove
-> the fail-closed branch. It uses the existing `__OMNI_FETCH_STUB__` seam, so it never
-> touches the network.
+> **Compatibility.** Environment variables keep their original `OMNI_*` names (and `GLOOKO_*`), and the default SQLite file is still `omni-endo.db`, so existing deployments keep working unchanged.
 
-> [!TIP]
-> **Allergic to instructions? Let an AI do the talking.** 🤖
-> This README is thorough, but nobody actually *enjoys* reading setup docs. So here's a little experiment: I've written a prompt that turns any decent AI assistant (Claude, ChatGPT, Gemini) into a personal install guide. Paste it in and it'll hold your hand through the whole thing, going as fast or as slow as *you* need, from "what's a terminal?" to "just give me the commands".
-> Grab it here: **[the conversational install prompt](https://github.com/rilhia/omni-endo-ai-mcp/blob/main/docs/installation-prompt.txt)**.
-> It's genuinely a bit of an experiment, and I would **love** to hear how it went for you, what worked, what didn't, where it got confused. Drop me a note (see [Get in Touch](#get-in-touch)). Your feedback makes the next person's install smoother.
+## What it does
 
----
+Ridgeline T1D exposes your diabetes history as analytical tools an AI can call over MCP (server name `ridgeline-t1d`): time in range, GMI and variability, best and worst days and hours, enriched bolus analysis (each bolus with the glucose and pump settings in force), basal delivery and pump modes, Control-IQ day review, and Google Health context (activity, sleep, weight). It also serves a report page at `/` with the same numbers.
 
-## 📖 Table of Contents
-* [What is Omni-Endo AI (MCP)?](#what-is-omni-endo-ai)
-  * [What does it actually do?](#what-does-it-actually-do)
-  * [The "Aha!" Moment](#the-aha-moment)
-  * [Why I Built This](#why-i-built-this)
-* [Who This Is For](#who-this-is-for)
-* [Privacy & Security](#privacy--security)
-* [The "Tough Love" AI Persona](#the-tough-love-ai-persona)
-* [Step 1: Getting Ready (Installing Docker)](#step-1-installing-docker)
-* [Step 2: Getting the Files](#step-2-getting-the-files)
-* [Step 3: Configure Your Settings (`.env`)](#step-3-configure-your-settings)
-* [Ports (only if one is already in use)](#ports-and-docker-compose)
-* [Step 4: Build and Start the Tool](#step-4-build-the-tool)
-* [Section A: Use it with Claude Desktop](#section-a-claude-desktop)
-* [Section B: Use it with Open WebUI](#section-b-open-webui)
-* [Section C: Use it with the OpenAPI interface](#section-c-openapi)
-* [How to Stop](#how-to-stop)
-* [Troubleshooting](#troubleshooting)
-* [Get in Touch](#get-in-touch)
-* [API Reference](#api-reference)
-* [How the Code is Organised](#how-the-code-is-organised)
-* [License](#license)
-* [Disclaimer](#disclaimer)
+You ask things like: *"How was my time in range last month?"*, *"Why do I keep going high in the evenings?"*, *"Show me my worst day and tell me what happened."*
 
----
+## Features
 
-<a id="what-is-omni-endo-ai"></a>
-## 🌟 What is Omni-Endo AI (MCP)?
-**Omni-Endo AI** is a bridge between your diabetes data and an AI assistant. The original version was written as a web app. It can be found [here](https://github.com/rilhia/omni-endo-ai). This is an **MCP server** (Model Context Protocol) version, which is a standard way of giving an AI a set of tools it can use on your behalf. No need to copy and paste content between a website and an LLM and no need to pay for API use. The previous version was purposefully designed not to be tied to an LLM and to not mean that API calls needed to be paid for. Since it is now easy to use an MCP with Claude for free, I figured why not try it out.
+### 1. `POST /my-data` — a raw Glooko passthrough
 
-With this version you simply *talk* to your assistant. You ask a question in plain language, and the assistant reaches into your data, pulls exactly what it needs, and analyses it for you, all within the conversation.
+**What.** With `OMNI_MYDATA=1`, the HTTP transport serves one extra route alongside
+`/mcp`. Given `{startDate, endDate}` it returns `{startDate, endDate, data1, data2, data3}`
+— the three raw Glooko payloads, straight from `fetchGlookoRange()`, bypassing the SQLite
+archive and the range caps.
 
-> [!NOTE]
-> **Built for Claude first.** This was designed and tuned for **Claude Desktop** (Section A), and that is where it works best, fully featured and the most reliable. I have since added the option to run it with **other LLMs through Open WebUI** (Section B): that path works, but it is not as polished, so treat it as "good, not perfect". A happy side effect of wiring up Open WebUI is that the tools also became available as a plain web API, so you can poke around your data directly through the **OpenAPI interface** (Section C) with no AI at all. In short: Claude for the best experience; Open WebUI if you would rather use another model; OpenAPI if you just want to explore the raw functions.
+**How.** A client POSTs that shape to `/my-data` and this server answers from its own Glooko session, so the browser never holds a Glooko credential. `fetchGlookoRange()` already returns that identical object, so a reverse proxy can route `/my-data` here.
 
-You ask things like:
-* *"How was my time in range last month?"*
-* *"Why do I keep going high in the evenings?"*
-* *"Show me my worst day and tell me what happened."*
+**Why.** One Glooko session and no credential in the browser.
 
-<a id="what-does-it-actually-do"></a>
-### 🚀 What does it actually do?
-Omni-Endo AI exposes your diabetes history as a set of analytical tools the AI can call:
+**Auth.** `OMNI_MYDATA_BASIC` holds `user:password` and the route requires HTTP Basic —
+not the `OMNI_HTTP_TOKEN` Bearer, because a browser cannot be made to send a Bearer on a
+page's own `fetch()`, but it does replay Basic automatically on same-origin requests. The
+full header is compared in constant time, and a 401 carries a realm so a browser prompts
+by itself. **With `OMNI_MYDATA=1` and no `OMNI_MYDATA_BASIC` the route refuses to serve**
+rather than defaulting to open — it would otherwise hand anyone who can reach the port a
+live pull of your glucose history using the server's own Glooko credentials. Put a proxy
+with the same credential in front as well; the app-level check is what protects the port
+from anything already inside your Docker network. `/mcp` is unaffected and still Bearer.
 
-* **Summaries and trends:** time in range, GMI, variability, best and worst days and hours, basal/bolus balance, over any period you ask about.
-* **High-fidelity CGM data:** every 5-minute reading is captured, so no spike or dip is missed, but the AI is guided to pull *aggregates first* and only fetch raw readings when it genuinely needs them.
-* **Enriched bolus analysis:** each bolus is matched with the glucose at the time and the pump settings (ISF, carb ratio, target) that were active, so the AI can judge whether a dose made sense.
-* **Omnipod 5 behaviour:** when the algorithm was suspending, running at max, or running blind after losing signal.
+### 2. Batched older-gap backfill
 
-The assistant does all of this itself, live, by calling these tools while it talks to you.
+**What.** A query starting before the archive floor used to issue the whole gap as one
+`pullAndIngest`. Against Glooko's live API a wide orientation probe (`start=2000-01-01`,
+which `get_diabetes_summary`'s own description invites) measured 5+ minutes or hung —
+past any client-side tool-call timeout. It now walks backward in year-sized batches,
+reusing the cold-start shape, and stops after `MAX_EMPTY_BATCHES` consecutive empty years.
 
-<a id="the-aha-moment"></a>
-### The "Aha!" Moment
-This project started with a personal frustration. While trying to integrate my diabetes data into a [**Home Assistant**](https://www.home-assistant.io/) dashboard, I discovered that the wealth of historical data stored in [**Glooko**](https://glooko.com/) (especially from the **Omnipod 5**) is a goldmine. I realised that if I gave that data to an AI assistant and let it query the data directly, it could uncover patterns that months of manual logging never showed.
+**Why the extra table.** A probe that finds nothing never moves the earliest-CGM epoch, so
+the same empty span would be re-fetched from Glooko on *every* future wide query. A new
+`meta` key-value table remembers the oldest epoch already probed. It is purely additive, so
+`SCHEMA_VERSION` is deliberately **not** bumped — that would trigger the self-heal wipe and
+force a destructive re-sync of a populated archive.
 
-<a id="why-i-built-this"></a>
-### Why I Built This
-I built this to put the power back into the hands of the patient. We often only get 15 minutes with a consultant every few months. This tool lets you:
-1. **Be Proactive:** spot trends before your next appointment.
-2. **Be Private:** your data and credentials stay on your own machine.
-3. **Be Flexible:** use it with Claude Desktop, or with a local or cloud AI through Open WebUI.
+### 3. Tandem t:slim X2 (Control-IQ) through Glooko
 
----
+**What.** Glooko's Tandem Source link delivers a Tandem pump's data in series this server
+never requested. Control-IQ automatic correction boluses arrive only in `automaticBolus`
+(disjoint from `deliveredBolus`; Glooko's daily bolus total is the sum of both), so they were
+silently dropped. Tandem settings snapshots have no `maxBasalRate` and several named
+profiles, which made `get_diabetes_summary` and `get_enriched_bolus_log` throw.
 
-<a id="who-this-is-for"></a>
-## 👤 Who This Is For
+**How.** The client now also requests `automaticBolus`, the Control-IQ, Omnipod 5 and
+generic pump-mode series (including `pumpOp5LimitedMode`, which `limited` basal state
+always read but never fetched), `scheduledBasal`/`temporaryBasal`/`suspendBasal`/`lgsPlgs`,
+`reservoirChange` and `pumpAlarm`. Automatic boluses get the class
+`Automatic Correction Bolus`. A new `pump_mode` table holds possibly-overlapping
+automatic / manual / sleep / exercise / limited / activity intervals, surfaced as
+`pumpModes` in `get_basal_delivery`. Site changes are stored as `site` (old `pod` rows still
+read), cartridge changes as `cartridge`. Settings use the active profile and every field is
+optional. `get_diabetes_summary` adds `device` (pump, CGM, algorithm). Tool descriptions
+and the prompt are device-neutral, with a short Control-IQ section.
 
-This project is built for people who use the **Omnipod 5** hybrid closed-loop insulin delivery system (or, in this fork, a **Tandem t:slim X2** with Control-IQ) and sync their data to **Glooko**. If that is not you, you can still explore the project using the three months of included sample data (my data) — no Omnipod 5 or Glooko account required for that path.
+**Archive.** `SCHEMA_VERSION` is 6, so an online archive is wiped and re-pulled once. An
+offline archive (no Glooko credentials, e.g. the example database) is never wiped, since it
+could not be re-pulled; it keeps working at its old version.
 
-### Prerequisites
+**Known gaps.** Tandem Source supplies no pump settings to Glooko: the settings shown are
+the last ones uploaded some other way, possibly long ago. Glooko times are the pump's local
+clock written as UTC.
 
-**Required by everyone**
-- **Docker** — the entire stack runs inside Docker. Install it from [docker.com](https://www.docker.com/get-started). See [Step 1](#step-1-installing-docker) below.
+### 4. Google Health context: `get_health_context`
 
-**Required to analyse your own data**
-- **An Omnipod 5 or a Tandem t:slim X2** — the insulin delivery device whose data this project analyses.
-- **A Glooko account** — with your pump synced to it (for Tandem, through Glooko's Tandem Source link). This is how the MCP server retrieves your data.
+**What.** A read-only pull of the Google Health API (the hub the Google Health app fills
+from Health Connect on Android: Garmin Connect, Renpho Health, the phone itself) and one
+tool, `get_health_context(start, end, granularity)`. It puts steps, active minutes,
+workouts, sleep, resting HR, HRV, weight and body fat beside the same per-bucket
+glucose/insulin row `get_trend` returns.
 
-**Required — you need at least one AI to talk to**
+**How.** `src/health.js` refreshes an OAuth token from `OMNI_GHEALTH_CLIENT_ID`,
+`OMNI_GHEALTH_CLIENT_SECRET` and `OMNI_GHEALTH_REFRESH_TOKEN` (a one-user client with the
+`googlehealth.activity_and_fitness`, `.sleep` and `.health_metrics_and_measurements`
+read-only scopes), pages `dataPoints`, and reads daily `dailyRollUp` totals in windows
+inside the API's caps. Rows land in three additive tables (`health_sample`,
+`health_session`, `health_daily`): no `SCHEMA_VERSION` bump, outside the Glooko wipe.
+The first health tool call tops up under its own lock, so Google can never block Glooko;
+a failure (for example an account not yet linked to Google Health) comes back as a
+`healthSync` status with a fix-it hint.
 
-| Option | What you need | Data leaves your machine? |
-|--------|--------------|--------------------------|
-| **Claude Desktop** | Free download from [claude.ai/download](https://claude.ai/download) | Yes, to Anthropic |
-| **Google Gemini** (via Open WebUI) | Free API key from [Google AI Studio](https://aistudio.google.com/) | Yes, to Google |
-| **Ollama** (via Open WebUI) | [Ollama](https://ollama.com) installed locally | No |
+**Why.** Context for glucose: activity, sleep and weight move insulin need. Each point is
+stored at `physicalTime + utcOffset`, the same local-time-as-UTC frame as Glooko, so joins
+need no time-zone library.
 
-> **ChatGPT / OpenAI:** MCP support may be possible in principle, but this project has not been tested with it. The free tier does not support MCP configuration and it is not a supported path here. But try it out and let me know!
+**Known gaps.** The Google Health API carries only weight and body fat %, not muscle,
+water, bone or visceral fat; `health_sample` takes those types later from another source
+without a schema change. The t:slim X2 clock is set by hand, so around a daylight-saving
+change Glooko can be an hour off from health times.
+
+### 5. The report page: `GET /` with `OMNI_WEB=1`
+
+**What.** The web UI, served by this server. One static page
+(`src/web/index.html`, no build step) shows glucose control, insulin with automatic
+corrections counted, mode time, the Control-IQ day review, Google Health context when
+present, the settings in force, a copy-paste AI review prompt, and JSON exports (glucose
+timeline, enriched bolus log, hourly trends) for a deep-dive window.
+
+**How.** The page reads `GET /api/config` (configured unit and range, device, archive span),
+`GET /api/report?start&end` (`get_diabetes_summary`, `get_basal_delivery` modes,
+`get_controliq_review`, `get_health_context`) and `GET /api/export?type&start&end`. Each
+endpoint calls the MCP tools in process through an in-memory MCP client, so the page shows
+the same numbers from the same archive as any MCP client; the browser parses no Glooko
+data. The prompt states device facts (Control-IQ, user-set DIA, mode time from the pump's
+mode records) and the caveat rule: evidence counts, "discuss with your endocrinologist
+before changing settings", never a new setting value as an instruction.
+
+**Auth.** Same Basic credential and fail-closed rule as `/my-data` (`OMNI_MYDATA_BASIC`;
+503 when unset). `/mcp` and its Bearer are unchanged, and `/my-data` is unchanged.
+
+### Checks
+
+Run `npm ci` then each:
+
+`node --no-warnings test-tandem.mjs` feeds a synthetic Tandem fixture
+(`test-tandem.fixture.json`) through ingest and the MCP tools.
+`node --no-warnings test-health.mjs` feeds a synthetic Google Health fixture
+(`test-health.fixture.json`) through ingest and `get_health_context`, including an
+unlinked account.
+`node --no-warnings test-controliq.mjs` runs the same Tandem fixture through
+`get_controliq_review` (mode minutes per day, bolus split, flagged incomplete days).
+`node --no-warnings test-web.mjs` covers the page and `/api/*`: 401 without the credential,
+200 and valid JSON with it from the synthetic fixture, and 503 without `OMNI_MYDATA_BASIC`.
+`node test-mydata.mjs` covers the payload shape, anonymous / wrong-credential /
+Bearer-instead-of-Basic requests, and re-execs itself without `OMNI_MYDATA_BASIC` to prove
+the fail-closed branch. It uses the existing `__OMNI_FETCH_STUB__` seam, so it never
+touches the network.
 
 ---
 
@@ -280,7 +180,7 @@ Its directness is a deliberate style, not authority. Everything it says is to he
 
 <a id="step-1-installing-docker"></a>
 ## 🛠️ Step 1: Getting Ready (Installing Docker)
-To run this tool we use **Docker**. Think of Docker as a "shipping container" for software: it lets Omni-Endo AI (MCP) run perfectly on your computer without you installing complicated code libraries by hand.
+To run this tool we use **Docker**. Think of Docker as a "shipping container" for software: it lets Ridgeline T1D run perfectly on your computer without you installing complicated code libraries by hand.
 
 This may require a restart, so make sure you are ready for that before starting.
 
@@ -307,10 +207,9 @@ This may require a restart, so make sure you are ready for that before starting.
 
 <a id="step-2-getting-the-files"></a>
 ## 📂 Step 2: Getting the Files
-1. **Download the Code:** On [this GitHub page](https://github.com/rilhia/omni-endo-ai-mcp), click the green **"<> Code"** button, then **"Download ZIP"**.
-2. **Extract:** Open your Downloads folder, right-click the zip, and choose **"Extract All"**.
-3. **Move:** Move the extracted folder somewhere easy to find and remember, this location matters for the steps below. For example:
-   `/Users/richard/Development/Docker/omni-endo-ai-mcp-main`
+1. **Get the code:** `git clone https://github.com/jbeck1563/ridgeline-t1d` (or download the ZIP from that page).
+2. **Remember where it lives:** the folder location matters for the steps below. For example:
+   `/home/you/ridgeline-t1d`
 
 Inside, you should see:
 * `src/` (the application code)
@@ -393,7 +292,7 @@ The example `.env` below is ready to use for a test against the provided data. C
 
 ```bash
 # ============================================================================
-#  Omni-Endo AI: configuration
+#  Ridgeline T1D: configuration
 # ============================================================================
 #  Copy this file to ".env" (same folder) and fill in the two REQUIRED values
 #  below. Everything else has sensible defaults you can leave alone.
@@ -513,7 +412,7 @@ ports:
 The **left** number is the port on *your machine* (the host). The **right** number is the port *inside the container*.
 
 > [!IMPORTANT]
-> **Only ever change the left (host) number. Never change the right (container) number.** The container-side port is referenced by other parts of the stack (for example, the bridge reaches the data server at `http://omni-endo:3033/mcp`, and Open WebUI listens internally on `8080`). Changing a right-hand number will break those internal connections.
+> **Only ever change the left (host) number. Never change the right (container) number.** The container-side port is referenced by other parts of the stack (for example, the bridge reaches the data server at `http://ridgeline:3033/mcp`, and Open WebUI listens internally on `8080`). Changing a right-hand number will break those internal connections.
 
 So if something else on your machine is already using `8083`, you would change only the host side:
 
@@ -529,7 +428,7 @@ Pick any free port you like (adding a few hundred is a safe bet, e.g. `8083` →
 This is the part to be careful about, because a host port appears in more than one place:
 
 * **The address you type in your browser changes to match.** If you change Open WebUI to `"8090:8080"`, you now open **http://localhost:8090** instead of `http://localhost:8083`. The same applies to `8000` (the OpenAPI page) and `3033`. Anywhere in this README that mentions the old port, mentally substitute your new one.
-* **The internal address does *not* change.** The URL you enter inside Open WebUI to reach the tools, `http://omni-endo:3033/mcp`, stays exactly the same even if you remapped the host `3033`. That address uses Docker's internal network (the container port and service name), which the host port does not affect. Do not change it.
+* **The internal address does *not* change.** The URL you enter inside Open WebUI to reach the tools, `http://ridgeline:3033/mcp`, stays exactly the same even if you remapped the host `3033`. That address uses Docker's internal network (the container port and service name), which the host port does not affect. Do not change it.
 * **If you use the Claude Desktop path, nothing changes there either** — it does not go through these ports.
 
 If you change a port **after** you have already started the stack, restart it so the change takes effect (`docker compose down` then `docker compose up -d`). If you have not started it yet, there is nothing to restart, your change will simply be used when you first start it in Section B or C.
@@ -544,7 +443,7 @@ Now we build the Docker image that the tool uses, and start the stack. This one 
    - **Windows:** open "PowerShell" from the Start Menu.
    - **Mac:** open "Terminal" (Cmd + Space, type Terminal).
 2. **Go to the folder:** type `cd` then a space, then drag your project folder into the terminal window so the path fills in, and press Enter. For example:
-   `cd /Users/richard/Development/Docker/omni-endo-ai-mcp-main`
+   `cd /FULL/PATH/TO/ridgeline-t1d`
 3. **Build and start it:** run this command and press Enter:
    ```bash
    docker compose up -d --build
@@ -555,7 +454,7 @@ To check that everything is running:
 ```bash
 docker compose ps
 ```
-You should see the containers listed as running (`omni-endo`, `mcpo`, and `open-webui`). You can also watch the logs with `docker compose logs -f omni-endo`.
+You should see the containers listed as running (`ridgeline`, `mcpo`, and `open-webui`). You can also watch the logs with `docker compose logs -f ridgeline`.
 
 > [!IMPORTANT]
 > If you ever download a newer version of this tool, rebuild and restart with `docker compose up -d --build`. A plain start can reuse an old cached image and run outdated code.
@@ -578,7 +477,7 @@ If you started with the example data and now want to use your own Glooko account
 
 ---
 
-<a id="section-a-claude-desktop"></a>
+
 ## 💬 Section A: Use it with Claude Desktop
 
 With Claude Desktop, Claude launches its own copy of the tool on demand and reads your data directly. You do **not** need to keep anything running in the terminal for this — Claude starts and stops the container itself.
@@ -591,41 +490,41 @@ Claude Desktop is configured by a file called `claude_desktop_config.json`.
 
 The easiest way to open it: in Claude Desktop go to **Settings → Developer → Edit Config**. That opens the right file for you.
 
-### A2. Add the omni-endo server
-Add an `mcpServers` entry to the file. The block below is an **example using my own folder paths** — it will not work as-is on your machine, because the two paths point at where the project lives on *my* computer. Use it as a template and change those two paths to match *your* setup.
+### A2. Add the ridgeline-t1d server
+Add an `mcpServers` entry to the file. The block below is a template; change those two paths to match *your* setup.
 
 ```json
 {
   "mcpServers": {
-    "omni-endo": {
+    "ridgeline-t1d": {
       "command": "docker",
       "args": [
         "run",
         "-i",
         "--rm",
         "--env-file",
-        "/Users/richard/Development/Docker/omni-endo-ai-mcp-main/.env",
+        "/FULL/PATH/TO/ridgeline-t1d/.env",
         "-v",
-        "/Users/richard/Development/Docker/omni-endo-ai-mcp-main/data:/data",
-        "omni-endo-ai-mcp"
+        "/FULL/PATH/TO/ridgeline-t1d/data:/data",
+        "ridgeline-t1d"
       ]
     }
   }
 }
 ```
 
-If the file already has an `mcpServers` section, add just the `"omni-endo"` block inside it rather than pasting the whole thing.
+If the file already has an `mcpServers` section, add just the `"ridgeline-t1d"` block inside it rather than pasting the whole thing.
 
 **How this relates to your setup — change these two paths:**
 
-Both paths above start with my project folder, `/Users/richard/Development/Docker/omni-endo-ai-mcp-main`. Yours will be wherever you moved the extracted folder in Step 2. Replace my path with yours in both places:
+Both paths above start with the project folder, `/FULL/PATH/TO/ridgeline-t1d`. Yours will be wherever you moved the extracted folder in Step 2. Replace the placeholder with yours in both places:
 
 * **The `--env-file` line** must point to your `.env` file: `<your project folder>/.env`
 * **The `-v` line** must point to your `data` folder: `<your project folder>/data:/data`
 
 The part **after** the colon (`:/data`) is the path *inside* the container and must be left exactly as it is — only change the part before the colon.
 
-The last line, `omni-endo-ai-mcp`, is the name of the Docker image you built in Step 4, and stays the same for everyone.
+The last line, `ridgeline-t1d`, is the name of the Docker image you built in Step 4, and stays the same for everyone.
 
 > [!TIP]
 > Easiest way to get your exact path: in a terminal, `cd` into your project folder and run `pwd` (Mac) or `cd` with no arguments (Windows shows the path). Copy what it prints and use it in both lines above.
@@ -637,7 +536,7 @@ The last line, `omni-endo-ai-mcp`, is the name of the Docker image you built in 
 Fully quit Claude Desktop (on Mac, Cmd + Q, not just closing the window) and open it again, so it picks up the new config.
 
 ### A4. Make sure the tools are loaded
-In a chat, open the connector / tools menu. You should see **omni-endo** with its tools.
+In a chat, open the connector / tools menu. You should see **ridgeline-t1d** with its tools.
 
 <kbd><img src="docs/images/Claude1.png" width="700"></kbd>
 
@@ -668,196 +567,7 @@ Claude pulls the data and gives you it's interpretation. You can then discuss th
 ---
 
 <a id="section-b-open-webui"></a>
-## 🌐 Section B: Use it with Open WebUI
 
-This path lets you use either a **local AI model** running on your own machine via [Ollama](https://ollama.com), or a **cloud model via Google Gemini**, through a browser-based chat interface. It uses the full Docker stack, which also includes a bridge that turns the tools into a normal web API.
-
-> [!NOTE]
-> This is the "other LLMs" path. It works, but the tool was tuned for Claude (Section A), so expect the analysis here to be a little less slick, especially with smaller local models. If you have Claude Desktop, that remains the smoothest experience.
-
-### B1. Make sure the stack is running
-If you followed Step 4, the stack is already running and you can skip straight to B2. If you stopped it (or you are returning later), start it again from your terminal, in the project folder:
-```bash
-docker compose up -d
-```
-This runs three things: the data server, a bridge (so web tools can reach it), and Open WebUI. The first question you ask may take a little longer while it loads your data.
-
-To check it is running:
-```bash
-docker compose ps
-```
-
-### B2. Create your Open WebUI account
-Open **http://localhost:8083** in your browser. On first launch, Open WebUI will ask you to create an account.
-
-1. Click **Sign up** and enter a name, email address, and password. This account is local — it does not connect to any external service.
-2. The first account you create automatically becomes the admin account.
-
-### B3. Connect an AI model
-
-You need to connect Open WebUI to an AI backend. Choose one of the options below.
-
-#### Option A: Google Gemini (cloud, free tier available)
-
-**Get a Gemini API key**
-
-1. Go to [Google AI Studio](https://aistudio.google.com/) and sign in with your Google account.
-2. Click **Get API Key**, then **Create API key**.
-3. Copy the key and keep it somewhere safe.
-
-**Configure the connection in Open WebUI**
-
-1. Click the button in the **top-right** of the screen (your initials) and select **Admin Panel**.
-
-<kbd><img src="docs/images/OpenWebUI1.png" width="400"></kbd>
-
-2. Select the **Settings** tab.
-
-<kbd><img src="docs/images/OpenWebUI2.png" width="900"></kbd>
-
-3. Select **Connections** on the left, then click the **+** symbol to the right of **OpenAI API**.
-
-<kbd><img src="docs/images/OpenWebUI3.png" width="900"></kbd>
-
-4. An **Add Connection** popup appears.
-
-<kbd><img src="docs/images/OpenWebUI4.png" width="500"></kbd>
-
-5. In the **URL** box enter `https://generativelanguage.googleapis.com/v1beta/openai`, and in the **Auth** section (set to **Bearer**) paste your Gemini API key. Then click **Save**.
-
-<kbd><img src="docs/images/OpenWebUI5.png" width="500"></kbd>
-
-**Select a Gemini model**
-
-6. Back on the main screen, click the model dropdown at the top and you can now select a **Google Gemini** model to use (search `gemini`, not "google"; models are listed by engine name such as `gemini-2.5-flash`).
-
-<kbd><img src="docs/images/OpenWebUI6.png" width="900"></kbd>
-
-> [!IMPORTANT]
-> If you use Gemini, your glucose and insulin data is sent to Google's servers as part of the conversation. Consider disabling chat history / model training in your Google AI Studio privacy settings before discussing your clinical data.
-
-
-#### Option B: Ollama (local models, nothing leaves your machine)
-
-Install [Ollama](https://ollama.com), then pull a model that supports tools. For example:
-```bash
-ollama pull qwen2.5
-```
-
-Then go to **Admin Panel → Settings → Connections** and add your Ollama endpoint (typically `http://host.docker.internal:11434`). Your locally available models will appear in the model dropdown.
-
-> [!NOTE]
-> Local models vary a lot in how well they use tools. `qwen2.5` is a reliable starting point; very small models often struggle to call tools correctly.
-
----
-
-### B4. Enable the MCP server in Open WebUI
-
-This connects Open WebUI to the omni-endo MCP server so the AI can call the data tools.
-
-1. As before, go from the **Admin Panel** to the **Settings** tab, then click **Integrations**. Click the **+** symbol to the right of **Manage Tool Servers**.
-
-<kbd><img src="docs/images/OpenWebUI7.png" width="900"></kbd>
-
-2. An **Add Connection** window pops up. Set the **Type** to **MCP Streamable HTTP**.
-
-<kbd><img src="docs/images/OpenWebUI8.png" width="500"></kbd>
-
-3. Give it a **Name** (anything) and **ID** (anything), set the **URL** to `http://omni-endo:3033/mcp` (as long as the port has not been changed), and in the **Auth** box (set to **Bearer**) add your token, the same `OMNI_TOKEN` value from your `.env` file. Then click **Save**.
-
-<kbd><img src="docs/images/OpenWebUI9.png" width="500"></kbd>
-
-4. Go to a chat window and click the **Integrations** button, then switch the **omni-endo-ai-mcp** tool **on**.
-
-<kbd><img src="docs/images/OpenWebUI10.png" width="700"></kbd>
-
-5. Ask your first question. A simple example is *"Tell me about my diabetes data."*
-
-<kbd><img src="docs/images/OpenWebUI11.png" width="700"></kbd>
-
-6. Take a look at the output.
-
-<kbd><img src="docs/images/OpenWebUI12.png" width="900"></kbd>
-
-> [!NOTE]
-> Open WebUI's MCP support is experimental and the specification changes periodically. If you encounter connection errors after an Open WebUI update, check the project's issues page for compatibility notes.
-
----
-
-### B5. Chat
-That's it, you are connected. From here, start a new chat any time, select your model, make sure the **omni-endo-ai-mcp** tool is enabled for the chat (step 4 above), and ask away. A good first question:
-
-> *"Check what date ranges you have in my diabetes data, then give me an overview of how I'm doing."*
-
----
-
-<a id="section-c-openapi"></a>
-## 🔧 Section C: Use it with the OpenAPI interface
-
-Every tool is also available as a normal web API, with a built-in interactive page (Swagger UI) where you can read what each function does, see exactly what it accepts, and run it live in your browser. This is the easiest way to explore the tools by hand, to check what the AI is actually calling on your behalf, or to build your own integration.
-
-You do not need an AI for this path at all — it talks to the data tools directly.
-
-### C1. Make sure the stack is running
-The API runs as part of the Docker stack, so if you followed Step 4 (or already started it for Section B) it is already running and you can skip to C2. Otherwise, start it from your terminal, in the project folder:
-```bash
-docker compose up -d
-```
-
-### C2. Open the interactive API page
-In your browser, go to:
-```
-http://localhost:8000/docs
-```
-You will see every tool listed, each with a description and a **"Try it out"** button.
-
-### C3. Authorise with your token
-The functions are protected by your secret token, so you authorise once before using them.
-
-1. Open the **http://localhost:8000/docs** URL in your browser.
-
-<kbd><img src="docs/images/openAPI1.png" width="900"></kbd>
-
-2. Click the **Authorize** button, add your token (the same `OMNI_TOKEN` value from your `.env` file), and click **Authorize**.
-
-<kbd><img src="docs/images/openAPI2.png" width="600"></kbd>
-
-You can now run any function on the page.
-
-### C4. Try a function
-A good first one is **`get_diabetes_summary`**, which gives an overview and also tells you the date range the database holds.
-
-<kbd><img src="docs/images/openAPI3.png" width="900"></kbd>
-
-1. Click on **`get_diabetes_summary`** to expand it (shown above).
-2. Click **"Try it out"**.
-3. In the request body, enter a wide window so you can see everything held, for example:
-   ```json
-   {
-     "start": "2000-01-01T00:00:00.000Z",
-     "end": "2030-01-01T00:00:00.000Z"
-   }
-   ```
-4. Click **Execute**. The response appears below, including a `reportRange` showing the first and last data the database actually holds.
-
-<kbd><img src="docs/images/openAPI4.png" width="900"></kbd>
-
-> [!NOTE]
-> All times in the API are **UTC** (the trailing `Z`). Send UTC, and expect UTC back. See the [API Reference](#api-reference) at the end of this document for every endpoint, its parameters, and what it returns.
-
-### C5. Call it from a script (optional)
-You can also call the API from the command line or your own code. Send the token as a header:
-```bash
-curl -X POST http://localhost:8000/get_diabetes_summary \
-  -H "Authorization: Bearer YOUR_OMNI_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"start":"2026-01-01T00:00:00.000Z","end":"2026-04-01T00:00:00.000Z"}'
-```
-Replace `YOUR_OMNI_TOKEN` with the token from your `.env`.
-
----
-
-<a id="how-to-stop"></a>
 ## 🛑 How to Stop
 * **Claude Desktop path:** nothing to stop — Claude shuts the container down itself when it's done.
 * **Open WebUI or OpenAPI path:** in your terminal, in the project folder, run:
@@ -882,7 +592,7 @@ Rebuild and restart the image: `docker compose up -d --build`. A cached image ca
 Another app is using a port (3033, 8000, or 8083). See [Ports (only if one is already in use)](#ports-and-docker-compose) for how to change it safely: change only the host (left) number of the mapping in `docker-compose.yml`, restart, and use the new port in your browser. Claude-Desktop-only users are unaffected.
 
 **Open WebUI can't reach the MCP tools.**
-Check the URL is `http://omni-endo:3033/mcp` (not `localhost`) and that the bearer token matches your `OMNI_TOKEN` exactly.
+Check the URL is `http://ridgeline:3033/mcp` (not `localhost`) and that the bearer token matches your `OMNI_TOKEN` exactly.
 
 **The OpenAPI page rejects my requests (401 / unauthorised).**
 Click **Authorize** at the top of `http://localhost:8000/docs` and paste your `OMNI_TOKEN`. The token must match the one in your `.env` exactly.
@@ -895,354 +605,15 @@ Search for `gemini`, not `google`. The models are prefixed by engine name. If no
 
 ---
 
-<a id="get-in-touch"></a>
-## 📬 Get in Touch
 
-Whether you're stuck on Docker or want to share how the audit improved your Time in Range, I'm happy to help.
 
-### **Technical Help**
-If something isn't working, please **[Open an Issue](https://github.com/rilhia/omni-endo-ai-mcp/issues)** so others can benefit from the solution too.
+## Deploying under the new name
 
-### **Personal & Professional**
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/rilhia/)
+A deployer must change: the compose build context URL to `https://github.com/jbeck1563/ridgeline-t1d.git` (the old URL redirects), the image name (suggest `ridgeline-t1d:<sha>`), and the Claude MCP connection name to `ridgeline-t1d`. Keep every `OMNI_*` / `GLOOKO_*` variable, the SQLite file and `/mcp`, `/my-data`, `/`, `/api/*` as they are.
 
-> [!NOTE]
-> **Privacy Reminder:** if you send me a screenshot for support, please blur out any private medical information or Glooko credentials first.
+## License
 
----
+MIT. The example database is the original author's own data, shared for exploration.
 
-<a id="api-reference"></a>
-## 🔌 API Reference
-
-When running the Open WebUI stack (`docker compose up -d`), the full API is available at **http://localhost:8000** with an interactive Swagger UI at **http://localhost:8000/docs**.
-
-The Swagger UI lets you read every endpoint's description, see exactly what parameters it accepts, and try it live — useful for debugging, building integrations, or just understanding what the AI is actually calling on your behalf.
-
-### Authentication
-
-Every endpoint requires a Bearer token. This is the `OMNI_TOKEN` value from your `.env` file.
-
-In the Swagger UI, click **Authorize** at the top of the page and paste your token. In direct API calls, send it as an HTTP header:
-
-```
-Authorization: Bearer <your OMNI_TOKEN>
-```
-
-### A note on timestamps
-
-**All timestamps in this API are UTC ISO 8601.** A timestamp looks like this:
-
-```
-2026-01-01T00:00:00.000Z
-```
-
-The `T` separates the date (`2026-01-01`) from the time (`00:00:00.000`), and the trailing `Z` means the time is in UTC. This applies in both directions: the timestamps you send must be UTC, and all timestamps the API returns are UTC.
-
-If you are calling the API directly, convert your local times to UTC before sending them. For example, 9pm BST (UTC+1) is `2026-06-27T20:00:00.000Z`.
-
-### A note on glucose units
-
-Most endpoints accept optional `units`, `lower`, and `upper` parameters. If you omit them, the server uses the values you configured in `.env` (`OMNI_UNITS`, `OMNI_LOWER`, `OMNI_UPPER`). Only pass them if you want to override the defaults for a single call — for example, to check time below 3.5 mmol/L without changing your normal threshold.
-
----
-
-### Endpoints
-
-All endpoints use `POST`. The request body is JSON.
-
----
-
-#### `POST /get_diabetes_summary`
-
-The best starting point for any overview question. Returns fixed-size aggregates over any window, no matter how long, so it is cheap to call across months or years.
-
-**Tip:** call it with a very wide window, for example `start` of `2000-01-01T00:00:00.000Z` and an `end` far in the future such as `2030-01-01T00:00:00.000Z`, to discover the full date range held in the database — the returned `reportRange.start` and `reportRange.end` are the first and last readings actually present.
-
-**Parameters**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `start` | string | Yes | Window start, UTC ISO 8601 |
-| `end` | string | Yes | Window end, UTC ISO 8601 |
-| `units` | string | No | `"mmol"` or `"mgdl"` — overrides server default for this call |
-| `lower` | number | No | Hypo boundary in the chosen unit — overrides server default |
-| `upper` | number | No | Hyper boundary in the chosen unit — overrides server default |
-
-**Returns**
-
-- `reportRange` — the actual data span present (`start`, `end`, `days`)
-- `glucoseControl` — average BG, GMI (estimated HbA1c), standard deviation, coefficient of variation, variability flag, time in range / time low / time high, CGM reading count
-- `glucoseExtremes` — highest and lowest readings, each with every timestamped instance
-- `bestWorst` — best and worst day and hour, each with TIR, median absolute target deviation, and CV so the ranking is explainable
-- `insulin` — bolus summed from individual events; basal from Glooko daily totals; basal/bolus percentages on a per-day-rate basis
-- `bolusArchitecture` — counts by bolus type (meal, manual correction, system correction, meal with correction)
-- `carbs` — total grams, grams per day, entry count
-- `settings` — the time-segmented pump profiles in force during the window
-
----
-
-#### `POST /get_trend`
-
-Multi-period comparison. Splits a span into time buckets and computes each independently from raw readings — so a year by month gives you 12 correct rows in a single call, not averaged averages.
-
-**Parameters**
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `start` | string | Yes | | Window start, UTC ISO 8601 |
-| `end` | string | Yes | | Window end, UTC ISO 8601 |
-| `mode` | string | No | `"calendar"` | `"calendar"` for day/week/month/quarter buckets; `"fixed"` for equal-length buckets |
-| `granularity` | string | No | `"month"` | Calendar bucket size: `"day"`, `"week"`, `"month"`, or `"quarter"`. Only used when `mode` is `"calendar"` |
-| `fixedSizeDays` | integer | No | `7` | Bucket length in days. Only used when `mode` is `"fixed"` |
-| `units` | string | No | | Overrides server default for this call |
-| `lower` | number | No | | Overrides server default |
-| `upper` | number | No | | Overrides server default |
-
-**Returns**
-
-`bucketCount` and a `buckets` array. Each row contains: `bucket` (period key), `start`, `end`, `observedDays`; `glucose` (avg, TIR, time low, time high, stdDev, CV, GMI, reading count); `insulin` (bolus and basal figures); `carbs`; and `coverage` (reading count, expected count, coverage percent, and a `trustworthy` flag — treat buckets where this is false with caution).
-
----
-
-#### `POST /get_glucose`
-
-Individual timestamped CGM readings for a window. Use `band` to filter to only the part of the range you care about — pulling only hypos is far cheaper than pulling everything.
-
-Capped to 21 days. For wider windows use `get_chart_series`; for aggregate stats use `get_diabetes_summary` or `get_trend`.
-
-**Parameters**
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `start` | string | Yes | | Window start, UTC ISO 8601 |
-| `end` | string | Yes | | Window end, UTC ISO 8601 |
-| `band` | string | No | `"all"` | `"low"` (hypos only), `"high"` (hypers only), `"target"` (in range only), `"all"` (every reading, tagged with its band) |
-| `units` | string | No | | Overrides server default |
-| `lower` | number | No | | Overrides server default |
-| `upper` | number | No | | Overrides server default |
-
-**Returns**
-
-`window`, `thresholdsUsed` (lower, upper, unit), `band`, `count`, and a `readings` array — each reading has `time` (UTC), `value`, `velocity` (rate of change), and `band` when `band="all"`.
-
----
-
-#### `POST /get_chart_series`
-
-Glucose downsampled to a target number of points for plotting, with a min/max band per point so spikes are not lost. Also returns bolus events as overlay markers.
-
-Use this whenever you want to draw a chart. It is far cheaper than `get_glucose` for wide windows, and a chart cannot usefully display more points than its pixel width anyway.
-
-**Parameters**
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `start` | string | Yes | | Window start, UTC ISO 8601 |
-| `end` | string | Yes | | Window end, UTC ISO 8601 |
-| `maxPoints` | integer | No | `250` | Target number of plotted points (20–1000). 200–400 is sufficient for most screen widths |
-
-**Returns**
-
-`unit`, a `points` array (`t`, `avg`, `min`, `max`, `n` per point), and an `events` array of bolus markers for overlay.
-
----
-
-#### `POST /get_enriched_bolus_log`
-
-Every bolus in the window, enriched with the CGM value at the moment of delivery and the pump settings (ISF, carb ratio, target, DIA) that were active at that time.
-
-Each record also includes delivered vs programmed units (if `delivered < programmed` the bolus was interrupted, flagged `interrupted: true`), the calculator recommendation split into correction and carb components, whether the user overrode it, and the bolus class.
-
-Capped to 92 days per call.
-
-**Parameters**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `start` | string | Yes | Window start, UTC ISO 8601 |
-| `end` | string | Yes | Window end, UTC ISO 8601 |
-| `classes` | array of strings | No | Filter to specific bolus types. Valid values: `"Meal Bolus"`, `"Manual Correction Bolus"`, `"System Correction Bolus"`, `"Meal With Correction Bolus"`. Omit to return all classes |
-
-**Returns**
-
-`count`, `filterApplied`, and a `boluses` array. Each record: `time`, `units`, `delivered`, `programmed`, `interrupted`, `recCorrection`, `recCarbs`, `recTotal`, `override` (`"above"` / `"below"` / null), `bgInput`, `bgSource`, `cgm_val`, `class`, `isManual`, and a `context` object with the settings in force at delivery.
-
----
-
-#### `POST /get_hourly_trends`
-
-Time in range and average glucose pooled by clock-hour across the entire window. Every reading that fell in the 07:00 hour on any day is combined into one 07:00 row — useful for identifying recurring time-of-day patterns such as the dawn phenomenon or consistent evening highs.
-
-Hours are returned as UTC clock-hours. Convert to your local time when interpreting results.
-
-**Parameters**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `start` | string | Yes | Window start, UTC ISO 8601 |
-| `end` | string | Yes | Window end, UTC ISO 8601 |
-| `units` | string | No | Overrides server default |
-| `lower` | number | No | Overrides server default |
-| `upper` | number | No | Overrides server default |
-
-**Returns**
-
-A `byHour` array of up to 24 rows, each with `hour` (UTC, `"HH:00"`), `averageBG`, `timeInRange`, `timeLow`, `timeHigh`, and `readings` (count for that hour).
-
----
-
-#### `POST /get_basal_delivery`
-
-What the pump's algorithm was doing with basal delivery over time, expressed as states rather than units, plus `pumpModes`: time in each pump mode (automatic, manual, sleep, exercise, limited, activity).
-
-> **Important:** these are behavioural states, not insulin amounts. `suspend` means basal was paused; `max` means it was running at its ceiling. Neither is a unit figure. For basal units, use `get_daily_insulin`.
-
-| State | Meaning |
-|-------|---------|
-| `normal` | Ordinary automated delivery |
-| `suspend` | Algorithm paused basal, typically to prevent a predicted low |
-| `max` | Algorithm delivering at its ceiling, typically fighting a rise |
-| `limited` | CGM signal lost for more than 20 minutes; algorithm ran a fixed preset and was not adjusting |
-
-**Parameters**
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `start` | string | Yes | | Window start, UTC ISO 8601 |
-| `end` | string | Yes | | Window end, UTC ISO 8601 |
-| `includeIntervals` | boolean | No | `true` | Set to `false` to return only the per-state summary totals without the full interval timeline — much smaller over long spans |
-
-**Returns**
-
-A `summary` with minutes and percentage per state, and (unless `includeIntervals` is false) an `intervals` array with `state`, `start`, `end`, and `minutes` for each contiguous period.
-
----
-
-#### `POST /get_daily_insulin`
-
-Glooko's own per-day insulin totals: basal units, bolus units, and combined total for each day, plus a window aggregate.
-
-Use this when you want a day-by-day table of insulin delivery or total daily dose figures. Note that the bolus figure here is Glooko's pre-aggregated daily total; for bolus summed from individual events (the method used everywhere else in this API), use `get_diabetes_summary` or `get_trend`.
-
-The most recent day may be flagged `provisional` if it has not yet been finalised.
-
-**Parameters**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `start` | string | Yes | Window start, UTC ISO 8601 |
-| `end` | string | Yes | Window end, UTC ISO 8601 |
-
-**Returns**
-
-`source` (`"glooko-daily"`), a `days` array (`date`, `basalUnits`, `bolusUnits`, `totalUnits`, `provisional`), and an `aggregate` (`daysWithData`, `basalUnits`, `bolusUnits`, `totalUnits`, per-day averages, `basalPercent`). All dates are UTC days.
-
----
-
-#### `POST /get_settings_history`
-
-Every pump setting change that was in effect during the window, in chronological order: DIA, max basal rate, and the time-segmented target, ISF, and carb-ratio profiles.
-
-Useful for establishing which settings were active at a specific point in time before judging a bolus or an excursion, or for reviewing how settings have been adjusted over a long span.
-
-Glucose-based values (target, ISF) are returned in the configured unit. Per-segment `from` times are pump-schedule clock-hours, not UTC timestamps.
-
-**Parameters**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `start` | string | Yes | Window start, UTC ISO 8601 |
-| `end` | string | Yes | Window end, UTC ISO 8601 |
-
-**Returns**
-
-A `settings` array. Each entry has `effective` (UTC timestamp when this setting took effect), `DIA_hours`, `maxBasalRate`, and three time-segmented profiles — `targetBg`, `isf`, and `carbRatio` — each a list of `{from, value}` segments.
-
----
-
-#### `POST /get_device_events`
-
-Infusion-site (pod or Tandem set), cartridge and CGM sensor changes as timestamped events, in separate lists.
-
-These are point-in-time markers, not amounts. They are most useful as context for nearby glucose disruption: a fresh pod can run high for the first hours while the cannula settles, and a new sensor can read erratically during warm-up. Treat any correlation as a possible contributing factor — never assert it as a confirmed cause.
-
-**Parameters**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `start` | string | Yes | Window start, UTC ISO 8601 |
-| `end` | string | Yes | Window end, UTC ISO 8601 |
-
-**Returns**
-
-`siteChanges` (also as `podChanges`), `cartridgeChanges` and `sensorChanges` arrays of UTC timestamps, plus a count for each.
-
----
-
-#### `POST /get_controliq_review`
-
-Control-IQ algorithm behaviour per pump-local day: minutes and percent in automatic, sleep, exercise and manual mode (plus other and unknown, so a day sums to 24 h), automatic correction bolus count and units, user bolus units, total daily dose and the automatic share of it. Adds a period summary and 24 hour-of-day rows over complete days only, with n; incomplete days are flagged with reasons. Hourly basal-vs-profile deviation is not available (no time-resolved delivered basal rate is stored); the output says what is missing. Descriptive only: discuss any pattern with your endocrinologist before changing settings.
-
-**Parameters**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `start` | string | Yes | Window start, UTC ISO 8601 |
-| `end` | string | Yes | Window end, UTC ISO 8601 |
-
-**Returns**
-
-`caveat`, `notes`, `summary`, `byHour`, `basalVsProfile`, `days`.
-
----
-
-#### `POST /get_meal_window_analysis`
-
-A focused look around a single bolus or meal event: 30 minutes before to 3 hours after the timestamp you pass.
-
-Use it to judge a post-meal glucose excursion and assess how well a dose worked, without pulling whole days of data. Locate the event time first (for example from `get_enriched_bolus_log`), then pass it here.
-
-**Parameters**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `eventTimestamp` | string | Yes | UTC ISO 8601 timestamp of the meal or bolus event |
-| `units` | string | No | Overrides server default for this call |
-
-**Returns**
-
-`targetEvent` (the timestamp you passed), `unit`, a `glucoseTimeline` array (`time`, `value`) across the 3.5-hour window, and an `associatedBoluses` array of enriched bolus records that fall within the window.
-
----
-
-<a id="how-the-code-is-organised"></a>
-## How the code is organised
-*(For developers reading the source. If you just want to use the tool, you can ignore this.)*
-
-The data flows: Glooko → sync → store → range → analytics → tools → your AI.
-
-* **`src/server.js`** — the MCP server and the tool definitions (what Claude launches over stdio). Thin wrappers around the analytics.
-* **`src/http.js`** — an alternative HTTP/SSE front door to the same tools (used by Open WebUI via the bridge).
-* **`src/analytics.js`** — the heart: all the clinical maths and data shaping, written as pure functions.
-* **`src/store.js`** — the SQLite archive (normalised rows, not raw Glooko blobs).
-* **`src/range.js`** — the layer the tools call; answers from the local archive and tops up from Glooko only when needed. Offline mode is gated here.
-* **`src/sync.js`** — the engine that pulls Glooko data into the archive (cold start, top-up, startup warm-up).
-* **`src/glooko.js`** — the Glooko API client (auth and fetching).
-* **`src/prompt.js`** — the clinical-auditor persona.
-
-A few invariants hold throughout: glucose is stored internally in one canonical unit (mmol/L) and only converted on output; bolus is summed from individual events while basal comes from Glooko's daily totals; all times are UTC; and per-day rates use the real observed span of data.
-
----
-
-<a id="license"></a>
-## 📄 License
-
-This project is released under the **MIT License** — you are free to use, modify, and distribute it, including for commercial purposes, provided the copyright notice and licence text are retained. See the [LICENSE](LICENSE) file for the full text.
-
-The MIT licence covers the **code**. The example database is the author's own data, shared for exploration; please be considerate in how you use it.
-
----
-
-<a id="disclaimer"></a>
 ### Disclaimer
-*This tool is for informational and educational purposes only. It is not a medical device and is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions regarding a medical condition. Any analysis produced with the help of this tool, including AI-generated suggestions, must be reviewed with a qualified clinical professional before making any changes to your insulin therapy or medical regimen.*
+

@@ -1,10 +1,10 @@
 # ============================================================================
-#  Omni-Endo AI: one stack, three ways to use your diabetes data
+#  Ridgeline T1D: one stack, three ways to use your diabetes data
 # ============================================================================
 #  First time:   docker compose up -d --build
 #  Afterwards:   docker compose up -d
 #  Stop:         docker compose down
-#  View logs:    docker compose logs -f omni-endo
+#  View logs:    docker compose logs -f ridgeline
 #
 #  Once running you have THREE things, all from this one stack:
 #    1. A data server Claude can connect to        (see README: "Use with Claude")
@@ -19,10 +19,10 @@ services:
   # Built from the code in this folder the first time you run --build, then run
   # as a network (HTTP/SSE) server so the bridge, Open WebUI, and optionally
   # Claude can all reach it.
-  omni-endo:
+  ridgeline:
     build: .
-    image: omni-endo-ai-mcp:latest
-    container_name: omni-endo-mcp
+    image: ridgeline-t1d:latest
+    container_name: ridgeline-t1d
     restart: unless-stopped
     env_file:
       - ./.env
@@ -59,9 +59,9 @@ services:
       - "--header"
       - '{"Authorization": "Bearer ${OMNI_TOKEN}"}'
       - "--"
-      - "http://omni-endo:3033/mcp"
+      - "http://ridgeline:3033/mcp"
     depends_on:
-      - omni-endo
+      - ridgeline
 
   # ---- Chat UI (optional) ---------------------------------------------------
   # For chatting with a local Ollama model that can call your data tools.

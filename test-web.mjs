@@ -66,7 +66,7 @@ if (NOBASIC) {
     for (const p of ['/', '/api/config', `/api/report?${win}`]) {
       const r = await get(p, h);
       assert.strictEqual(r.status, 401, `${p} ${JSON.stringify(h)}`);
-      assert.match(r.headers.get('www-authenticate') || '', /^Basic realm="omni-endo"/);
+      assert.match(r.headers.get('www-authenticate') || '', /^Basic realm="ridgeline"/);
     }
   }
 
@@ -75,7 +75,7 @@ if (NOBASIC) {
   assert.strictEqual(page.status, 200);
   assert.match(page.headers.get('content-type'), /^text\/html/);
   const html = await page.text();
-  assert.match(html, /<title>Omni-Endo Report<\/title>/);
+  assert.match(html, /<title>Ridgeline T1D<\/title>/);
   assert.ok(!/mmol\/L/.test(html), 'page must not hard-code a glucose unit');
 
   // 3. Config: unit and archive span from the server.

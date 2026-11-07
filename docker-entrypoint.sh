@@ -13,7 +13,7 @@ case "${OMNI_TRANSPORT:-stdio}" in
     exec node --no-warnings src/http.js
     ;;
   *)
-    echo "[omni-endo-ai] Unknown OMNI_TRANSPORT='${OMNI_TRANSPORT}'. Use 'stdio' or 'http'." >&2
+    echo "[ridgeline] Unknown OMNI_TRANSPORT='${OMNI_TRANSPORT}'. Use 'stdio' or 'http'." >&2
     exit 1
     ;;
 esac
