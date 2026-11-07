@@ -45,6 +45,7 @@ import {
   toDisplayDelta,
   calendarBucketKey,
   buildControlIqReview,
+  buildTddTrend,
 } from './analytics.js';
 import { PERSONA_PROMPT } from './prompt.js';
 import { ensureHealthFresh, bucketHealth, healthSources } from './health.js';
@@ -837,6 +838,61 @@ server.registerTool(
         window: { start: s, end: e },
         device: bundle.device,
         ...buildControlIqReview(bundle, Date.parse(s) / 1000, Date.parse(e) / 1000),
+      });
+    } catch (err) {
+      return errorResult(err.message);
+    }
+  }
+);
+
+// --- get_tdd_trend --------------------------------------------------------
+server.registerTool(
+  'get_tdd_trend',
+  {
+    title: 'Week-over-week total daily dose trend',
+    description:
+      'Is my insulin use going up or down over time? Per Monday-start week ' +
+      '(pump-local days): mean total daily dose, mean basal, mean bolus and mean ' +
+      'automatic-correction units per day, basal/bolus split, the number of ' +
+      'complete days behind the means, and the change vs the previous week ' +
+      '(units and %). Weeks with fewer than 5 complete days are flagged ' +
+      '(included: false) and left out of the change, the 4-week rolling mean and ' +
+      'the slope. trend gives the least-squares slope of weekly mean TDD in units ' +
+      'per week with the number of weeks behind it.\n\n' +
+      'Each week also carries mean glucose and time in range, and two labelled ' +
+      'proxies: TDD per kg (Google Health weigh-in in that week; omitted when ' +
+      'none) and TDD per gram of logged carbs (when carbs are logged). Read them ' +
+      'together: rising TDD with flat glucose and TIR means more insulin is doing ' +
+      'the same job; rising TDD with rising glucose means it is not keeping up. ' +
+      'These are proxies, not a measured ISF; never derive an ISF, carb ratio or ' +
+      'basal value from them. Relay the caveat: discuss with your ' +
+      'endocrinologist before changing settings.\n\n' +
+      'Returns: caveat, notes, trend {weeksInWindow, includedWeeks, ' +
+      'slopeUnitsPerWeek, confidence}, weeks, healthSync.',
+    inputSchema: {
+      start: z.string().describe(startDesc),
+      end: z.string().describe(endDesc),
+      units: unitsSchema,
+      lower: lowerSchema,
+      upper: upperSchema,
+    },
+  },
+  async ({ start, end, units: unitsIn, lower: lowerIn, upper: upperIn }) => {
+    try {
+      const { units, lower, upper } = resolveThresholdInputs({ units: unitsIn, lower: lowerIn, upper: upperIn });
+      const s = assertIsoDate(start, 'start');
+      const e = assertIsoDate(end, 'end');
+      assertWithinCap(s, e, CAPS.summaryMaxDays, 'get_tdd_trend');
+      const sEpoch = Math.floor(Date.parse(s) / 1000);
+      const eEpoch = Math.floor(Date.parse(e) / 1000);
+      const [bundle, healthSync] = await Promise.all([getProcessedRange(s, e), ensureHealthFresh(sEpoch)]);
+      // Weigh-ins anywhere in the first/last week count, so widen to whole weeks.
+      const weights = getHealth(sEpoch - 7 * 86400, eEpoch + 7 * 86400).samples.filter((x) => x.type === 'weight');
+      return jsonResult({
+        window: { start: s, end: e },
+        unit: units === 'mgdl' ? 'mg/dL' : 'mmol/L',
+        ...buildTddTrend(bundle, weights, getThresholds(units, lower, upper), units, sEpoch, eEpoch),
+        healthSync,
       });
     } catch (err) {
       return errorResult(err.message);

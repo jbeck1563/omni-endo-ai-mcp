@@ -12,7 +12,7 @@ Originally forked from [rilhia/omni-endo-ai-mcp](https://github.com/rilhia/omni-
 
 ## What it does
 
-Ridgeline T1D exposes your diabetes history as analytical tools an AI can call over MCP (server name `ridgeline-t1d`): time in range, GMI and variability, best and worst days and hours, enriched bolus analysis (each bolus with the glucose and pump settings in force), basal delivery and pump modes, Control-IQ day review, and Google Health context (activity, sleep, weight). It also serves a report page at `/` with the same numbers.
+Ridgeline T1D exposes your diabetes history as analytical tools an AI can call over MCP (server name `ridgeline-t1d`): time in range, GMI and variability, best and worst days and hours, enriched bolus analysis (each bolus with the glucose and pump settings in force), basal delivery and pump modes, Control-IQ day review, week-over-week total daily dose trend, and Google Health context (activity, sleep, weight). It also serves a report page at `/` with the same numbers.
 
 You ask things like: *"How was my time in range last month?"*, *"Why do I keep going high in the evenings?"*, *"Show me my worst day and tell me what happened."*
 
@@ -107,17 +107,29 @@ water, bone or visceral fat; `health_sample` takes those types later from anothe
 without a schema change. The t:slim X2 clock is set by hand, so around a daylight-saving
 change Glooko can be an hour off from health times.
 
-### 5. The report page: `GET /` with `OMNI_WEB=1`
+### 5. Weekly total daily dose trend: `get_tdd_trend`
+
+**What.** `get_tdd_trend(start, end)` answers "is my insulin use going up or down?". Per
+Monday-start week (pump-local days): mean total daily dose, basal, bolus and automatic
+correction units, basal/bolus split, the number of complete days behind each mean, and the
+change vs the previous week. Weeks with fewer than 5 complete days are flagged and left out
+of the change, the 4-week rolling mean and the slope (units per week, with the n of weeks).
+Each week also carries mean glucose and time in range, plus two labelled proxies: TDD per kg
+(Google Health weigh-in that week) and TDD per gram of logged carbs. They are proxies, not a
+measured insulin sensitivity; the tool never computes an ISF, carb ratio or basal value.
+
+### 6. The report page: `GET /` with `OMNI_WEB=1`
 
 **What.** The web UI, served by this server. One static page
 (`src/web/index.html`, no build step) shows glucose control, insulin with automatic
-corrections counted, mode time, the Control-IQ day review, Google Health context when
+corrections counted, mode time, the Control-IQ day review, the weekly total daily dose
+trend (table and inline SVG chart), Google Health context when
 present, the settings in force, a copy-paste AI review prompt, and JSON exports (glucose
 timeline, enriched bolus log, hourly trends) for a deep-dive window.
 
 **How.** The page reads `GET /api/config` (configured unit and range, device, archive span),
 `GET /api/report?start&end` (`get_diabetes_summary`, `get_basal_delivery` modes,
-`get_controliq_review`, `get_health_context`) and `GET /api/export?type&start&end`. Each
+`get_controliq_review`, `get_tdd_trend`, `get_health_context`) and `GET /api/export?type&start&end`. Each
 endpoint calls the MCP tools in process through an in-memory MCP client, so the page shows
 the same numbers from the same archive as any MCP client; the browser parses no Glooko
 data. The prompt states device facts (Control-IQ, user-set DIA, mode time from the pump's
@@ -138,6 +150,8 @@ Run `npm ci` then each:
 unlinked account.
 `node --no-warnings test-controliq.mjs` runs the same Tandem fixture through
 `get_controliq_review` (mode minutes per day, bolus split, flagged incomplete days).
+`node --no-warnings test-tdd.mjs` seeds five synthetic weeks (one partial) and checks
+`get_tdd_trend`: weekly means, flagged partial week, change, rolling mean, slope, proxies.
 `node --no-warnings test-web.mjs` covers the page and `/api/*`: 401 without the credential,
 200 and valid JSON with it from the synthetic fixture, and 503 without `OMNI_MYDATA_BASIC`.
 `node test-mydata.mjs` covers the payload shape, anonymous / wrong-credential /
